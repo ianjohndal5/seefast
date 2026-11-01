@@ -1,4 +1,5 @@
 // Planning: turn resolved facts into the plan's env files, services, requirements, ordered steps and run targets.
+import { isEnvName } from './envnames.js';
 import { createHash } from 'node:crypto';
 import type { ChoiceClaim, Ctx, ProjectDraft, ServiceClaim, StepDraft } from './context.js';
 import { ev, withRole, stepId } from './context.js';
@@ -180,11 +181,16 @@ export function planEnv(ctx: Ctx, out: EnvFile[]): void {
         sig: `copy:${tpl.file.split('/').pop()}>${targetBase}`,
       });
     } else if (toFill.length || vars.length) {
+      const names = vars.filter((v) => v.fill !== 'optional' && isEnvName(v.name)).map((v) => v.name);
       ctx.addStep({
         local: 'env', project: p.id, phase: 'configure', order: 20,
-        title: `Create ${targetBase} by hand`,
-        cwd: p.root, action: { type: 'manual', text: `Create ${target} with values for: ${listNames(vars.filter((v) => v.fill !== 'optional').map((v) => v.name))}.` },
+        title: `Create ${targetBase} with the variable names`,
+        cwd: p.root, action: { type: 'env-names', path: targetBase, names, required: toFill.filter((n) => names.includes(n)) },
         network: false, thirdPartyCode: false, confidence: 'low',
+        notes: [
+          ...(exists ? [`${target} already exists: nothing is created or overwritten.`] : []),
+          `Names only, no values: ${listNames(names)}. Uncomment the ones the app needs and set them${toFill.length ? `; ${toFill.join(', ')} ${toFill.length === 1 ? 'is' : 'are'} required` : ''}.`,
+        ],
         // Without a template nobody says these are needed to start, unless a framework requires one.
         optional: !(spec?.required.length),
         why: `The repo has no env template, but the code reads ${vars.length} environment variable${vars.length === 1 ? '' : 's'}. Which ones need real values is unknown.`,

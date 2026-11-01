@@ -1,6 +1,7 @@
 // Automated setup: execute the plan's steps with consent. Shows every command before it runs, asks per step (or
 // takes an approval of the whole reviewed plan), supports a dry run, stops at the first failure, never elevates,
 // asks separately before anything that changes the machine outside the project, and can resume.
+import { envNamesLines } from '../core/envnames.js';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
@@ -208,6 +209,18 @@ export async function runSetup(plan: Plan, opts: RunnerOptions): Promise<RunResu
         else {
           fs.copyFileSync(from, to, fs.constants.COPYFILE_EXCL);
           record('done', { ms: ms(), message: `created ${step.action.to}` });
+        }
+        continue;
+      }
+      if (step.action.type === 'env-names') {
+        const p = path.resolve(cwd, step.action.path);
+        if (!insideRoot(root, p)) throw new RefusedError('file outside the project');
+        if (fileExists(p)) record('done', { ms: ms(), message: `${step.action.path} already exists; left unchanged` });
+        else {
+          const text = envNamesLines(step.action).join('\n') + '\n';
+          fs.mkdirSync(path.dirname(p), { recursive: true });
+          fs.writeFileSync(p, text, { flag: 'wx' });
+          record('done', { ms: ms(), message: `created ${step.action.path} with ${step.action.names.length} variable names (no values)` });
         }
         continue;
       }

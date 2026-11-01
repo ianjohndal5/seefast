@@ -4,7 +4,7 @@
     "name": "seefast",
     "version": "0.1.0"
   },
-  "digest": "sha256:282642e11b07a45ae2c4dbfcc95236d075deeab61606c01899992275263f3809",
+  "digest": "sha256:425a235ee6d42d5c408afeca30c8902335611441e36c0f01b9b74dd168089871",
   "summary": {
     "support": "generic",
     "projects": 1,
@@ -197,11 +197,15 @@
       "id": "root.env",
       "project": "root",
       "phase": "configure",
-      "title": "Create .env by hand",
+      "title": "Create .env with the variable names",
       "cwd": ".",
       "action": {
-        "type": "manual",
-        "text": "Create .env with values for: DJANGO_SECRET_KEY."
+        "type": "env-names",
+        "path": ".env",
+        "names": [
+          "DJANGO_SECRET_KEY"
+        ],
+        "required": []
       },
       "network": false,
       "thirdPartyCode": false,
@@ -211,7 +215,9 @@
       "requires": [],
       "confidence": "low",
       "why": "The repo has no env template, but the code reads 1 environment variable. Which ones need real values is unknown.",
-      "notes": [],
+      "notes": [
+        "Names only, no values: DJANGO_SECRET_KEY. Uncomment the ones the app needs and set them."
+      ],
       "evidence": [
         {
           "file": "mysite/settings.py",

@@ -135,6 +135,22 @@ describe('safety', () => {
     expect(r2.steps[0].status).toBe('refused');
     expect(calls).toEqual([]);
   });
+  it('env-names creates the env file from names only, inside the project, and never overwrites', async () => {
+    const plan = mkPlan([mkStep('env', { action: { type: 'env-names', path: '.env', names: ['APP_URL', 'API_KEY'], required: ['API_KEY'] } })]);
+    const res = await runSetup(plan, { root, spawn: () => { throw new Error('nothing is executed'); }, host, approveAll: true });
+    expect(res.status).toBe('success');
+    const text = fs.readFileSync(path.join(root, '.env'), 'utf8');
+    expect(text.split('\n').filter((l) => !l.startsWith('# Variables') && !l.startsWith('# Lines'))).toEqual(['# APP_URL=', 'API_KEY=', '']);
+    fs.writeFileSync(path.join(root, '.env'), 'API_KEY=mine\n');
+    fs.rmSync(path.join(root, '.seefast'), { recursive: true, force: true });
+    const again = await runSetup(plan, { root, spawn: () => { throw new Error('nothing is executed'); }, host, approveAll: true });
+    expect(again.status).toBe('success');
+    expect(fs.readFileSync(path.join(root, '.env'), 'utf8')).toBe('API_KEY=mine\n');
+    const outside = await runSetup(mkPlan([mkStep('env', { action: { type: 'env-names', path: '../../escaped.env', names: ['A'], required: [] } })]), { root, spawn: () => { throw new Error('nothing is executed'); }, host, approveAll: true });
+    expect(outside.status).not.toBe('success');
+    expect(fs.existsSync(path.resolve(root, '../../escaped.env'))).toBe(false);
+  });
+
   it('copies an env file but never overwrites one', async () => {
     fs.writeFileSync(path.join(root, '.env.example'), 'A=1\n');
     const plan = mkPlan([mkStep('env', { action: { type: 'copy', from: '.env.example', to: '.env' } })]);

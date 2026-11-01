@@ -529,7 +529,9 @@ async function stepCard(s, n, done, onChange) {
   }
   const fill = s.notes.find((x) => /^Then fill in/.test(x));
   if (fill) li.append(h('div.note', h('strong', 'Then fill in: '), fill.replace(/^Then fill in:?\s*/, '')));
-  const other = s.notes.filter((x) => x !== fill);
+  const names = s.notes.find((x) => /^Names only/.test(x));
+  if (names) li.append(h('div.note', h('strong', 'Names only, no values: '), names.replace(/^Names only, no values:\s*/, '')));
+  const other = s.notes.filter((x) => x !== fill && x !== names);
   li.append(h('details', h('summary', 'Why?'), h('p.why', s.why), other.length ? h('ul.ev', other.map((x) => h('li', x))) : null, evidenceList(s.evidence)));
   return li;
 }
@@ -601,7 +603,11 @@ function speech(run, p) {
   const n = p.steps.filter((s) => (run.opts.includeOptional || !s.optional)).length;
   const res = run.result;
   if (run.stopping) return ['busy', h('span', h('strong', 'Stopping…'), ' Ending the command that is running. Nothing else will start.')];
-  if (run.consent) return ['idle', h('span', 'Can I run this one? ', h('strong', 'It is highlighted below.'))];
+  if (run.consent) {
+    const asked = p.steps.find((x) => x.id === run.consent.step);
+    if (asked?.action.type === 'env-names') return ['idle', h('span', `Want me to create ${asked.action.path} for you? `, h('strong', 'It is highlighted below.'))];
+    return ['idle', h('span', 'Can I run this one? ', h('strong', 'It is highlighted below.'))];
+  }
   if (run.running) {
     const s = p.steps.find((x) => x.id === run.current);
     return ['busy', h('span', 'Working on ', h('strong', s ? s.title : 'it'), '…', run.approved ? ' I will keep going until every step is done.' : '')];
@@ -619,9 +625,13 @@ async function viewAuto() {
   const seq = renderSeq;
   setTitle('Do it for me', `${p.meta.rootName} · nothing runs without your OK`);
   // Optional steps are listed when included or once they have a result; the step being asked about always is.
-  const shown = p.steps.filter((s) => !s.optional || run.opts.includeOptional || run.consent?.step === s.id || (run.statuses[s.id] && run.statuses[s.id] !== 'skipped'));
-  // Every command is on screen before anything runs (the consent prompt repeats the one about to run).
-  const cmds = await Promise.all(shown.map((s) => (s.action.type === 'manual' ? s.action.text : commandFor(s.action))));
+  // Creating the env file from variable names is always offered (it is asked about even when extras are off).
+  const offered = (s) => s.action.type === 'env-names';
+  const shown = p.steps.filter((s) => !s.optional || offered(s) || run.opts.includeOptional || run.consent?.step === s.id || (run.statuses[s.id] && run.statuses[s.id] !== 'skipped'));
+  // Every command is on screen before anything runs (the consent prompt repeats the one about to run). Writing an
+  // env file is described by what goes into it rather than by the long shell line that would do the same.
+  const describe = (s) => (s.action.type === 'manual' ? s.action.text : offered(s) ? `${s.action.path}: ${plural(s.action.names.length, 'variable name')}, no values` : null);
+  const cmds = await Promise.all(shown.map((s) => describe(s) ?? commandFor(s.action)));
   if (seq !== renderSeq) return;
   const [mood, words] = speech(run, p);
   setMood(mood);
@@ -638,13 +648,22 @@ async function viewAuto() {
     const glyph = st === 'done' || st === 'already-done' ? icon('check') : st === 'failed' || st === 'refused' ? icon('cross') : st === 'skipped' || st === 'declined' || st === 'stopped' ? icon('dash') : now ? icon('spinner', 'ico spin') : st ? null : String(i + 1);
     const body = h('div',
       h('div.t', s.title, s.optional ? h('span.tag.likely', 'optional') : null, s.outsideProject ? h('span.tag.guess', 'outside this folder') : null),
-      h('code', { title: cmds[i] }, s.cwd !== '.' && s.action.type !== 'manual' ? `${s.cwd}/ ` : '', asking ? run.consent.command : cmds[i]),
+      h('code', { title: cmds[i] }, s.cwd !== '.' && s.action.type !== 'manual' ? `${s.cwd}/ ` : '', asking && !offered(s) ? run.consent.command : cmds[i]),
       // The running step says so in words, with a moving bar, a clock and the latest line of output.
       now ? h('div.live', { role: 'status' }, h('div.busybar', { 'aria-hidden': 'true' }),
         h('div.live-line', h('span.clock', run.stopping ? 'Stopping' : 'Running', ' · ', h('span', { dataset: { since: String(run.stepStarted?.[s.id] ?? Date.now()) } }, '0:00')),
           h('span.tail', lastLine(run.output) || 'Starting…'))) : null,
       run.messages[s.id] ? h('div.msg', run.messages[s.id]) : null);
-    if (asking) {
+    if (asking && offered(s)) {
+      // "Create it for me" or "I'll do it myself": the file gets the names below, commented out, and no values.
+      const a = s.action;
+      body.append(h('div.ask', { role: 'group', 'aria-label': `Create ${a.path}?` },
+        h('span.q', `Create ${a.path} with these names for you? No values are written: you fill them in afterwards.`),
+        h('div.files.names', a.names.join('  ')),
+        h('button.btn.small.go', { type: 'button', onclick: () => answer('yes') }, icon('file'), 'Create it for me'),
+        h('button.btn.small', { type: 'button', onclick: () => answer('skip') }, "I'll do it myself"),
+        h('button.btn.small.danger', { type: 'button', onclick: () => answer('quit') }, 'Stop')));
+    } else if (asking) {
       const c = run.consent;
       body.append(h('div.ask', { role: 'group', 'aria-label': `Approve ${s.title}` },
         h('span.q', c.reason === 'outside-project' ? 'This one changes things outside this folder. Run it?' : c.reason === 'optional' ? 'This one is optional. Run it?' : c.reason === 'manual' ? 'Do this by hand, then continue.' : 'Run this one?'),

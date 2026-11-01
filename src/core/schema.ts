@@ -169,6 +169,11 @@ export type Action =
   | { type: 'copy'; from: string; to: string }
   /** Create an empty file if it does not exist. */
   | { type: 'touch'; path: string }
+  /**
+   * Create an env file listing variable names, if it does not exist (never overwrites). Names only, never values:
+   * names in `required` are written `NAME=`, the others commented out (`# NAME=`). See src/core/envnames.ts.
+   */
+  | { type: 'env-names'; path: string; names: string[]; required: string[] }
   /** Something only a person can do; the runner pauses and shows it. */
   | { type: 'manual'; text: string };
 

@@ -364,7 +364,8 @@ function registerIpc(): void {
         root: current.root, dryRun: opts.dryRun, includeOptional: opts.includeOptional, allowOutside: opts.allowOutside, approveAll: opts.approveAll,
         resume: opts.resume, only: opts.only, signal: runAbort.signal, shell: shellKind(),
         consent: (req: ConsentRequest) =>
-          req.reason === 'optional' && !opts.includeOptional
+          // Creating the env file from variable names is offered even then: it is not an "extra" like demo data.
+          req.reason === 'optional' && !opts.includeOptional && req.step.action.type !== 'env-names'
             ? Promise.resolve<Decision>('skip')
             : new Promise<Decision>((resolve) => {
             const id = ++consentSeq;

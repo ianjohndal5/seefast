@@ -93,7 +93,8 @@ describe('trap: no .env.example', () => {
       ['STRIPE_SECRET_KEY', 'unknown', true],
     ]);
     expect(plan.unknowns.some((u) => u.id === 'env-no-template:root')).toBe(true);
-    expect(step(plan, 'root.env')).toMatchObject({ optional: true, confidence: 'low', action: { type: 'manual' } });
+    // With no template it offers to create the file from the names alone: no values, nothing marked required.
+    expect(step(plan, 'root.env')).toMatchObject({ optional: true, confidence: 'low', action: { type: 'env-names', path: '.env', names: ['DATABASE_URL', 'JWT_SECRET', 'STRIPE_SECRET_KEY'], required: [] } });
   });
   it('finds the port from the code', () => {
     expect(plan.run.find((r) => r.primary && r.kind === 'dev')?.ports[0]).toMatchObject({ port: 4000, evidence: [expect.objectContaining({ file: 'server.js', line: 7 })] });

@@ -165,6 +165,12 @@ describe('shell rendering', () => {
     expect(quotePowerShell('C:\\x\\y.exe')).toBe('C:\\x\\y.exe');
   });
   it('renders file actions per shell, never overwriting', () => {
+    const names = { type: 'env-names', path: '.env', names: ['APP_URL', 'API_KEY'], required: ['API_KEY'] } as const;
+    expect(renderAction(names, 'posix')).toBe(`[ -e .env ] || printf '%s\\n' '# Variables the code reads (found by SeeFast). Uncomment the ones you need and add values.' '# Lines without "#" are required.' '# APP_URL=' 'API_KEY=' > .env`);
+    expect(renderAction(names, 'powershell')).toBe(`if (-not (Test-Path .env)) { Set-Content -Encoding ascii -Path .env -Value @('# Variables the code reads (found by SeeFast). Uncomment the ones you need and add values.', '# Lines without "#" are required.', '# APP_URL=', 'API_KEY=') }`);
+    // Only variable names can get into the file: anything else is refused, so a plan cannot smuggle in a value.
+    expect(() => renderAction({ type: 'env-names', path: '.env', names: ['A=secret'], required: [] }, 'posix')).toThrow(/not variable names/);
+    expect(() => renderAction({ type: 'env-names', path: '.env', names: ['A\nB=1'], required: [] }, 'posix')).toThrow(/not variable names/);
     const copy = { type: 'copy', from: '.env.example', to: '.env' } as const;
     expect(renderAction(copy, 'posix')).toBe('[ -e .env ] || cp .env.example .env');
     expect(renderAction(copy, 'powershell')).toBe('if (-not (Test-Path .env)) { Copy-Item .env.example .env }');

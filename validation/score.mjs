@@ -18,6 +18,7 @@ function planKind(step, plan) {
   const local = step.id.slice(step.project.length + 1);
   if (a.type === 'copy') return 'env-copy';
   if (a.type === 'touch') return 'other:sqlite-file';
+  if (a.type === 'env-names') return 'env-manual';
   if (a.type === 'manual') return local === 'env' ? 'env-manual' : `manual:${local.replace(/^service-/, '')}`;
   if (local === 'services' || /^services-\d+$/.test(local)) return 'compose-up';
   if (local === 'submodules') return 'submodules';

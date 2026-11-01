@@ -141,6 +141,7 @@ seefast guide --plan setup-plan.json    # every command can read a saved plan in
 | `exec` | `argv`, optional `windowsArgv` | quoted for the shell | the program at `argv[0]` from PATH (or relative to `cwd`), no shell; `.cmd`/`.bat` through `cmd.exe /d /s /c` with strict argument checks |
 | `copy` | `from`, `to` | `[ -e to ] \|\| cp from to` / `if (-not (Test-Path to)) { Copy-Item from to }` | a file copy that never overwrites |
 | `touch` | `path` | `[ -e p ] \|\| touch p` / `New-Item` | creates an empty file if missing |
+| `env-names` | `path`, `names`, `required` | `[ -e p ] \|\| printf '%s\n' … > p` / `Set-Content -Encoding ascii` | creates the env file if missing (never overwrites): a comment line, then `NAME=` for each name in `required` and `# NAME=` for the others. Names only: every name must match `[A-Za-z_][A-Za-z0-9_.]*` or the step is refused, so no value can be written. Used when a project has no env template and the names come from reading the code. |
 | `manual` | `text` | the text | the runner shows it and asks you to confirm |
 
 ## `RunTarget`

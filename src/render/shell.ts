@@ -1,6 +1,7 @@
 // Rendering plan actions as commands for a person to type: POSIX shells (bash, zsh, sh) and PowerShell.
 // The runner never uses these strings; it executes argv directly (docs/DECISIONS.md D7).
 import type { Action } from '../core/schema.js';
+import { envNamesLines } from '../core/envnames.js';
 
 export type ShellKind = 'posix' | 'powershell';
 
@@ -48,9 +49,20 @@ export function renderAction(action: Action, shell: ShellKind): string {
       return shell === 'powershell'
         ? `if (-not (Test-Path ${q(toWindowsPath(action.path))})) { New-Item -ItemType File ${q(toWindowsPath(action.path))} | Out-Null }`
         : `[ -e ${q(action.path)} ] || touch ${q(action.path)}`;
+    case 'env-names': {
+      const lines = envNamesLines(action);
+      return shell === 'powershell'
+        ? `if (-not (Test-Path ${q(toWindowsPath(action.path))})) { Set-Content -Encoding ascii -Path ${q(toWindowsPath(action.path))} -Value @(${lines.map(quoteAlways(shell)).join(', ')}) }`
+        : `[ -e ${q(action.path)} ] || printf '%s\\n' ${lines.map(quoteAlways(shell)).join(' ')} > ${q(action.path)}`;
+    }
     case 'manual':
       return `# ${action.text}`;
   }
+}
+
+/** Always single-quoted (lines of text, not words). */
+function quoteAlways(shell: ShellKind): (s: string) => string {
+  return shell === 'powershell' ? (s) => `'${s.replace(/'/g, "''")}'` : (s) => `'${s.replace(/'/g, `'\\''`)}'`;
 }
 
 /** `cd` into a working directory relative to the project folder. */

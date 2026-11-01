@@ -448,3 +448,4 @@ pre.out { margin: 8px 0 0; max-height: 180px; overflow: auto; background: var(--
 .sources strong { font: 700 12px var(--hud); text-transform: uppercase; letter-spacing: .07em; }
 .links { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
 .runstat .show { margin-left: 10px; color: var(--glow); font: 700 12.5px var(--hud); letter-spacing: .03em; text-decoration-color: var(--glow); }
+.ask .names { width: 100%; padding: 6px 9px; border-radius: 8px; background: var(--code-bg); color: var(--code-text); white-space: normal; word-spacing: 4px; max-height: 96px; overflow: auto; }

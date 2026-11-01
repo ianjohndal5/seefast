@@ -251,7 +251,9 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
           if (!asked.includes(st.consent)) {
             asked.push(st.consent);
             if (asked.length === 1) await shot('consent-1-prompt');
-            await js(`[...document.querySelectorAll('.tl.current .ask button')].find((b) => b.textContent === '${asked.length === 1 ? 'Run' : 'Skip'}').click()`);
+            if (asked.length > 1) await shot(`consent-${asked.length}-prompt`);
+            // First prompt: Run. The env file offer: Create it for me. Anything else: Skip.
+            await js(`(() => { const bs = [...document.querySelectorAll('.tl.current .ask button')]; (bs.find((b) => /^(${asked.length === 1 ? 'Run' : 'Create it for me|Skip'})$/.test(b.textContent)) ?? bs.find((b) => b.textContent === 'Skip')).click(); })()`);
           }
         }
         await sleep(150);
@@ -260,6 +262,12 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
       check('every "Waiting for your OK" has a visible prompt', !stuck, `asked: ${asked.join(', ')}`);
       check('excluded optional steps are skipped without asking', !asked.some((id) => /build/.test(id)), asked.join(', '));
       check('after Run and Skip the run finishes', !final.running && final.status !== null, JSON.stringify(final));
+      const envFile = path.join(consentDir, '.env');
+      if (fs.existsSync(path.join(consentDir, '.env.example'))) void 0;
+      else {
+        const written = fs.existsSync(envFile) ? fs.readFileSync(envFile, 'utf8') : '';
+        check('"Create it for me" writes the env file with names only', /^# API_KEY=$/m.test(written) && !/^[A-Z_]+=.+$/m.test(written), JSON.stringify(written));
+      }
       await sleep(300);
       await shot('consent-2-finished');
     }

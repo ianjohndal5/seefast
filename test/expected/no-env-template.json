@@ -4,7 +4,7 @@
     "name": "seefast",
     "version": "0.1.0"
   },
-  "digest": "sha256:2d7b41a22fd3bd0ab0d34d215965599ce70055975663817ffef8c75fd3e56cc4",
+  "digest": "sha256:1db923856fc12c79108b45437236dcef46a92858072bd5eec033f7c851bee15c",
   "summary": {
     "support": "full",
     "projects": 1,
@@ -199,11 +199,17 @@
       "id": "root.env",
       "project": "root",
       "phase": "configure",
-      "title": "Create .env by hand",
+      "title": "Create .env with the variable names",
       "cwd": ".",
       "action": {
-        "type": "manual",
-        "text": "Create .env with values for: DATABASE_URL, JWT_SECRET, STRIPE_SECRET_KEY."
+        "type": "env-names",
+        "path": ".env",
+        "names": [
+          "DATABASE_URL",
+          "JWT_SECRET",
+          "STRIPE_SECRET_KEY"
+        ],
+        "required": []
       },
       "network": false,
       "thirdPartyCode": false,
@@ -213,7 +219,9 @@
       "requires": [],
       "confidence": "low",
       "why": "The repo has no env template, but the code reads 3 environment variables. Which ones need real values is unknown.",
-      "notes": [],
+      "notes": [
+        "Names only, no values: DATABASE_URL, JWT_SECRET, STRIPE_SECRET_KEY. Uncomment the ones the app needs and set them."
+      ],
       "evidence": [
         {
           "file": "server.js",

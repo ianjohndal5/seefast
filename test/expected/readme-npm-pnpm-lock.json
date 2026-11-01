@@ -4,7 +4,7 @@
     "name": "seefast",
     "version": "0.1.0"
   },
-  "digest": "sha256:a544fee36830e02510394098416f9ae7855a31c6cd050a21efc6011c20bb80e0",
+  "digest": "sha256:68594f08c9d627fc081fd1e9ff71983d7df5b6cf9101da1b6b710b54cb4d761a",
   "summary": {
     "support": "full",
     "projects": 1,
@@ -184,11 +184,15 @@
       "id": "root.env",
       "project": "root",
       "phase": "configure",
-      "title": "Create .env by hand",
+      "title": "Create .env with the variable names",
       "cwd": ".",
       "action": {
-        "type": "manual",
-        "text": "Create .env with values for: VITE_API_BASE."
+        "type": "env-names",
+        "path": ".env",
+        "names": [
+          "VITE_API_BASE"
+        ],
+        "required": []
       },
       "network": false,
       "thirdPartyCode": false,
@@ -198,7 +202,9 @@
       "requires": [],
       "confidence": "low",
       "why": "The repo has no env template, but the code reads 1 environment variable. Which ones need real values is unknown.",
-      "notes": [],
+      "notes": [
+        "Names only, no values: VITE_API_BASE. Uncomment the ones the app needs and set them."
+      ],
       "evidence": [
         {
           "file": "src/main.tsx",
