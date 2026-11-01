@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: 'mysql/mysql-server:8.0'
+    ports:
+      - '${FORWARD_DB_PORT:-3306}:3306'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+  redis:
+    image: 'redis:7-alpine'
+    ports:
+      - '${FORWARD_REDIS_PORT:-6379}:6379'
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    ports:
+      - '1025:1025'
+      - '8025:8025'

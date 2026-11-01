@@ -1,0 +1,60 @@
+{
+  "packages": [
+    {
+      "name": "laravel/framework",
+      "version": "v12.36.1",
+      "require": {
+        "php": "^8.2",
+        "ext-ctype": "*",
+        "ext-filter": "*",
+        "ext-hash": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-session": "*",
+        "ext-tokenizer": "*"
+      }
+    },
+    {
+      "name": "laravel/tinker",
+      "version": "v2.10.1",
+      "require": {
+        "php": "^7.2.5|^8.0"
+      }
+    },
+    {
+      "name": "symfony/mime",
+      "version": "v7.3.4",
+      "require": {
+        "php": ">=8.2"
+      }
+    }
+  ],
+  "packages-dev": [
+    {
+      "name": "laravel/pail",
+      "version": "v1.2.3",
+      "require": {
+        "php": "^8.2",
+        "ext-mbstring": "*",
+        "ext-pcntl": "*"
+      }
+    },
+    {
+      "name": "phpunit/phpunit",
+      "version": "11.5.7",
+      "require": {
+        "php": ">=8.2",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-xml": "*",
+        "ext-xmlwriter": "*"
+      }
+    }
+  ],
+  "platform": {
+    "php": "^8.2"
+  },
+  "plugin-api-version": "2.6.0"
+}

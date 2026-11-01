@@ -1,0 +1,11 @@
+{
+  "name": "landing",
+  "private": true,
+  "scripts": {
+    "dev": "vite --port 8080",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

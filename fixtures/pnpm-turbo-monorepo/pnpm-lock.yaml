@@ -1,0 +1,9 @@
+lockfileVersion: '9.0'
+
+importers:
+
+  .:
+    devDependencies:
+      turbo:
+        specifier: ^2.3.0
+        version: 2.3.3

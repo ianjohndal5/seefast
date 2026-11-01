@@ -1,0 +1,81 @@
+{
+  "_readme": [
+    "This file locks the dependencies of your project to a known state"
+  ],
+  "content-hash": "0f1e2d3c4b5a69788796a5b4c3d2e1f0",
+  "packages": [
+    {
+      "name": "laravel/framework",
+      "version": "v11.31.0",
+      "require": {
+        "php": "^8.2",
+        "ext-ctype": "*",
+        "ext-filter": "*",
+        "ext-hash": "*",
+        "ext-mbstring": "*",
+        "ext-openssl": "*",
+        "ext-session": "*",
+        "ext-tokenizer": "*",
+        "composer-runtime-api": "^2.2"
+      }
+    },
+    {
+      "name": "laravel/sanctum",
+      "version": "v4.0.3",
+      "require": {
+        "php": "^8.2"
+      }
+    },
+    {
+      "name": "league/flysystem-local",
+      "version": "3.29.0",
+      "require": {
+        "php": "^8.0.2",
+        "ext-fileinfo": "*"
+      }
+    },
+    {
+      "name": "nesbot/carbon",
+      "version": "3.8.2",
+      "require": {
+        "php": "^8.1",
+        "ext-json": "*"
+      }
+    },
+    {
+      "name": "symfony/console",
+      "version": "v7.1.8",
+      "require": {
+        "php": ">=8.2",
+        "symfony/polyfill-mbstring": "~1.0"
+      }
+    }
+  ],
+  "packages-dev": [
+    {
+      "name": "fakerphp/faker",
+      "version": "v1.24.1",
+      "require": {
+        "php": "^7.4 || ^8.0"
+      }
+    },
+    {
+      "name": "phpunit/phpunit",
+      "version": "11.4.4",
+      "require": {
+        "php": ">=8.2",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-xml": "*",
+        "ext-xmlwriter": "*"
+      }
+    }
+  ],
+  "platform": {
+    "php": "^8.2"
+  },
+  "platform-dev": [],
+  "plugin-api-version": "2.6.0"
+}

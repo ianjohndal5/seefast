@@ -1,0 +1,3 @@
+[submodule "vendor/libtrack"]
+	path = vendor/libtrack
+	url = https://github.com/example/libtrack.git

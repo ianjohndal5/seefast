@@ -1,0 +1,14 @@
+{
+  "name": "web",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@acme/ui": "workspace:*",
+    "next": "^15.0.3",
+    "react": "^19.0.0"
+  }
+}

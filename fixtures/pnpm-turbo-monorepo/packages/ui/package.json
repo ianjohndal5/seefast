@@ -1,0 +1,13 @@
+{
+  "name": "@acme/ui",
+  "version": "0.0.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.tsx --dts",
+    "dev": "tsup src/index.tsx --watch"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.0"
+  }
+}

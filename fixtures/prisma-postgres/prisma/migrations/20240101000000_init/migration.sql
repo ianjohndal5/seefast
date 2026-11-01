@@ -1,0 +1,1 @@
+CREATE TABLE "Note" ("id" SERIAL PRIMARY KEY, "title" TEXT NOT NULL);
