@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:ecaa71675afc8c4fb65b85d1c73d263d0ef9ea8c8589ad3161da02d47a1edfbc",
+  "summary": {
+    "support": "none",
+    "projects": 0,
+    "steps": 0,
+    "conflicts": 0,
+    "unknowns": 1,
+    "lowestStepConfidence": null
+  },
+  "projects": [],
+  "requirements": [],
+  "services": [],
+  "env": [],
+  "steps": [],
+  "run": [],
+  "tasks": [],
+  "conflicts": [],
+  "unknowns": [
+    {
+      "evidence": [],
+      "id": "no-project",
+      "subject": "projects",
+      "message": "No project manifest was found (no package.json, composer.json, pyproject.toml, go.mod, Cargo.toml, Gemfile, pom.xml, Makefile, Dockerfile...).",
+      "suggestion": "Check that this is the right folder, or read the README for setup instructions."
+    }
+  ],
+  "meta": {
+    "rootName": "no-manifest",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 5,
+      "filesRead": 1,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 1,
+      "codeFilesScanned": 0,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": "README.md",
+        "sha256": "9499de82410e9f8d0d451071f33d83e7105c980d2ac3f3c2176b23cd24881041"
+      }
+    ]
+  }
+}

@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:282642e11b07a45ae2c4dbfcc95236d075deeab61606c01899992275263f3809",
+  "summary": {
+    "support": "generic",
+    "projects": 1,
+    "steps": 4,
+    "conflicts": 0,
+    "unknowns": 1,
+    "lowestStepConfidence": "low"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "python-django",
+      "ecosystems": [
+        "python"
+      ],
+      "support": "generic",
+      "role": "app",
+      "frameworks": [],
+      "packageManagers": [
+        {
+          "ecosystem": "python",
+          "name": "pip",
+          "confidence": "low",
+          "why": "No lockfile of uv, Poetry, Pipenv or PDM; using pip with a virtual environment.",
+          "evidence": []
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "requirements.txt",
+          "source": "manifest",
+          "detail": "requirements.txt found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:python",
+      "kind": "runtime",
+      "name": "python",
+      "recommended": "3.12",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "requirements.txt needs Python. .python-version pins Python 3.12.",
+      "evidence": [
+        {
+          "file": ".python-version",
+          "line": 1,
+          "source": "version-file",
+          "detail": ".python-version: 3.12",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "services": [],
+  "env": [
+    {
+      "project": "root",
+      "file": ".env",
+      "template": null,
+      "exists": false,
+      "createdBy": "root.env",
+      "vars": [
+        {
+          "name": "DJANGO_SECRET_KEY",
+          "fill": "unknown",
+          "secret": true,
+          "confidence": "low",
+          "note": "Read by the code; there is no env template to say whether it needs a value.",
+          "evidence": [
+            {
+              "file": "mysite/settings.py",
+              "line": 2,
+              "source": "code",
+              "detail": "os.environ[\"DJANGO_SECRET_KEY\"]",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "confidence": "low",
+      "why": "No template; variables come from the code.",
+      "evidence": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "root.venv",
+      "project": "root",
+      "phase": "install",
+      "title": "Create a virtual environment (.venv)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "python3",
+          "-m",
+          "venv",
+          ".venv"
+        ],
+        "windowsArgv": [
+          "py",
+          "-3",
+          "-m",
+          "venv",
+          ".venv"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "runtime:python"
+      ],
+      "confidence": "low",
+      "why": "Keeps the project's packages out of the system Python.",
+      "notes": [
+        "Generic support: this ecosystem is detected with fallbacks, not a full provider. Check the project docs."
+      ],
+      "evidence": [
+        {
+          "file": "requirements.txt",
+          "source": "manifest",
+          "detail": "requirements.txt present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install Python dependencies (pip)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          ".venv/bin/python",
+          "-m",
+          "pip",
+          "install",
+          "-r",
+          "requirements.txt"
+        ],
+        "windowsArgv": [
+          ".venv\\Scripts\\python.exe",
+          "-m",
+          "pip",
+          "install",
+          "-r",
+          "requirements.txt"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.venv"
+      ],
+      "requires": [
+        "runtime:python"
+      ],
+      "confidence": "low",
+      "why": "requirements.txt lists the dependencies.",
+      "notes": [
+        "Generic support: this ecosystem is detected with fallbacks, not a full provider. Check the project docs."
+      ],
+      "evidence": [
+        {
+          "file": "requirements.txt",
+          "source": "manifest",
+          "detail": "requirements.txt present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.env",
+      "project": "root",
+      "phase": "configure",
+      "title": "Create .env by hand",
+      "cwd": ".",
+      "action": {
+        "type": "manual",
+        "text": "Create .env with values for: DJANGO_SECRET_KEY."
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": true,
+      "after": [],
+      "requires": [],
+      "confidence": "low",
+      "why": "The repo has no env template, but the code reads 1 environment variable. Which ones need real values is unknown.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "mysite/settings.py",
+          "line": 2,
+          "source": "code",
+          "detail": "os.environ[\"DJANGO_SECRET_KEY\"]",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.migrate",
+      "project": "root",
+      "phase": "database",
+      "title": "Apply Django database migrations",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          ".venv/bin/python",
+          "manage.py",
+          "migrate"
+        ],
+        "windowsArgv": [
+          ".venv\\Scripts\\python.exe",
+          "manage.py",
+          "migrate"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.install"
+      ],
+      "requires": [],
+      "confidence": "low",
+      "why": "manage.py marks a Django project; migrate creates the database tables.",
+      "notes": [
+        "Generic support: this ecosystem is detected with fallbacks, not a full provider. Check the project docs."
+      ],
+      "evidence": [
+        {
+          "file": "manage.py",
+          "source": "manifest",
+          "detail": "manage.py present",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.runserver",
+      "project": "root",
+      "name": "runserver",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start  (Django dev server)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          ".venv/bin/python",
+          "manage.py",
+          "runserver"
+        ],
+        "windowsArgv": [
+          ".venv\\Scripts\\python.exe",
+          "manage.py",
+          "runserver"
+        ]
+      },
+      "ports": [
+        {
+          "port": 8000,
+          "confidence": "low",
+          "evidence": [
+            {
+              "file": "manage.py",
+              "source": "recipe",
+              "detail": "default port 8000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 8000,
+        "timeoutSec": 180
+      },
+      "confidence": "low",
+      "why": "Django's development server listens on port 8000 by default.",
+      "evidence": [
+        {
+          "file": "manage.py",
+          "source": "manifest",
+          "detail": "manage.py present",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "conflicts": [],
+  "unknowns": [
+    {
+      "evidence": [],
+      "id": "env-no-template:root",
+      "subject": "env:root",
+      "message": "The project has no env template (.env.example); the variables were found by reading the code and may be incomplete.",
+      "suggestion": "Check the README or ask the maintainers which values are needed."
+    }
+  ],
+  "meta": {
+    "rootName": "python-django",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 5,
+      "filesRead": 3,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 2,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".python-version",
+        "sha256": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d"
+      },
+      {
+        "file": "manage.py",
+        "sha256": "163d08a934e142ecce6d6e2796507b56837a0861de2a01710e7635a488d4e63e"
+      },
+      {
+        "file": "mysite/settings.py",
+        "sha256": "12cb0a334f77b5ebaef6776bc78f7435b000ddf373793a69c57ed43e2fe8cd7d"
+      }
+    ]
+  }
+}

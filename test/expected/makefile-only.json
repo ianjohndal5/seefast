@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:1965e54b1361971b5cdfaebbf7a9ce9ac7400defa81e4db4a20e12052d4ff50e",
+  "summary": {
+    "support": "generic",
+    "projects": 1,
+    "steps": 3,
+    "conflicts": 0,
+    "unknowns": 0,
+    "lowestStepConfidence": "low"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "makefile-only",
+      "ecosystems": [
+        "generic"
+      ],
+      "support": "generic",
+      "role": "app",
+      "frameworks": [],
+      "packageManagers": [],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "Makefile",
+          "source": "task-runner",
+          "detail": "Makefile found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "tool:git",
+      "kind": "tool",
+      "name": "git",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "Submodules are fetched with git.",
+      "evidence": [
+        {
+          "file": ".gitmodules",
+          "line": 1,
+          "source": "manifest",
+          "detail": ".gitmodules present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "tool:git-lfs",
+      "kind": "tool",
+      "name": "git-lfs",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "Some files are stored with Git LFS.",
+      "evidence": [
+        {
+          "file": ".gitattributes",
+          "line": 1,
+          "source": "manifest",
+          "detail": "*.bin filter=lfs diff=lfs merge=lfs -text",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "tool:make",
+      "kind": "tool",
+      "name": "make",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "Makefile defines tasks you can run instead of the individual commands.",
+      "evidence": [
+        {
+          "file": "Makefile",
+          "source": "task-runner",
+          "detail": "Makefile present",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "services": [],
+  "env": [],
+  "steps": [
+    {
+      "id": "root.submodules",
+      "project": "root",
+      "phase": "prepare",
+      "title": "Fetch git submodules",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "git",
+          "submodule",
+          "update",
+          "--init",
+          "--recursive"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "tool:git"
+      ],
+      "confidence": "high",
+      "why": ".gitmodules declares 1 submodule (vendor/libtrack), which a plain clone does not fetch. 1 of them is empty here.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": ".gitmodules",
+          "line": 1,
+          "source": "manifest",
+          "detail": "1 submodule(s)",
+          "role": "basis"
+        },
+        {
+          "file": "Makefile",
+          "line": 4,
+          "source": "task-runner",
+          "detail": "git submodule update --init",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "root.lfs",
+      "project": "root",
+      "phase": "prepare",
+      "title": "Download Git LFS files",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "git",
+          "lfs",
+          "pull"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "tool:git-lfs"
+      ],
+      "confidence": "high",
+      "why": ".gitattributes stores files with Git LFS; without git-lfs a clone holds small pointer files instead of the real content.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": ".gitattributes",
+          "line": 1,
+          "source": "manifest",
+          "detail": "*.bin filter=lfs diff=lfs merge=lfs -text",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.task-setup",
+      "project": "root",
+      "phase": "install",
+      "title": "Run the repo's \"setup\" task (make)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "make",
+          "setup"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "tool:make"
+      ],
+      "confidence": "low",
+      "why": "No supported manifest says how to install this project, but Makefile defines \"setup\", which by its name sets the project up. It runs: git submodule update --init; ./configure --prefix=$(PWD)/build",
+      "notes": [
+        "Generic fallback: read the task before running it; this tool does not know what it does."
+      ],
+      "evidence": [
+        {
+          "file": "Makefile",
+          "line": 3,
+          "source": "task-runner",
+          "detail": "setup: git submodule update --init",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.task-run",
+      "project": "root",
+      "name": "run",
+      "kind": "dev",
+      "primary": true,
+      "title": "Run the repo's \"run\" task (make)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "make",
+          "run"
+        ]
+      },
+      "ports": [],
+      "needs": [],
+      "after": [],
+      "readiness": {
+        "type": "stays-up",
+        "seconds": 20
+      },
+      "confidence": "low",
+      "why": "Makefile defines \"run\": ./build/bin/tracker --port 9000",
+      "evidence": [
+        {
+          "file": "Makefile",
+          "line": 7,
+          "source": "task-runner",
+          "detail": "run: ./build/bin/tracker --port 9000",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "runner": "make",
+      "name": "setup",
+      "project": "root",
+      "file": "Makefile",
+      "line": 3,
+      "commands": [
+        "git submodule update --init",
+        "./configure --prefix=$(PWD)/build"
+      ],
+      "purpose": "setup"
+    },
+    {
+      "runner": "make",
+      "name": "run",
+      "project": "root",
+      "file": "Makefile",
+      "line": 7,
+      "commands": [
+        "./build/bin/tracker --port 9000"
+      ],
+      "purpose": "run"
+    },
+    {
+      "runner": "make",
+      "name": "test",
+      "project": "root",
+      "file": "Makefile",
+      "line": 10,
+      "commands": [
+        "./run-tests.sh"
+      ],
+      "purpose": "test"
+    }
+  ],
+  "conflicts": [],
+  "unknowns": [],
+  "meta": {
+    "rootName": "makefile-only",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 5,
+      "filesRead": 4,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 0,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".gitattributes",
+        "sha256": "35c9aa1fa6293646d4e217fdf8c2285fe66cc22285f0e69d59c96247e9929710"
+      },
+      {
+        "file": ".gitmodules",
+        "sha256": "921f8c5a8ff8fa982c3b7be522cb39f8a168e822848ec1baab77c6d04653a482"
+      },
+      {
+        "file": "Makefile",
+        "sha256": "dcb57e053199934531b17963577f0afea052a49a992d43c81d63b5be103bdd2e"
+      },
+      {
+        "file": "README.md",
+        "sha256": "fcfb5329a5d43bae092a2937efa686d690edaef75a19173284d4af64f0cec3a8"
+      }
+    ]
+  }
+}

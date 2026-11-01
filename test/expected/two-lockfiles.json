@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:4c64683b77f0ed045e86905ece0faa804eac44289a9bc07cab4bacb52d5369a5",
+  "summary": {
+    "support": "full",
+    "projects": 1,
+    "steps": 2,
+    "conflicts": 1,
+    "unknowns": 0,
+    "lowestStepConfidence": "high"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "landing",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "yarn",
+          "confidence": "medium",
+          "why": "yarn.lock exists (ci agrees)",
+          "evidence": [
+            {
+              "file": "package-lock.json",
+              "source": "lockfile",
+              "detail": "package-lock.json present",
+              "role": "contradicts"
+            },
+            {
+              "file": "yarn.lock",
+              "source": "lockfile",
+              "detail": "yarn.lock present",
+              "role": "basis"
+            },
+            {
+              "file": ".github/workflows/build.yml",
+              "line": 11,
+              "source": "ci",
+              "detail": "yarn install --frozen-lockfile",
+              "role": "supports"
+            },
+            {
+              "file": ".github/workflows/build.yml",
+              "line": 12,
+              "source": "ci",
+              "detail": "yarn build",
+              "role": "supports"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "recommended": "20",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": "package.json needs Node.js. CI (build.yml) uses Node.js 20.",
+      "evidence": [
+        {
+          "file": ".github/workflows/build.yml",
+          "line": 10,
+          "source": "ci",
+          "detail": "actions/setup-node node-version: 20",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:yarn",
+      "kind": "package-manager",
+      "name": "yarn",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": "landing uses yarn: yarn.lock exists (ci agrees).",
+      "evidence": []
+    }
+  ],
+  "services": [],
+  "env": [],
+  "steps": [
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (yarn)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "yarn",
+          "install",
+          "--frozen-lockfile"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:yarn",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "package.json declares the dependencies; yarn.lock exists (ci agrees). The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"yarn install\" instead (it may change the lockfile)."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "yarn.lock",
+          "source": "lockfile",
+          "detail": "yarn.lock present",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/build.yml",
+          "line": 11,
+          "source": "ci",
+          "detail": "yarn install --frozen-lockfile",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "root.build",
+      "project": "root",
+      "phase": "build",
+      "title": "Build landing for production",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "yarn",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "Only needed for the production run target; the dev server builds on the fly.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.build: \"vite build\"",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/build.yml",
+          "line": 12,
+          "source": "ci",
+          "detail": "yarn build",
+          "role": "supports"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.dev",
+      "project": "root",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start landing (vite dev server)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "yarn",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 8080,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 5,
+              "source": "manifest",
+              "detail": "the script sets port 8080",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 8080,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"dev\": vite --port 8080.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 5,
+          "source": "manifest",
+          "detail": "scripts.dev: \"vite --port 8080\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "conflicts": [
+    {
+      "id": "pm:node@root:npm",
+      "subject": "pm:node@root",
+      "chosen": "yarn",
+      "alternatives": [
+        {
+          "value": "yarn",
+          "evidence": [
+            {
+              "file": "yarn.lock",
+              "source": "lockfile",
+              "detail": "yarn.lock present",
+              "role": "basis"
+            },
+            {
+              "file": ".github/workflows/build.yml",
+              "line": 11,
+              "source": "ci",
+              "detail": "yarn install --frozen-lockfile",
+              "role": "basis"
+            },
+            {
+              "file": ".github/workflows/build.yml",
+              "line": 12,
+              "source": "ci",
+              "detail": "yarn build",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "value": "npm",
+          "evidence": [
+            {
+              "file": "package-lock.json",
+              "source": "lockfile",
+              "detail": "package-lock.json present",
+              "role": "contradicts"
+            }
+          ]
+        }
+      ],
+      "severity": "warning",
+      "message": "Both package-lock.json and yarn.lock exist; CI (build.yml) runs \"yarn install --frozen-lockfile\", so using yarn. package-lock.json is probably stale.",
+      "rule": "tie between equally strong sources"
+    }
+  ],
+  "unknowns": [],
+  "meta": {
+    "rootName": "two-lockfiles",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 6,
+      "filesRead": 4,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 0,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".github/workflows/build.yml",
+        "sha256": "724017f6869e68c5502c0651238f568e8ece35ff73cc3942b13b272cb6101d72"
+      },
+      {
+        "file": "package-lock.json",
+        "sha256": "a4912112b37567936bf2ca357b7bb97148a9761d222c782ce4488f7c56b51bb6"
+      },
+      {
+        "file": "package.json",
+        "sha256": "e9576851623ae5c6e98197af3d57ab47540842ad604eb6b8fd1325e6432e15f3"
+      },
+      {
+        "file": "yarn.lock",
+        "sha256": "b1559c23000f4900d19cd43c96c8a40b414b36e8323b534d64e75f94815b5cf1"
+      }
+    ]
+  }
+}

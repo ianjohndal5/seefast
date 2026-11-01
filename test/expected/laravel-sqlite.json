@@ -1,0 +1,1501 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:c652d83fe3e31c9191d676004d5a076d858da6d75755e9f4f24f19e371dc1407",
+  "summary": {
+    "support": "full",
+    "projects": 1,
+    "steps": 9,
+    "conflicts": 0,
+    "unknowns": 0,
+    "lowestStepConfidence": "medium"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "laravel",
+      "ecosystems": [
+        "php",
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [
+        {
+          "id": "laravel",
+          "name": "Laravel",
+          "version": "^12.0",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "composer.json",
+              "line": 6,
+              "source": "manifest",
+              "detail": "\"laravel/framework\": \"^12.0\"",
+              "role": "basis"
+            },
+            {
+              "file": "artisan",
+              "source": "manifest",
+              "detail": "artisan exists",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "npm",
+          "confidence": "high",
+          "why": "package-lock.json exists",
+          "evidence": [
+            {
+              "file": "package-lock.json",
+              "source": "lockfile",
+              "detail": "package-lock.json present",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "ecosystem": "php",
+          "name": "composer",
+          "confidence": "high",
+          "why": "composer.json is a Composer manifest.",
+          "evidence": [
+            {
+              "file": "composer.json",
+              "source": "manifest",
+              "detail": "composer.json",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "composer.json",
+          "source": "manifest",
+          "detail": "composer.json found",
+          "role": "basis"
+        },
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "range": ">=20.19.0",
+      "rangeText": ">= 20.19",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": "package.json needs Node.js. package-lock.json: locked dependency vite@7.1.12 declares engines.node \"^20.19.0 || >=22.12.0\".",
+      "evidence": [
+        {
+          "file": "package-lock.json",
+          "line": 16,
+          "source": "lockfile",
+          "detail": "locked dependency vite@7.1.12 declares engines.node \"^20.19.0 || >=22.12.0\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "runtime:php",
+      "kind": "runtime",
+      "name": "php",
+      "range": ">=8.2.0 <9.0.0-0",
+      "rangeText": "^8.2",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.json needs PHP. composer.json require.php requires \"^8.2\"; together: ^8.2.",
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 5,
+          "source": "manifest",
+          "detail": "require.php: \"^8.2\"",
+          "role": "basis"
+        },
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel 12 requires php >= 8.2.0 (https://laravel.com/docs/12.x/installation)",
+          "role": "basis"
+        },
+        {
+          "file": "composer.lock",
+          "line": 7,
+          "source": "lockfile",
+          "detail": "locked package laravel/framework v12.36.1 requires php \"^8.2\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:composer",
+      "kind": "package-manager",
+      "name": "composer",
+      "range": ">=2.0.0",
+      "rangeText": ">= 2",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": "composer.json declares the PHP dependencies. composer.lock: plugin-api-version: \"2.6.0\" (Composer 2).",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 59,
+          "source": "lockfile",
+          "detail": "plugin-api-version: \"2.6.0\" (Composer 2)",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:npm",
+      "kind": "package-manager",
+      "name": "npm",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "laravel uses npm: package-lock.json exists. npm comes with Node.js (some Linux distributions package it separately).",
+      "evidence": []
+    },
+    {
+      "id": "php-extension:ctype",
+      "kind": "extension",
+      "name": "ctype",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-ctype.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 8,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-ctype",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:dom",
+      "kind": "extension",
+      "name": "dom",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-dom.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 47,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-dom",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:filter",
+      "kind": "extension",
+      "name": "filter",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-filter.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 9,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-filter",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:libxml",
+      "kind": "extension",
+      "name": "libxml",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-libxml.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 49,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-libxml",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:mbstring",
+      "kind": "extension",
+      "name": "mbstring",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-mbstring.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 11,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-mbstring",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:openssl",
+      "kind": "extension",
+      "name": "openssl",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-openssl.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 12,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-openssl",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:pcntl",
+      "kind": "extension",
+      "name": "pcntl",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/pail requires ext-pcntl.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 39,
+          "source": "lockfile",
+          "detail": "laravel/pail requires ext-pcntl",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:pdo_sqlite",
+      "kind": "extension",
+      "name": "pdo_sqlite",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": ".env.example says DB_CONNECTION=sqlite uses the pdo_sqlite driver.",
+      "evidence": [
+        {
+          "file": ".env.example",
+          "line": 7,
+          "source": "env-template",
+          "detail": "DB_CONNECTION=sqlite uses the pdo_sqlite driver",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:session",
+      "kind": "extension",
+      "name": "session",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-session.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 13,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-session",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:tokenizer",
+      "kind": "extension",
+      "name": "tokenizer",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-tokenizer.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 14,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-tokenizer",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:xml",
+      "kind": "extension",
+      "name": "xml",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-xml.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 51,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-xml",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:xmlwriter",
+      "kind": "extension",
+      "name": "xmlwriter",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-xmlwriter.",
+      "evidence": [
+        {
+          "file": "composer.lock",
+          "line": 52,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-xmlwriter",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "services": [],
+  "env": [
+    {
+      "project": "root",
+      "file": ".env",
+      "template": ".env.example",
+      "exists": false,
+      "createdBy": "root.env",
+      "vars": [
+        {
+          "name": "APP_NAME",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 1,
+              "source": "env-template",
+              "detail": "APP_NAME=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "APP_ENV",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 2,
+              "source": "env-template",
+              "detail": "APP_ENV=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "APP_KEY",
+          "fill": "generated",
+          "secret": true,
+          "generatedBy": "root.key",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 3,
+              "source": "env-template",
+              "detail": "APP_KEY=",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "APP_DEBUG",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 4,
+              "source": "env-template",
+              "detail": "APP_DEBUG=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "APP_URL",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 5,
+              "source": "env-template",
+              "detail": "APP_URL=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_CONNECTION",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 7,
+              "source": "env-template",
+              "detail": "DB_CONNECTION=…",
+              "role": "basis"
+            },
+            {
+              "file": "config/database.php",
+              "line": 2,
+              "source": "code",
+              "detail": "env('DB_CONNECTION'",
+              "role": "supports"
+            }
+          ]
+        },
+        {
+          "name": "DB_HOST",
+          "fill": "optional",
+          "secret": false,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 8,
+              "source": "env-template",
+              "detail": "# DB_HOST=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_PORT",
+          "fill": "optional",
+          "secret": false,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 9,
+              "source": "env-template",
+              "detail": "# DB_PORT=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_DATABASE",
+          "fill": "optional",
+          "secret": false,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 10,
+              "source": "env-template",
+              "detail": "# DB_DATABASE=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_USERNAME",
+          "fill": "optional",
+          "secret": false,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 11,
+              "source": "env-template",
+              "detail": "# DB_USERNAME=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_PASSWORD",
+          "fill": "optional",
+          "secret": true,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 12,
+              "source": "env-template",
+              "detail": "# DB_PASSWORD=",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "SESSION_DRIVER",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 14,
+              "source": "env-template",
+              "detail": "SESSION_DRIVER=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "QUEUE_CONNECTION",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 15,
+              "source": "env-template",
+              "detail": "QUEUE_CONNECTION=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "CACHE_STORE",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 16,
+              "source": "env-template",
+              "detail": "CACHE_STORE=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "REDIS_CLIENT",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 18,
+              "source": "env-template",
+              "detail": "REDIS_CLIENT=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "REDIS_HOST",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 19,
+              "source": "env-template",
+              "detail": "REDIS_HOST=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "REDIS_PASSWORD",
+          "fill": "optional",
+          "secret": true,
+          "note": "Only needed for the integration it configures.",
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 20,
+              "source": "env-template",
+              "detail": "REDIS_PASSWORD=<placeholder>",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "REDIS_PORT",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 21,
+              "source": "env-template",
+              "detail": "REDIS_PORT=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "MAIL_MAILER",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 23,
+              "source": "env-template",
+              "detail": "MAIL_MAILER=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "VITE_APP_NAME",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 25,
+              "source": "env-template",
+              "detail": "VITE_APP_NAME=…",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "confidence": "high",
+      "why": ".env.example is the template for .env. Laravel reads .env.",
+      "evidence": [
+        {
+          "file": ".env.example",
+          "source": "env-template",
+          "detail": "20 variables",
+          "role": "basis"
+        },
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel reads .env",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "root.composer-install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install PHP dependencies (Composer)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "composer",
+          "install"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:composer",
+        "runtime:php"
+      ],
+      "confidence": "high",
+      "why": "composer.json declares the PHP dependencies and composer.lock pins them; composer install installs exactly the locked versions.",
+      "notes": [
+        "Composer also runs the project's \"post-autoload-dump\" script: Illuminate\\Foundation\\ComposerScripts::postAutoloadDump && @php artisan package:discover --ansi"
+      ],
+      "evidence": [
+        {
+          "file": "composer.json",
+          "source": "manifest",
+          "detail": "composer.json",
+          "role": "basis"
+        },
+        {
+          "file": "composer.lock",
+          "source": "lockfile",
+          "detail": "composer.lock present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (npm)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "ci"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:npm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "package.json declares the dependencies; package-lock.json exists. The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"npm install\" instead (it may change the lockfile)."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "package-lock.json",
+          "source": "lockfile",
+          "detail": "package-lock.json present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.env",
+      "project": "root",
+      "phase": "configure",
+      "title": "Create .env from .env.example",
+      "cwd": ".",
+      "action": {
+        "type": "copy",
+        "from": ".env.example",
+        "to": ".env"
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [],
+      "confidence": "medium",
+      "why": "The app reads its configuration from .env, which is not committed; .env.example is the template. Laravel reads .env.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": ".env.example",
+          "source": "env-template",
+          "detail": "20 variables",
+          "role": "basis"
+        },
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel reads .env",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.key",
+      "project": "root",
+      "phase": "configure",
+      "title": "Generate the application key (APP_KEY)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "key:generate"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.composer-install",
+        "root.env"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "high",
+      "why": "Laravel encrypts sessions and cookies with APP_KEY, and the template leaves it empty. Without it every page fails with \"No application encryption key has been specified\".",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: generate the application key (app_key)",
+          "role": "basis"
+        },
+        {
+          "file": ".env.example",
+          "line": 3,
+          "source": "env-template",
+          "detail": "APP_KEY=",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.storage-link",
+      "project": "root",
+      "phase": "configure",
+      "title": "Link public/storage to storage/app/public",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "storage:link"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.composer-install",
+        "root.env"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "medium",
+      "why": "Uploaded files on the public disk are served through this link. The app starts without it, but uploads and generated files 404.",
+      "notes": [
+        "On Windows, creating a symbolic link needs Developer Mode or an administrator prompt; this tool never elevates."
+      ],
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: link public/storage to storage/app/public",
+          "role": "basis"
+        },
+        {
+          "file": "storage/app/public",
+          "source": "manifest",
+          "detail": "storage/app/public/ exists",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.sqlite",
+      "project": "root",
+      "phase": "database",
+      "title": "Create the SQLite database file",
+      "cwd": ".",
+      "action": {
+        "type": "touch",
+        "path": "database/database.sqlite"
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [],
+      "confidence": "high",
+      "why": "DB_CONNECTION=sqlite with no DB_DATABASE uses database/database.sqlite, which is not committed. Laravel asks interactively to create it otherwise.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: create the sqlite database file",
+          "role": "basis"
+        },
+        {
+          "file": ".env.example",
+          "line": 7,
+          "source": "env-template",
+          "detail": "DB_CONNECTION=sqlite",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.migrate",
+      "project": "root",
+      "phase": "database",
+      "title": "Create the database tables (migrations)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "migrate"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.composer-install",
+        "root.key",
+        "root.sqlite"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "high",
+      "why": "database/migrations holds the schema. The app's first request fails on missing tables until they are created.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: create the database tables (migrations)",
+          "role": "basis"
+        },
+        {
+          "file": "database/migrations",
+          "source": "manifest",
+          "detail": "database/migrations/ exists",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.seed",
+      "project": "root",
+      "phase": "database",
+      "title": "Fill the database with seed data",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "db:seed"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.migrate"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "medium",
+      "why": "database/seeders/DatabaseSeeder.php exists. Seeding adds sample or required records (often an admin user); read the seeder before running it.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: fill the database with seed data",
+          "role": "basis"
+        },
+        {
+          "file": "database/seeders/DatabaseSeeder.php",
+          "source": "manifest",
+          "detail": "database/seeders/DatabaseSeeder.php exists",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.build",
+      "project": "root",
+      "phase": "build",
+      "title": "Build the frontend assets",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "medium",
+      "why": "Blade templates load compiled CSS and JavaScript (@vite reads public/build/manifest.json; mix() reads public/mix-manifest.json). Without a build, pages fail or render unstyled unless a dev/watch server runs.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.build: \"vite build\"",
+          "role": "basis"
+        },
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: build the frontend assets",
+          "role": "basis"
+        },
+        {
+          "file": "package.json",
+          "line": 13,
+          "source": "manifest",
+          "detail": "\"laravel-vite-plugin\": \"^2.0.0\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.composer-dev",
+      "project": "root",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start the Laravel app with its dev script (server, queue, logs, Vite)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "composer",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 8000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "composer.json",
+              "line": 6,
+              "source": "recipe",
+              "detail": "composer run dev listens on port 8000 by default",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.composer-install",
+        "root.install",
+        "root.key",
+        "root.migrate"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 8000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "composer.json defines a dev script, the maintainers' own way to start everything together. It runs `php artisan pail`, which needs the pcntl extension that PHP for Windows lacks. On Windows run `php artisan serve` and the Vite dev server separately.",
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: start the laravel app with its dev script (server, queue, logs, vite)",
+          "role": "basis"
+        },
+        {
+          "file": "composer.json",
+          "line": 23,
+          "source": "manifest",
+          "detail": "scripts.dev",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.artisan-serve",
+      "project": "root",
+      "name": "serve",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start the Laravel development server",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "serve"
+        ]
+      },
+      "ports": [
+        {
+          "port": 8000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "composer.json",
+              "line": 6,
+              "source": "recipe",
+              "detail": "php artisan serve listens on port 8000 by default",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.composer-install",
+        "root.key",
+        "root.migrate"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 8000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "php artisan serve listens on http://127.0.0.1:8000 by default.",
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: start the laravel development server",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.dev",
+      "project": "root",
+      "name": "dev",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start laravel (vite dev server)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 5173,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 7,
+              "source": "manifest",
+              "detail": "vite's default port is 5173",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 5173,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"dev\": vite.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 7,
+          "source": "manifest",
+          "detail": "scripts.dev: \"vite\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.artisan-queue",
+      "project": "root",
+      "name": "queue",
+      "kind": "worker",
+      "primary": false,
+      "title": "Process queued jobs",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "queue:work"
+        ]
+      },
+      "ports": [],
+      "needs": [],
+      "after": [
+        "root.migrate"
+      ],
+      "readiness": {
+        "type": "stays-up",
+        "seconds": 20
+      },
+      "confidence": "medium",
+      "why": "QUEUE_CONNECTION is not sync, so jobs wait in a queue until a worker processes them.",
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: process queued jobs",
+          "role": "basis"
+        },
+        {
+          "file": ".env.example",
+          "line": 15,
+          "source": "env-template",
+          "detail": "QUEUE_CONNECTION=database",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.artisan-test",
+      "project": "root",
+      "name": "test",
+      "kind": "test",
+      "primary": true,
+      "title": "Run the test suite",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "test"
+        ]
+      },
+      "ports": [],
+      "needs": [],
+      "after": [
+        "root.composer-install",
+        "root.key"
+      ],
+      "readiness": {
+        "type": "exits",
+        "timeoutSec": 1800
+      },
+      "confidence": "high",
+      "why": "phpunit.xml configures the tests; php artisan test runs them.",
+      "evidence": [
+        {
+          "file": "composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: run the test suite",
+          "role": "basis"
+        },
+        {
+          "file": "phpunit.xml",
+          "source": "manifest",
+          "detail": "phpunit.xml exists",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "runner": "composer",
+      "name": "dev",
+      "project": "root",
+      "file": "composer.json",
+      "line": 23,
+      "commands": [
+        "Composer\\Config::disableProcessTimeout",
+        "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=… \"php artisan pail --timeout=… \"npm run dev\" --names=…"
+      ],
+      "purpose": "run"
+    },
+    {
+      "runner": "composer",
+      "name": "test",
+      "project": "root",
+      "file": "composer.json",
+      "line": 27,
+      "commands": [
+        "@php artisan config:clear --ansi",
+        "@php artisan test"
+      ],
+      "purpose": "test"
+    }
+  ],
+  "conflicts": [],
+  "unknowns": [],
+  "meta": {
+    "rootName": "laravel-sqlite",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 16,
+      "filesRead": 6,
+      "secretFilesNotRead": [],
+      "skipped": {
+        "ignored directory": 1
+      },
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 1,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".env.example",
+        "sha256": "8cb4eee46cfb6a919960937c3036b741b8824582e60d4d52fa8133b9489faf42"
+      },
+      {
+        "file": "composer.json",
+        "sha256": "3001cc551fee174a2c33f26d860081718467c57046746c35560a2524532e3fd6"
+      },
+      {
+        "file": "composer.lock",
+        "sha256": "5fa314abb41464881f57050aa73bee8109be656626c29c184a0c30567e51b87e"
+      },
+      {
+        "file": "config/database.php",
+        "sha256": "9cb93b80ae69cd5a202ae0219cd0475bf71d60f0affb1a1e7906f57b1fd82749"
+      },
+      {
+        "file": "package-lock.json",
+        "sha256": "26a1ea13ac2e97424ad680a8a92838ef235e987e16aea8cb187e2124bf4f2e91"
+      },
+      {
+        "file": "package.json",
+        "sha256": "30dc1fa517193e5559ee05ff41cf881e702673081248f0df187ba59264ea5d89"
+      }
+    ]
+  }
+}

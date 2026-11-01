@@ -1,0 +1,834 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:81e986753516c0583802f2ea275a521daf72338f6c8874457a11f423c39306e5",
+  "summary": {
+    "support": "full",
+    "projects": 4,
+    "steps": 5,
+    "conflicts": 0,
+    "unknowns": 0,
+    "lowestStepConfidence": "medium"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "acme",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "workspace-root",
+      "frameworks": [],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "pnpm",
+          "version": "9.12.3",
+          "confidence": "high",
+          "why": "package.json sets packageManager: \"pnpm@9.12.3\" (lockfile agrees)",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 4,
+              "source": "manifest-explicit",
+              "detail": "packageManager: \"pnpm@9.12.3\"",
+              "role": "basis"
+            },
+            {
+              "file": "pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "supports"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "packages/ui",
+      "root": "packages/ui",
+      "name": "ui",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "pnpm",
+          "version": "9.12.3",
+          "confidence": "high",
+          "why": "package.json sets packageManager: \"pnpm@9.12.3\" (lockfile agrees)",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 4,
+              "source": "manifest-explicit",
+              "detail": "packageManager: \"pnpm@9.12.3\"",
+              "role": "basis"
+            },
+            {
+              "file": "pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "supports"
+            }
+          ]
+        }
+      ],
+      "workspaceRoot": "root",
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "packages/ui/package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "apps/docs",
+      "root": "apps/docs",
+      "name": "docs",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [
+        {
+          "id": "nextjs",
+          "name": "Next.js",
+          "version": "^15.0.3",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "apps/docs/package.json",
+              "line": 10,
+              "source": "manifest",
+              "detail": "\"next\": \"^15.0.3\"",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "pnpm",
+          "version": "9.12.3",
+          "confidence": "high",
+          "why": "package.json sets packageManager: \"pnpm@9.12.3\" (lockfile agrees)",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 4,
+              "source": "manifest-explicit",
+              "detail": "packageManager: \"pnpm@9.12.3\"",
+              "role": "basis"
+            },
+            {
+              "file": "pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "supports"
+            }
+          ]
+        }
+      ],
+      "workspaceRoot": "root",
+      "dependsOn": [
+        {
+          "project": "packages/ui",
+          "kind": "build",
+          "why": "docs depends on @acme/ui, whose entry point ./dist/index.js is a build output that is not in the repo, so @acme/ui must be built first.",
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "apps/docs/package.json",
+              "line": 9,
+              "source": "manifest",
+              "detail": "\"@acme/ui\": \"workspace:*\"",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "file": "apps/docs/package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "apps/web",
+      "root": "apps/web",
+      "name": "web",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [
+        {
+          "id": "nextjs",
+          "name": "Next.js",
+          "version": "^15.0.3",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "apps/web/package.json",
+              "line": 11,
+              "source": "manifest",
+              "detail": "\"next\": \"^15.0.3\"",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "pnpm",
+          "version": "9.12.3",
+          "confidence": "high",
+          "why": "package.json sets packageManager: \"pnpm@9.12.3\" (lockfile agrees)",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 4,
+              "source": "manifest-explicit",
+              "detail": "packageManager: \"pnpm@9.12.3\"",
+              "role": "basis"
+            },
+            {
+              "file": "pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "supports"
+            }
+          ]
+        }
+      ],
+      "workspaceRoot": "root",
+      "dependsOn": [
+        {
+          "project": "packages/ui",
+          "kind": "build",
+          "why": "web depends on @acme/ui, whose entry point ./dist/index.js is a build output that is not in the repo, so @acme/ui must be built first.",
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "apps/web/package.json",
+              "line": 10,
+              "source": "manifest",
+              "detail": "\"@acme/ui\": \"workspace:*\"",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "file": "apps/web/package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "range": ">=18.18.0",
+      "rangeText": ">= 18.18",
+      "recommended": "22",
+      "projects": [
+        "root",
+        "apps/docs",
+        "apps/web",
+        "packages/ui"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "package.json needs Node.js. .nvmrc pins Node.js 22. Next.js 15 requires node >= 18.18.0 (https://nextjs.org/docs/app/getting-started/installation); .nvmrc pins Node.js 22.",
+      "evidence": [
+        {
+          "file": ".nvmrc",
+          "line": 1,
+          "source": "version-file",
+          "detail": ".nvmrc: 22",
+          "role": "basis"
+        },
+        {
+          "file": "apps/docs/package.json",
+          "line": 10,
+          "source": "recipe",
+          "detail": "Next.js 15 requires node >= 18.18.0 (https://nextjs.org/docs/app/getting-started/installation)",
+          "role": "basis"
+        },
+        {
+          "file": "apps/web/package.json",
+          "line": 11,
+          "source": "recipe",
+          "detail": "Next.js 15 requires node >= 18.18.0 (https://nextjs.org/docs/app/getting-started/installation)",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:pnpm",
+      "kind": "package-manager",
+      "name": "pnpm",
+      "recommended": "9.12.3",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "acme uses pnpm: package.json sets packageManager: \"pnpm@9.12.3\" (lockfile agrees). package.json pins pnpm 9.12.3.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 4,
+          "source": "manifest-explicit",
+          "detail": "packageManager: \"pnpm@9.12.3\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "services": [],
+  "env": [],
+  "steps": [
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install the workspace's JavaScript dependencies (pnpm)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "install",
+          "--frozen-lockfile"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:pnpm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "package.json declares the dependencies; package.json sets packageManager: \"pnpm@9.12.3\" (lockfile agrees). The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"pnpm install\" instead (it may change the lockfile).",
+        "Installs the whole workspace: apps/docs, apps/web, packages/ui."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "pnpm-lock.yaml",
+          "source": "lockfile",
+          "detail": "pnpm-lock.yaml present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.build",
+      "project": "root",
+      "phase": "build",
+      "title": "Build acme for production",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "Only needed for the production run target; the dev server builds on the fly.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 7,
+          "source": "manifest",
+          "detail": "scripts.build: \"turbo run build\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "packages/ui.build",
+      "project": "packages/ui",
+      "phase": "build",
+      "title": "Build ui (other workspace packages import its build output)",
+      "cwd": "packages/ui",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "medium",
+      "why": "Other packages in the workspace import ui's compiled output, which is not committed.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "packages/ui/package.json",
+          "line": 7,
+          "source": "manifest",
+          "detail": "scripts.build: \"tsup src/index.tsx --dts\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "apps/docs.build",
+      "project": "apps/docs",
+      "phase": "build",
+      "title": "Build docs for production",
+      "cwd": "apps/docs",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "Only needed for the production run target; the dev server builds on the fly.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "apps/docs/package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.build: \"next build\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "apps/web.build",
+      "project": "apps/web",
+      "phase": "build",
+      "title": "Build web for production",
+      "cwd": "apps/web",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "Only needed for the production run target; the dev server builds on the fly.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "apps/web/package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.build: \"next build\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.dev",
+      "project": "root",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start acme (several processes through a task runner)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3000,
+          "confidence": "low",
+          "evidence": [
+            {
+              "file": "apps/web/package.json",
+              "line": 5,
+              "source": "manifest",
+              "detail": "the script sets port 3000",
+              "role": "supports"
+            }
+          ]
+        },
+        {
+          "port": 3001,
+          "confidence": "low",
+          "evidence": [
+            {
+              "file": "apps/docs/package.json",
+              "line": 5,
+              "source": "manifest",
+              "detail": "the script sets port 3001",
+              "role": "supports"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3000,
+        "timeoutSec": 180
+      },
+      "confidence": "high",
+      "why": "package.json defines \"dev\": turbo run dev.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.dev: \"turbo run dev\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "packages/ui.dev",
+      "project": "packages/ui",
+      "name": "dev",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start ui (the app)",
+      "cwd": "packages/ui",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "stays-up",
+        "seconds": 20
+      },
+      "confidence": "medium",
+      "why": "packages/ui/package.json defines \"dev\": tsup src/index.tsx --watch. The workspace root's \"dev\" script starts it together with the other packages.",
+      "evidence": [
+        {
+          "file": "packages/ui/package.json",
+          "line": 8,
+          "source": "manifest",
+          "detail": "scripts.dev: \"tsup src/index.tsx --watch\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "apps/docs.dev",
+      "project": "apps/docs",
+      "name": "dev",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start docs (next dev server)",
+      "cwd": "apps/docs",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3001,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "apps/docs/package.json",
+              "line": 5,
+              "source": "manifest",
+              "detail": "the script sets port 3001",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3001,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "apps/docs/package.json defines \"dev\": next dev -p 3001. The workspace root's \"dev\" script starts it together with the other packages.",
+      "evidence": [
+        {
+          "file": "apps/docs/package.json",
+          "line": 5,
+          "source": "manifest",
+          "detail": "scripts.dev: \"next dev -p 3001\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "apps/web.dev",
+      "project": "apps/web",
+      "name": "dev",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start web (next dev server)",
+      "cwd": "apps/web",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3000,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "apps/web/package.json",
+              "line": 5,
+              "source": "manifest",
+              "detail": "the script sets port 3000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "apps/web/package.json defines \"dev\": next dev --port 3000. The workspace root's \"dev\" script starts it together with the other packages.",
+      "evidence": [
+        {
+          "file": "apps/web/package.json",
+          "line": 5,
+          "source": "manifest",
+          "detail": "scripts.dev: \"next dev --port 3000\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "apps/web.start",
+      "project": "apps/web",
+      "name": "start",
+      "kind": "production",
+      "primary": true,
+      "title": "Serve web (next server)",
+      "cwd": "apps/web",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "start"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "apps/web/package.json",
+              "line": 7,
+              "source": "manifest",
+              "detail": "next's default port is 3000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "apps/web.build",
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "apps/web/package.json defines \"start\": next start (needs a build first).",
+      "evidence": [
+        {
+          "file": "apps/web/package.json",
+          "line": 7,
+          "source": "manifest",
+          "detail": "scripts.start: \"next start\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "conflicts": [],
+  "unknowns": [],
+  "meta": {
+    "rootName": "pnpm-turbo-monorepo",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 15,
+      "filesRead": 8,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 1,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".nvmrc",
+        "sha256": "f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56"
+      },
+      {
+        "file": "apps/docs/package.json",
+        "sha256": "6a5df942f47412a2149a06b27833d2312e2b3c6fdac253ad210cbc8f1182308a"
+      },
+      {
+        "file": "apps/web/package.json",
+        "sha256": "f1e873011bc1a657a0b2ea5f7c66e88990e72078addd2ac290032028cde87732"
+      },
+      {
+        "file": "package.json",
+        "sha256": "3be37eccea7a28d31b3d6ceffb23068e80aab722f3697cb5b60593ac957f5e78"
+      },
+      {
+        "file": "packages/ui/package.json",
+        "sha256": "d775cd3f6cacb207cf7870d2b9a3be78f35b5fae835d9912a1e46f7c4b65e828"
+      },
+      {
+        "file": "packages/ui/src/index.tsx",
+        "sha256": "101086c04aac0612f34948bbd875c4e7269cd161bf52118a88c26e2eafcf5975"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "sha256": "bb3121282a02e028d9a96ea1b842dd54b26b41805396210fd648efbf2b7bab3f"
+      },
+      {
+        "file": "pnpm-workspace.yaml",
+        "sha256": "08d75840c97ab0e72d1d9b5b84a17e47a2e06cb159a5fbec5ee0a6a56682dad7"
+      }
+    ]
+  }
+}

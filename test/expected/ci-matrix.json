@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:1499fd9b4ff5a62e191abbc5a69f12180ffc251f34d1cc721050b9b35420ef02",
+  "summary": {
+    "support": "full",
+    "projects": 1,
+    "steps": 1,
+    "conflicts": 0,
+    "unknowns": 0,
+    "lowestStepConfidence": "high"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "tiny-api",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "npm",
+          "confidence": "high",
+          "why": "package-lock.json exists (ci agrees)",
+          "evidence": [
+            {
+              "file": "package-lock.json",
+              "source": "lockfile",
+              "detail": "package-lock.json present",
+              "role": "basis"
+            },
+            {
+              "file": ".github/workflows/test.yml",
+              "line": 15,
+              "source": "ci",
+              "detail": "actions/setup-node cache: npm",
+              "role": "supports"
+            },
+            {
+              "file": ".github/workflows/test.yml",
+              "line": 16,
+              "source": "ci",
+              "detail": "npm ci",
+              "role": "supports"
+            },
+            {
+              "file": ".github/workflows/test.yml",
+              "line": 17,
+              "source": "ci",
+              "detail": "npm test",
+              "role": "supports"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "range": ">=18.0.0",
+      "rangeText": ">= 18",
+      "recommended": "22.x",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "package.json needs Node.js. package.json engines.node requires \">=18\"; CI (test.yml) tests Node.js 18.x, 20.x, 22.x; recommending the newest.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "engines.node: \">=18\"",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/test.yml",
+          "line": 14,
+          "source": "ci",
+          "detail": "actions/setup-node node-version: 18.x (matrix)",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:npm",
+      "kind": "package-manager",
+      "name": "npm",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "tiny-api uses npm: package-lock.json exists (ci agrees). npm comes with Node.js (some Linux distributions package it separately).",
+      "evidence": []
+    }
+  ],
+  "services": [],
+  "env": [],
+  "steps": [
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (npm)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "ci"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:npm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "package.json declares the dependencies; package-lock.json exists (ci agrees). The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"npm install\" instead (it may change the lockfile)."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "package-lock.json",
+          "source": "lockfile",
+          "detail": "package-lock.json present",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/test.yml",
+          "line": 16,
+          "source": "ci",
+          "detail": "npm ci",
+          "role": "supports"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.start",
+      "project": "root",
+      "name": "start",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start tiny-api (the app)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "start"
+        ]
+      },
+      "ports": [
+        {
+          "port": 8080,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "index.js",
+              "line": 1,
+              "source": "code",
+              "detail": "require('fastify')().listen({ port: Number(process.env.PORT ?? 8080) });",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 8080,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"start\": node index.js.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 9,
+          "source": "manifest",
+          "detail": "scripts.start: \"node index.js\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.test",
+      "project": "root",
+      "name": "test",
+      "kind": "test",
+      "primary": true,
+      "title": "Run tiny-api's tests",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "test"
+        ]
+      },
+      "ports": [],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "exits",
+        "timeoutSec": 1800
+      },
+      "confidence": "high",
+      "why": "package.json defines a test script.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 10,
+          "source": "manifest",
+          "detail": "scripts.test: \"node --test\"",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/test.yml",
+          "line": 17,
+          "source": "ci",
+          "detail": "npm test",
+          "role": "supports"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "conflicts": [],
+  "unknowns": [],
+  "meta": {
+    "rootName": "ci-matrix",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 6,
+      "filesRead": 4,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 1,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".github/workflows/test.yml",
+        "sha256": "309842d3e84ac48f006d3b1fa52a7c2437347b55124421243803b6623ce72e21"
+      },
+      {
+        "file": "index.js",
+        "sha256": "fd160622c19247da44d016390c60ae5236a1dfd05079f0db3fdd0e06753ca163"
+      },
+      {
+        "file": "package-lock.json",
+        "sha256": "6c8c773e961d568a88522fab3eef552beebe76b0a68c649fcbcf42200fa67364"
+      },
+      {
+        "file": "package.json",
+        "sha256": "30605418af364e3eb20282fbb366252555d9c6d7db53e8de9e8097e28a9f7bf0"
+      }
+    ]
+  }
+}

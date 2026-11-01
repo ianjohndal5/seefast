@@ -1,0 +1,2481 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:8e085726e4740181611febe03cf929e5298801dea25edd2c69dcb4f5c3dabe16",
+  "summary": {
+    "support": "full",
+    "projects": 2,
+    "steps": 12,
+    "conflicts": 2,
+    "unknowns": 0,
+    "lowestStepConfidence": "medium"
+  },
+  "projects": [
+    {
+      "id": "api",
+      "root": "api",
+      "name": "portal-api",
+      "ecosystems": [
+        "php",
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [
+        {
+          "id": "laravel",
+          "name": "Laravel",
+          "version": "^11.31",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/composer.json",
+              "line": 6,
+              "source": "manifest",
+              "detail": "\"laravel/framework\": \"^11.31\"",
+              "role": "basis"
+            },
+            {
+              "file": "api/artisan",
+              "source": "manifest",
+              "detail": "artisan exists",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "npm",
+          "confidence": "high",
+          "why": "package-lock.json exists",
+          "evidence": [
+            {
+              "file": "api/package-lock.json",
+              "source": "lockfile",
+              "detail": "package-lock.json present",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "ecosystem": "php",
+          "name": "composer",
+          "confidence": "high",
+          "why": "api/composer.json is a Composer manifest.",
+          "evidence": [
+            {
+              "file": "api/composer.json",
+              "source": "manifest",
+              "detail": "composer.json",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "source": "manifest",
+          "detail": "composer.json found",
+          "role": "basis"
+        },
+        {
+          "file": "api/package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "web",
+      "root": "web",
+      "name": "web",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [
+        {
+          "id": "nextjs",
+          "name": "Next.js",
+          "version": "15.1.0",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "web/package.json",
+              "line": 15,
+              "source": "manifest",
+              "detail": "\"next\": \"15.1.0\"",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "pnpm",
+          "version": "9.15.0",
+          "confidence": "high",
+          "why": "package.json sets packageManager: \"pnpm@9.15.0\" (lockfile, ci agree)",
+          "evidence": [
+            {
+              "file": "web/package.json",
+              "line": 4,
+              "source": "manifest-explicit",
+              "detail": "packageManager: \"pnpm@9.15.0\"",
+              "role": "basis"
+            },
+            {
+              "file": "web/pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "supports"
+            },
+            {
+              "file": ".github/workflows/ci.yml",
+              "line": 42,
+              "source": "ci",
+              "detail": "uses pnpm/action-setup",
+              "role": "supports"
+            },
+            {
+              "file": ".github/workflows/ci.yml",
+              "line": 46,
+              "source": "ci",
+              "detail": "actions/setup-node cache: pnpm",
+              "role": "supports"
+            },
+            {
+              "file": ".github/workflows/ci.yml",
+              "line": 48,
+              "source": "ci",
+              "detail": "pnpm install --frozen-lockfile",
+              "role": "supports"
+            },
+            {
+              "file": "README.md",
+              "line": 20,
+              "source": "readme",
+              "detail": "npm install",
+              "role": "contradicts"
+            },
+            {
+              "file": "README.md",
+              "line": 21,
+              "source": "readme",
+              "detail": "npm run dev",
+              "role": "contradicts"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [
+        {
+          "project": "api",
+          "kind": "runtime",
+          "confidence": "medium",
+          "why": "NEXT_PUBLIC_API_URL points at localhost:8000, where portal-api serves; start portal-api first.",
+          "evidence": [
+            {
+              "file": "web/.env.example",
+              "line": 1,
+              "source": "env-template",
+              "detail": "NEXT_PUBLIC_API_URL=http://localhost:8000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "evidence": [
+        {
+          "file": "web/package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "range": ">=20.0.0",
+      "rangeText": ">= 20",
+      "recommended": "20.18.0",
+      "projects": [
+        "api",
+        "web"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "api/package.json needs Node.js. package-lock.json: locked dependency concurrently@9.1.0 declares engines.node \">=18\". package.json engines.node requires \">=20\"; .nvmrc pins Node.js 20.18.0; together: >= 20.",
+      "evidence": [
+        {
+          "file": "api/package-lock.json",
+          "line": 14,
+          "source": "lockfile",
+          "detail": "locked dependency concurrently@9.1.0 declares engines.node \">=18\"",
+          "role": "basis"
+        },
+        {
+          "file": "web/package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "engines.node: \">=20\"",
+          "role": "basis"
+        },
+        {
+          "file": "web/package.json",
+          "line": 15,
+          "source": "recipe",
+          "detail": "Next.js 15 requires node >= 18.18.0 (https://nextjs.org/docs/app/getting-started/installation)",
+          "role": "basis"
+        },
+        {
+          "file": "web/pnpm-lock.yaml",
+          "line": 19,
+          "source": "lockfile",
+          "detail": "locked dependency next@15.1.0 declares engines.node \"^18.18.0 || ^19.8.0 || >= 20.0.0\"",
+          "role": "basis"
+        },
+        {
+          "file": "web/.nvmrc",
+          "line": 1,
+          "source": "version-file",
+          "detail": ".nvmrc: 20.18.0",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "runtime:php",
+      "kind": "runtime",
+      "name": "php",
+      "range": ">=8.2.0 <9.0.0-0",
+      "rangeText": "^8.2",
+      "recommended": "8.3",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "api/composer.json needs PHP. composer.json require.php requires \"^8.2\"; CI (ci.yml) tests PHP 8.2, 8.3; recommending the newest; together: ^8.2.",
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 5,
+          "source": "manifest",
+          "detail": "require.php: \"^8.2\"",
+          "role": "basis"
+        },
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel 11 requires php >= 8.2.0 (https://laravel.com/docs/12.x/installation)",
+          "role": "basis"
+        },
+        {
+          "file": "api/composer.lock",
+          "line": 11,
+          "source": "lockfile",
+          "detail": "locked package laravel/framework v11.31.0 requires php \"^8.2\"",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 24,
+          "source": "ci",
+          "detail": "shivammathur/setup-php php-version: 8.2 (matrix)",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:composer",
+      "kind": "package-manager",
+      "name": "composer",
+      "range": ">=2.0.0",
+      "rangeText": ">= 2",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": "api/composer.json declares the PHP dependencies. composer.lock: plugin-api-version: \"2.6.0\" (Composer 2).",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 80,
+          "source": "lockfile",
+          "detail": "plugin-api-version: \"2.6.0\" (Composer 2)",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:npm",
+      "kind": "package-manager",
+      "name": "npm",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "portal-api uses npm: package-lock.json exists. npm comes with Node.js (some Linux distributions package it separately).",
+      "evidence": []
+    },
+    {
+      "id": "package-manager:pnpm",
+      "kind": "package-manager",
+      "name": "pnpm",
+      "recommended": "9.15.0",
+      "projects": [
+        "web"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "web uses pnpm: package.json sets packageManager: \"pnpm@9.15.0\" (lockfile, ci agree). package.json pins pnpm 9.15.0.",
+      "evidence": [
+        {
+          "file": "web/package.json",
+          "line": 4,
+          "source": "manifest-explicit",
+          "detail": "packageManager: \"pnpm@9.15.0\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:ctype",
+      "kind": "extension",
+      "name": "ctype",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-ctype.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 12,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-ctype",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:dom",
+      "kind": "extension",
+      "name": "dom",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-dom.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 67,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-dom",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:fileinfo",
+      "kind": "extension",
+      "name": "fileinfo",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: league/flysystem-local requires ext-fileinfo.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 34,
+          "source": "lockfile",
+          "detail": "league/flysystem-local requires ext-fileinfo",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:filter",
+      "kind": "extension",
+      "name": "filter",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-filter.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 13,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-filter",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:libxml",
+      "kind": "extension",
+      "name": "libxml",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-libxml.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 69,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-libxml",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:mbstring",
+      "kind": "extension",
+      "name": "mbstring",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-mbstring.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 15,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-mbstring",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 25,
+          "source": "ci",
+          "detail": "setup-php extensions: mbstring",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:openssl",
+      "kind": "extension",
+      "name": "openssl",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-openssl.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 16,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-openssl",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:pdo_mysql",
+      "kind": "extension",
+      "name": "pdo_mysql",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": ".env.example says DB_CONNECTION=mysql uses the pdo_mysql driver.",
+      "evidence": [
+        {
+          "file": "api/.env.example",
+          "line": 9,
+          "source": "env-template",
+          "detail": "DB_CONNECTION=mysql uses the pdo_mysql driver",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 25,
+          "source": "ci",
+          "detail": "setup-php extensions: pdo_mysql",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:redis",
+      "kind": "extension",
+      "name": "redis",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": ".env.example says CACHE_STORE=redis with Laravel's default client phpredis.",
+      "evidence": [
+        {
+          "file": "api/.env.example",
+          "line": 17,
+          "source": "env-template",
+          "detail": "CACHE_STORE=redis with Laravel's default client phpredis",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:session",
+      "kind": "extension",
+      "name": "session",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-session.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 17,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-session",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:tokenizer",
+      "kind": "extension",
+      "name": "tokenizer",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: laravel/framework requires ext-tokenizer.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 18,
+          "source": "lockfile",
+          "detail": "laravel/framework requires ext-tokenizer",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:xml",
+      "kind": "extension",
+      "name": "xml",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-xml.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 71,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-xml",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "php-extension:xmlwriter",
+      "kind": "extension",
+      "name": "xmlwriter",
+      "projects": [
+        "api"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "composer.lock: phpunit/phpunit requires ext-xmlwriter.",
+      "evidence": [
+        {
+          "file": "api/composer.lock",
+          "line": 72,
+          "source": "lockfile",
+          "detail": "phpunit/phpunit requires ext-xmlwriter",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "tool:docker",
+      "kind": "tool",
+      "name": "docker",
+      "projects": [
+        "api"
+      ],
+      "optional": true,
+      "status": "ok",
+      "confidence": "high",
+      "why": "Only to start mysql, redis with Compose; a local installation works too.",
+      "evidence": [
+        {
+          "file": "docker-compose.yml",
+          "source": "compose",
+          "detail": "docker-compose.yml present",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "service:mailpit",
+      "name": "mailpit",
+      "category": "mail",
+      "ports": [
+        1025,
+        8025
+      ],
+      "provider": {
+        "type": "compose",
+        "file": "docker-compose.yml",
+        "service": "mailpit",
+        "image": "axllent/mailpit:latest"
+      },
+      "projects": [
+        "api"
+      ],
+      "env": [],
+      "optional": true,
+      "confidence": "medium",
+      "why": "docker-compose.yml defines it, but no env template points at it.",
+      "evidence": [
+        {
+          "file": "docker-compose.yml",
+          "line": 14,
+          "source": "compose",
+          "detail": "service \"mailpit\": image axllent/mailpit:latest, port 1025, 8025",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "service:mysql",
+      "name": "mysql",
+      "category": "database",
+      "version": "8.0",
+      "ports": [
+        3306
+      ],
+      "provider": {
+        "type": "compose",
+        "file": "docker-compose.yml",
+        "service": "mysql",
+        "image": "mysql/mysql-server:8.0"
+      },
+      "projects": [
+        "api"
+      ],
+      "env": [
+        "DB_HOST",
+        "DB_PORT",
+        "DB_DATABASE",
+        "DB_USERNAME",
+        "DB_PASSWORD"
+      ],
+      "optional": false,
+      "confidence": "high",
+      "why": ".env.example says DB_CONNECTION=mysql.",
+      "evidence": [
+        {
+          "file": "api/.env.example",
+          "line": 9,
+          "source": "env-template",
+          "detail": "DB_CONNECTION=mysql",
+          "role": "basis"
+        },
+        {
+          "file": "docker-compose.yml",
+          "line": 2,
+          "source": "compose",
+          "detail": "service \"mysql\": image mysql/mysql-server:8.0, port 3306",
+          "role": "supports"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 10,
+          "source": "ci",
+          "detail": "CI job \"api\" runs service container mysql:8.0",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "service:redis",
+      "name": "redis",
+      "category": "cache",
+      "version": "7",
+      "ports": [
+        6379
+      ],
+      "provider": {
+        "type": "compose",
+        "file": "docker-compose.yml",
+        "service": "redis",
+        "image": "redis:7-alpine"
+      },
+      "projects": [
+        "api"
+      ],
+      "env": [
+        "REDIS_HOST",
+        "REDIS_PORT",
+        "REDIS_PASSWORD"
+      ],
+      "optional": false,
+      "confidence": "high",
+      "why": ".env.example says CACHE_STORE=redis.",
+      "evidence": [
+        {
+          "file": "api/.env.example",
+          "line": 17,
+          "source": "env-template",
+          "detail": "CACHE_STORE=redis",
+          "role": "basis"
+        },
+        {
+          "file": "docker-compose.yml",
+          "line": 10,
+          "source": "compose",
+          "detail": "service \"redis\": image redis:7-alpine, port 6379",
+          "role": "supports"
+        }
+      ]
+    }
+  ],
+  "env": [
+    {
+      "project": "api",
+      "file": "api/.env",
+      "template": "api/.env.example",
+      "exists": false,
+      "createdBy": "api.env",
+      "vars": [
+        {
+          "name": "APP_NAME",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 1,
+              "source": "env-template",
+              "detail": "APP_NAME=…",
+              "role": "basis"
+            },
+            {
+              "file": "api/config/app.php",
+              "line": 3,
+              "source": "code",
+              "detail": "env('APP_NAME'",
+              "role": "supports"
+            }
+          ]
+        },
+        {
+          "name": "APP_ENV",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 2,
+              "source": "env-template",
+              "detail": "APP_ENV=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "APP_KEY",
+          "fill": "generated",
+          "secret": true,
+          "generatedBy": "api.key",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 3,
+              "source": "env-template",
+              "detail": "APP_KEY=",
+              "role": "basis"
+            },
+            {
+              "file": "api/config/app.php",
+              "line": 4,
+              "source": "code",
+              "detail": "env('APP_KEY'",
+              "role": "supports"
+            }
+          ]
+        },
+        {
+          "name": "APP_DEBUG",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 4,
+              "source": "env-template",
+              "detail": "APP_DEBUG=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "APP_URL",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 5,
+              "source": "env-template",
+              "detail": "APP_URL=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "LOG_CHANNEL",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 7,
+              "source": "env-template",
+              "detail": "LOG_CHANNEL=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_CONNECTION",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 9,
+              "source": "env-template",
+              "detail": "DB_CONNECTION=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_HOST",
+          "fill": "default",
+          "secret": false,
+          "note": "DB_HOST=mysql is the Compose service name, which only resolves inside Docker. When the app runs on your machine, set DB_HOST=127.0.0.1.",
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 10,
+              "source": "env-template",
+              "detail": "DB_HOST=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_PORT",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 11,
+              "source": "env-template",
+              "detail": "DB_PORT=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_DATABASE",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 12,
+              "source": "env-template",
+              "detail": "DB_DATABASE=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_USERNAME",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 13,
+              "source": "env-template",
+              "detail": "DB_USERNAME=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "DB_PASSWORD",
+          "fill": "user",
+          "secret": true,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 14,
+              "source": "env-template",
+              "detail": "DB_PASSWORD=",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "SESSION_DRIVER",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 16,
+              "source": "env-template",
+              "detail": "SESSION_DRIVER=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "CACHE_STORE",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 17,
+              "source": "env-template",
+              "detail": "CACHE_STORE=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "QUEUE_CONNECTION",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 18,
+              "source": "env-template",
+              "detail": "QUEUE_CONNECTION=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "REDIS_HOST",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 20,
+              "source": "env-template",
+              "detail": "REDIS_HOST=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "REDIS_PASSWORD",
+          "fill": "optional",
+          "secret": true,
+          "note": "Only needed for the integration it configures.",
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 21,
+              "source": "env-template",
+              "detail": "REDIS_PASSWORD=<placeholder>",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "REDIS_PORT",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 22,
+              "source": "env-template",
+              "detail": "REDIS_PORT=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "MAIL_MAILER",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 24,
+              "source": "env-template",
+              "detail": "MAIL_MAILER=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "MAIL_HOST",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 25,
+              "source": "env-template",
+              "detail": "MAIL_HOST=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "fill": "optional",
+          "secret": true,
+          "note": "Only needed for the integration it configures.",
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 27,
+              "source": "env-template",
+              "detail": "AWS_ACCESS_KEY_ID=",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "fill": "optional",
+          "secret": true,
+          "note": "Only needed for the integration it configures.",
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 28,
+              "source": "env-template",
+              "detail": "AWS_SECRET_ACCESS_KEY=",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "FRONTEND_URL",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 30,
+              "source": "env-template",
+              "detail": "FRONTEND_URL=…",
+              "role": "basis"
+            },
+            {
+              "file": "api/config/app.php",
+              "line": 5,
+              "source": "code",
+              "detail": "env('FRONTEND_URL'",
+              "role": "supports"
+            }
+          ]
+        },
+        {
+          "name": "SENTRY_LARAVEL_DSN",
+          "fill": "unknown",
+          "secret": true,
+          "confidence": "low",
+          "note": "Read by the code but missing from .env.example.",
+          "evidence": [
+            {
+              "file": "api/config/services.php",
+              "line": 3,
+              "source": "code",
+              "detail": "env('SENTRY_LARAVEL_DSN'",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "confidence": "high",
+      "why": "api/.env.example is the template for .env. CI (ci.yml) runs \"cp .env.example .env\" (recipe agrees).",
+      "evidence": [
+        {
+          "file": "api/.env.example",
+          "source": "env-template",
+          "detail": "23 variables",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 29,
+          "source": "ci",
+          "detail": "cp .env.example .env",
+          "role": "basis"
+        },
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel reads .env",
+          "role": "supports"
+        },
+        {
+          "file": "README.md",
+          "line": 11,
+          "source": "readme",
+          "detail": "cp .env.example .env",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "project": "web",
+      "file": "web/.env.local",
+      "template": "web/.env.example",
+      "exists": false,
+      "createdBy": "web.env",
+      "vars": [
+        {
+          "name": "NEXT_PUBLIC_API_URL",
+          "fill": "default",
+          "secret": false,
+          "note": "Inlined into the browser bundle when the app is built: changing it needs a rebuild, and it must not hold a secret.",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "web/.env.example",
+              "line": 1,
+              "source": "env-template",
+              "detail": "NEXT_PUBLIC_API_URL=…",
+              "role": "basis"
+            },
+            {
+              "file": "web/src/app/page.tsx",
+              "line": 2,
+              "source": "code",
+              "detail": "process.env.NEXT_PUBLIC_API_URL",
+              "role": "supports"
+            }
+          ]
+        },
+        {
+          "name": "AUTH_SECRET",
+          "fill": "user",
+          "secret": true,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "web/.env.example",
+              "line": 2,
+              "source": "env-template",
+              "detail": "AUTH_SECRET=",
+              "role": "basis"
+            },
+            {
+              "file": "web/src/lib/session.ts",
+              "line": 1,
+              "source": "code",
+              "detail": "process.env.AUTH_SECRET",
+              "role": "supports"
+            }
+          ]
+        },
+        {
+          "name": "NEXT_PUBLIC_ANALYTICS_ID",
+          "fill": "unknown",
+          "secret": false,
+          "confidence": "low",
+          "note": "Read by the code but missing from .env.example.",
+          "evidence": [
+            {
+              "file": "web/src/lib/session.ts",
+              "line": 2,
+              "source": "code",
+              "detail": "process.env.NEXT_PUBLIC_ANALYTICS_ID",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "confidence": "high",
+      "why": "web/.env.example is the template for .env.local. Next.js reads .env.local.",
+      "evidence": [
+        {
+          "file": "web/.env.example",
+          "source": "env-template",
+          "detail": "2 variables",
+          "role": "basis"
+        },
+        {
+          "file": "web/package.json",
+          "line": 15,
+          "source": "recipe",
+          "detail": "Next.js reads .env.local",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "api.composer-install",
+      "project": "api",
+      "phase": "install",
+      "title": "Install PHP dependencies (Composer)",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "composer",
+          "install"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:composer",
+        "runtime:php"
+      ],
+      "confidence": "high",
+      "why": "api/composer.json declares the PHP dependencies and composer.lock pins them; composer install installs exactly the locked versions.",
+      "notes": [
+        "Composer also runs the project's \"post-autoload-dump\" script: Illuminate\\Foundation\\ComposerScripts::postAutoloadDump && @php artisan package:discover --ansi"
+      ],
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "source": "manifest",
+          "detail": "composer.json",
+          "role": "basis"
+        },
+        {
+          "file": "api/composer.lock",
+          "source": "lockfile",
+          "detail": "composer.lock present",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 27,
+          "source": "ci",
+          "detail": "composer install --no-interaction --prefer-dist",
+          "role": "supports"
+        },
+        {
+          "file": "README.md",
+          "line": 10,
+          "source": "readme",
+          "detail": "composer install",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "api.install",
+      "project": "api",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (npm)",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "ci"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:npm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "api/package.json declares the dependencies; package-lock.json exists. The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"npm install\" instead (it may change the lockfile)."
+      ],
+      "evidence": [
+        {
+          "file": "api/package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "api/package-lock.json",
+          "source": "lockfile",
+          "detail": "package-lock.json present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.env",
+      "project": "api",
+      "phase": "configure",
+      "title": "Create .env from .env.example",
+      "cwd": "api",
+      "action": {
+        "type": "copy",
+        "from": ".env.example",
+        "to": ".env"
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [],
+      "confidence": "high",
+      "why": "The app reads its configuration from .env, which is not committed; api/.env.example is the template. CI (ci.yml) runs \"cp .env.example .env\" (recipe agrees).",
+      "notes": [
+        "Then fill in: DB_PASSWORD."
+      ],
+      "evidence": [
+        {
+          "file": "api/.env.example",
+          "source": "env-template",
+          "detail": "23 variables",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 29,
+          "source": "ci",
+          "detail": "cp .env.example .env",
+          "role": "basis"
+        },
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel reads .env",
+          "role": "supports"
+        },
+        {
+          "file": "README.md",
+          "line": 11,
+          "source": "readme",
+          "detail": "cp .env.example .env",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "api.key",
+      "project": "api",
+      "phase": "configure",
+      "title": "Generate the application key (APP_KEY)",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "key:generate"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "api.composer-install",
+        "api.env"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "high",
+      "why": "Laravel encrypts sessions and cookies with APP_KEY, and the template leaves it empty. Without it every page fails with \"No application encryption key has been specified\".",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: generate the application key (app_key)",
+          "role": "basis"
+        },
+        {
+          "file": "api/.env.example",
+          "line": 3,
+          "source": "env-template",
+          "detail": "APP_KEY=",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 30,
+          "source": "ci",
+          "detail": "php artisan key:generate",
+          "role": "supports"
+        },
+        {
+          "file": "README.md",
+          "line": 12,
+          "source": "readme",
+          "detail": "php artisan key:generate",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "api.storage-link",
+      "project": "api",
+      "phase": "configure",
+      "title": "Link public/storage to storage/app/public",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "storage:link"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "api.composer-install",
+        "api.env"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "medium",
+      "why": "Uploaded files on the public disk are served through this link. The app starts without it, but uploads and generated files 404.",
+      "notes": [
+        "On Windows, creating a symbolic link needs Developer Mode or an administrator prompt; this tool never elevates."
+      ],
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: link public/storage to storage/app/public",
+          "role": "basis"
+        },
+        {
+          "file": "api/storage/app/public",
+          "source": "manifest",
+          "detail": "storage/app/public/ exists",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.services",
+      "project": "api",
+      "phase": "services",
+      "title": "Start mysql, redis with Docker Compose",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "docker",
+          "compose",
+          "up",
+          "-d",
+          "mysql",
+          "redis"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": true,
+      "optional": false,
+      "after": [
+        "api.env"
+      ],
+      "requires": [
+        "tool:docker"
+      ],
+      "confidence": "medium",
+      "why": "docker-compose.yml defines mysql 8.0 and redis 7, which the app needs. Compose reads the env file in its folder for passwords and ports.",
+      "notes": [
+        "Creates containers and volumes outside the project folder, and downloads images on first run.",
+        "If you already run mysql/redis on this machine, skip this step and point the env file at it.",
+        "Stop them later with: docker compose stop"
+      ],
+      "evidence": [
+        {
+          "file": "docker-compose.yml",
+          "line": 2,
+          "source": "compose",
+          "detail": "service \"mysql\": image mysql/mysql-server:8.0, port 3306",
+          "role": "basis"
+        },
+        {
+          "file": "docker-compose.yml",
+          "line": 10,
+          "source": "compose",
+          "detail": "service \"redis\": image redis:7-alpine, port 6379",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.migrate",
+      "project": "api",
+      "phase": "database",
+      "title": "Create the database tables (migrations)",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "migrate"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "api.composer-install",
+        "api.key",
+        "api.services"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "medium",
+      "why": "database/migrations holds the schema. The app's first request fails on missing tables until they are created.",
+      "notes": [
+        "Needs the database server running and DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME and DB_PASSWORD in the env file to match it; the database itself must exist."
+      ],
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: create the database tables (migrations)",
+          "role": "basis"
+        },
+        {
+          "file": "api/database/migrations",
+          "source": "manifest",
+          "detail": "database/migrations/ exists",
+          "role": "basis"
+        },
+        {
+          "file": "README.md",
+          "line": 13,
+          "source": "readme",
+          "detail": "php artisan migrate --seed",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "api.seed",
+      "project": "api",
+      "phase": "database",
+      "title": "Fill the database with seed data",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "db:seed"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "api.migrate",
+        "api.services"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "confidence": "medium",
+      "why": "database/seeders/DatabaseSeeder.php exists. Seeding adds sample or required records (often an admin user); read the seeder before running it.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: fill the database with seed data",
+          "role": "basis"
+        },
+        {
+          "file": "api/database/seeders/DatabaseSeeder.php",
+          "source": "manifest",
+          "detail": "database/seeders/DatabaseSeeder.php exists",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.build",
+      "project": "api",
+      "phase": "build",
+      "title": "Build the frontend assets",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "api.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "medium",
+      "why": "Blade templates load compiled CSS and JavaScript (@vite reads public/build/manifest.json; mix() reads public/mix-manifest.json). Without a build, pages fail or render unstyled unless a dev/watch server runs.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "api/package.json",
+          "line": 5,
+          "source": "manifest",
+          "detail": "scripts.build: \"vite build\"",
+          "role": "basis"
+        },
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: build the frontend assets",
+          "role": "basis"
+        },
+        {
+          "file": "api/package.json",
+          "line": 11,
+          "source": "manifest",
+          "detail": "\"laravel-vite-plugin\": \"^1.0\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "web.install",
+      "project": "web",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (pnpm)",
+      "cwd": "web",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "install",
+          "--frozen-lockfile"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:pnpm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "web/package.json declares the dependencies; package.json sets packageManager: \"pnpm@9.15.0\" (lockfile, ci agree). The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"pnpm install\" instead (it may change the lockfile)."
+      ],
+      "evidence": [
+        {
+          "file": "web/package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "web/pnpm-lock.yaml",
+          "source": "lockfile",
+          "detail": "pnpm-lock.yaml present",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 48,
+          "source": "ci",
+          "detail": "pnpm install --frozen-lockfile",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "web.env",
+      "project": "web",
+      "phase": "configure",
+      "title": "Create .env.local from .env.example",
+      "cwd": "web",
+      "action": {
+        "type": "copy",
+        "from": ".env.example",
+        "to": ".env.local"
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [],
+      "confidence": "medium",
+      "why": "The app reads its configuration from .env.local, which is not committed; web/.env.example is the template. Next.js reads .env.local.",
+      "notes": [
+        "Then fill in: AUTH_SECRET."
+      ],
+      "evidence": [
+        {
+          "file": "web/.env.example",
+          "source": "env-template",
+          "detail": "2 variables",
+          "role": "basis"
+        },
+        {
+          "file": "web/package.json",
+          "line": 15,
+          "source": "recipe",
+          "detail": "Next.js reads .env.local",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "web.build",
+      "project": "web",
+      "phase": "build",
+      "title": "Build web for production",
+      "cwd": "web",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "web.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "Only needed for the production run target; the dev server builds on the fly.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "web/package.json",
+          "line": 10,
+          "source": "manifest",
+          "detail": "scripts.build: \"next build\"",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 49,
+          "source": "ci",
+          "detail": "pnpm build",
+          "role": "supports"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "api.composer-dev",
+      "project": "api",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start the Laravel app with its dev script (server, queue, logs, Vite)",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "composer",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 8000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/composer.json",
+              "line": 6,
+              "source": "recipe",
+              "detail": "composer run dev listens on port 8000 by default",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [
+        "service:mysql",
+        "service:redis"
+      ],
+      "after": [
+        "api.composer-install",
+        "api.install",
+        "api.key",
+        "api.migrate"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 8000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "composer.json defines a dev script, the maintainers' own way to start everything together. It runs `php artisan pail`, which needs the pcntl extension that PHP for Windows lacks. On Windows run `php artisan serve` and the Vite dev server separately.",
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: start the laravel app with its dev script (server, queue, logs, vite)",
+          "role": "basis"
+        },
+        {
+          "file": "api/composer.json",
+          "line": 23,
+          "source": "manifest",
+          "detail": "scripts.dev",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.artisan-serve",
+      "project": "api",
+      "name": "serve",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start the Laravel development server",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "serve"
+        ]
+      },
+      "ports": [
+        {
+          "port": 8000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/composer.json",
+              "line": 6,
+              "source": "recipe",
+              "detail": "php artisan serve listens on port 8000 by default",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [
+        "service:mysql",
+        "service:redis"
+      ],
+      "after": [
+        "api.composer-install",
+        "api.key",
+        "api.migrate"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 8000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "php artisan serve listens on http://127.0.0.1:8000 by default.",
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: start the laravel development server",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.dev",
+      "project": "api",
+      "name": "dev",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start portal-api (vite dev server)",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 5173,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "api/package.json",
+              "line": 6,
+              "source": "manifest",
+              "detail": "vite's default port is 5173",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [
+        "service:mysql",
+        "service:redis"
+      ],
+      "after": [
+        "api.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 5173,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "api/package.json defines \"dev\": vite.",
+      "evidence": [
+        {
+          "file": "api/package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.dev: \"vite\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.artisan-queue",
+      "project": "api",
+      "name": "queue",
+      "kind": "worker",
+      "primary": false,
+      "title": "Process queued jobs",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "queue:work"
+        ]
+      },
+      "ports": [],
+      "needs": [
+        "service:mysql",
+        "service:redis"
+      ],
+      "after": [
+        "api.migrate"
+      ],
+      "readiness": {
+        "type": "stays-up",
+        "seconds": 20
+      },
+      "confidence": "medium",
+      "why": "QUEUE_CONNECTION is not sync, so jobs wait in a queue until a worker processes them.",
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: process queued jobs",
+          "role": "basis"
+        },
+        {
+          "file": "api/.env.example",
+          "line": 18,
+          "source": "env-template",
+          "detail": "QUEUE_CONNECTION=database",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "api.artisan-test",
+      "project": "api",
+      "name": "test",
+      "kind": "test",
+      "primary": true,
+      "title": "Run the test suite",
+      "cwd": "api",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "php",
+          "artisan",
+          "test"
+        ]
+      },
+      "ports": [],
+      "needs": [],
+      "after": [
+        "api.composer-install",
+        "api.key"
+      ],
+      "readiness": {
+        "type": "exits",
+        "timeoutSec": 1800
+      },
+      "confidence": "high",
+      "why": "phpunit.xml configures the tests; php artisan test runs them.",
+      "evidence": [
+        {
+          "file": "api/composer.json",
+          "line": 6,
+          "source": "recipe",
+          "detail": "Laravel recipe: run the test suite",
+          "role": "basis"
+        },
+        {
+          "file": "api/phpunit.xml",
+          "source": "manifest",
+          "detail": "phpunit.xml exists",
+          "role": "basis"
+        },
+        {
+          "file": ".github/workflows/ci.yml",
+          "line": 31,
+          "source": "ci",
+          "detail": "php artisan test",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "web.dev",
+      "project": "web",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start web (next dev server)",
+      "cwd": "web",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "web/package.json",
+              "line": 9,
+              "source": "manifest",
+              "detail": "next's default port is 3000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [
+        "api.composer-dev"
+      ],
+      "after": [
+        "web.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "web/package.json defines \"dev\": next dev --turbopack.",
+      "evidence": [
+        {
+          "file": "web/package.json",
+          "line": 9,
+          "source": "manifest",
+          "detail": "scripts.dev: \"next dev --turbopack\"",
+          "role": "basis"
+        },
+        {
+          "file": "README.md",
+          "line": 21,
+          "source": "readme",
+          "detail": "npm run dev",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "web.start",
+      "project": "web",
+      "name": "start",
+      "kind": "production",
+      "primary": true,
+      "title": "Serve web (next server)",
+      "cwd": "web",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "start"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "web/package.json",
+              "line": 11,
+              "source": "manifest",
+              "detail": "next's default port is 3000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "web.build",
+        "web.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "web/package.json defines \"start\": next start (needs a build first).",
+      "evidence": [
+        {
+          "file": "web/package.json",
+          "line": 11,
+          "source": "manifest",
+          "detail": "scripts.start: \"next start\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "runner": "composer",
+      "name": "dev",
+      "project": "api",
+      "file": "api/composer.json",
+      "line": 23,
+      "commands": [
+        "Composer\\Config::disableProcessTimeout",
+        "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=… \"php artisan pail --timeout=… \"npm run dev\" --names=…"
+      ],
+      "purpose": "run"
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "env-host:api:DB_HOST",
+      "subject": "env:api:DB_HOST",
+      "chosen": "127.0.0.1",
+      "alternatives": [
+        {
+          "value": "mysql",
+          "evidence": [
+            {
+              "file": "api/.env.example",
+              "line": 10,
+              "source": "env-template",
+              "detail": "DB_HOST=mysql",
+              "role": "contradicts"
+            }
+          ]
+        }
+      ],
+      "severity": "warning",
+      "message": "api/.env.example sets DB_HOST=mysql, the name of a Compose service. That name only resolves between containers; with the app running on your machine use DB_HOST=127.0.0.1 (the published port).",
+      "rule": "compose service names resolve only inside Docker"
+    },
+    {
+      "id": "pm:node@web:npm",
+      "subject": "pm:node@web",
+      "chosen": "pnpm",
+      "alternatives": [
+        {
+          "value": "pnpm",
+          "evidence": [
+            {
+              "file": "web/package.json",
+              "line": 4,
+              "source": "manifest-explicit",
+              "detail": "packageManager: \"pnpm@9.15.0\"",
+              "role": "basis"
+            },
+            {
+              "file": "web/pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "basis"
+            },
+            {
+              "file": ".github/workflows/ci.yml",
+              "line": 42,
+              "source": "ci",
+              "detail": "uses pnpm/action-setup",
+              "role": "basis"
+            },
+            {
+              "file": ".github/workflows/ci.yml",
+              "line": 46,
+              "source": "ci",
+              "detail": "actions/setup-node cache: pnpm",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "value": "npm",
+          "evidence": [
+            {
+              "file": "README.md",
+              "line": 20,
+              "source": "readme",
+              "detail": "npm install",
+              "role": "contradicts"
+            },
+            {
+              "file": "README.md",
+              "line": 21,
+              "source": "readme",
+              "detail": "npm run dev",
+              "role": "contradicts"
+            }
+          ]
+        }
+      ],
+      "severity": "info",
+      "message": "README.md says \"npm install\", but package.json sets packageManager: \"pnpm@9.15.0\"; using pnpm.",
+      "rule": "stronger source wins"
+    }
+  ],
+  "unknowns": [],
+  "meta": {
+    "rootName": "crlf-bom",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 33,
+      "filesRead": 17,
+      "secretFilesNotRead": [],
+      "skipped": {
+        "ignored directory": 1
+      },
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 5,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".github/workflows/ci.yml",
+        "sha256": "f820430cf1a848abc41a274a68c1ffd43693a8601713583d344f47d9fd362bb5"
+      },
+      {
+        "file": "README.md",
+        "sha256": "7159bd5b3f86c500c07599f3f577b1587cecd61676d990f4d7cef6ada97a66e2"
+      },
+      {
+        "file": "api/.env.example",
+        "sha256": "58c38b21cbfa1b85c12bef88af0f27cca3f99c1807b0f39432a8320045dadc89"
+      },
+      {
+        "file": "api/composer.json",
+        "sha256": "71fdee24fcf397fd23f8f9a1d69c20f1618c5aef69d49b6bf9a7506bccff042c"
+      },
+      {
+        "file": "api/composer.lock",
+        "sha256": "1fefb17d8b5ed2e6b72094dac4425dd681b9ce37d3333880e4f478b198496bc4"
+      },
+      {
+        "file": "api/config/app.php",
+        "sha256": "92837f5caf6a5ffc4a81c1879b932e5d2e9bc940ee39794445d7d921da5aa40e"
+      },
+      {
+        "file": "api/config/services.php",
+        "sha256": "f3b6e327e099ff8723c2388fd020c359624080541c711b90b22cca30b9e1459e"
+      },
+      {
+        "file": "api/package-lock.json",
+        "sha256": "1f2916d22180ce344e8680ca4d54067f83c73ee59844ded03e066601660e5d90"
+      },
+      {
+        "file": "api/package.json",
+        "sha256": "b64dd36a7e445a7990acb8b79dbcab2631835b3ca11edeefad840d48a41281dc"
+      },
+      {
+        "file": "docker-compose.yml",
+        "sha256": "0c066f9e9fb3335d8a0f409db9f7a640bead93b6b67f24a76aabedf9f712c267"
+      },
+      {
+        "file": "web/.env.example",
+        "sha256": "32526a62fe9470615066ecce1083234385007fac03541f7160dee5ae734791c0"
+      },
+      {
+        "file": "web/.nvmrc",
+        "sha256": "b49f73e8b3ed0474885ee31adbfd0cba2c87fde4f26c1be15b9894288e490f9b"
+      },
+      {
+        "file": "web/next.config.mjs",
+        "sha256": "9e153e0a7052c6a513b1630ae728498f0f47cb88f2f3ad87c47bf09f2be45ac6"
+      },
+      {
+        "file": "web/package.json",
+        "sha256": "1f74c96bca2fdb8fdf3aa0e19ecb642c534115faa8c90b8c1ce0e646f11b7ee2"
+      },
+      {
+        "file": "web/pnpm-lock.yaml",
+        "sha256": "b8248c596d9509645a44f9d26949d1bf79924f723677448f6168b3d629b9ef63"
+      },
+      {
+        "file": "web/src/app/page.tsx",
+        "sha256": "99e05c705b7557f2d3546bfb53639b38bfe5336812b0007275a8591f54fc1fad"
+      },
+      {
+        "file": "web/src/lib/session.ts",
+        "sha256": "ca3876b9c484f6efda367f793ead7d67c3fd9ce423fa143dbc067473c3355c83"
+      }
+    ]
+  }
+}

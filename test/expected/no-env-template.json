@@ -1,0 +1,391 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:2d7b41a22fd3bd0ab0d34d215965599ce70055975663817ffef8c75fd3e56cc4",
+  "summary": {
+    "support": "full",
+    "projects": 1,
+    "steps": 2,
+    "conflicts": 0,
+    "unknowns": 1,
+    "lowestStepConfidence": "high"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "orders-service",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "npm",
+          "confidence": "high",
+          "why": "package-lock.json exists",
+          "evidence": [
+            {
+              "file": "package-lock.json",
+              "source": "lockfile",
+              "detail": "package-lock.json present",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "range": ">=10.0.0",
+      "rangeText": ">= 10",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": "package.json needs Node.js. package-lock.json: locked dependency nodemon@3.1.7 declares engines.node \">=10\".",
+      "evidence": [
+        {
+          "file": "package-lock.json",
+          "line": 25,
+          "source": "lockfile",
+          "detail": "locked dependency nodemon@3.1.7 declares engines.node \">=10\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:npm",
+      "kind": "package-manager",
+      "name": "npm",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "orders-service uses npm: package-lock.json exists. npm comes with Node.js (some Linux distributions package it separately).",
+      "evidence": []
+    }
+  ],
+  "services": [],
+  "env": [
+    {
+      "project": "root",
+      "file": ".env",
+      "template": null,
+      "exists": false,
+      "createdBy": "root.env",
+      "vars": [
+        {
+          "name": "DATABASE_URL",
+          "fill": "unknown",
+          "secret": false,
+          "confidence": "low",
+          "note": "Read by the code; there is no env template to say whether it needs a value.",
+          "evidence": [
+            {
+              "file": "server.js",
+              "line": 6,
+              "source": "code",
+              "detail": "process.env.DATABASE_URL",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "JWT_SECRET",
+          "fill": "unknown",
+          "secret": true,
+          "confidence": "low",
+          "note": "Read by the code; there is no env template to say whether it needs a value.",
+          "evidence": [
+            {
+              "file": "server.js",
+              "line": 10,
+              "source": "code",
+              "detail": "process.env.JWT_SECRET",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "STRIPE_SECRET_KEY",
+          "fill": "unknown",
+          "secret": true,
+          "confidence": "low",
+          "note": "Read by the code; there is no env template to say whether it needs a value.",
+          "evidence": [
+            {
+              "file": "lib/payments.js",
+              "line": 1,
+              "source": "code",
+              "detail": "process.env['STRIPE_SECRET_KEY']",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "confidence": "low",
+      "why": "No template; variables come from the code.",
+      "evidence": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (npm)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "ci"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:npm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "package.json declares the dependencies; package-lock.json exists. The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"npm install\" instead (it may change the lockfile)."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "package-lock.json",
+          "source": "lockfile",
+          "detail": "package-lock.json present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.env",
+      "project": "root",
+      "phase": "configure",
+      "title": "Create .env by hand",
+      "cwd": ".",
+      "action": {
+        "type": "manual",
+        "text": "Create .env with values for: DATABASE_URL, JWT_SECRET, STRIPE_SECRET_KEY."
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": true,
+      "after": [],
+      "requires": [],
+      "confidence": "low",
+      "why": "The repo has no env template, but the code reads 3 environment variables. Which ones need real values is unknown.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "server.js",
+          "line": 6,
+          "source": "code",
+          "detail": "process.env.DATABASE_URL",
+          "role": "basis"
+        },
+        {
+          "file": "server.js",
+          "line": 10,
+          "source": "code",
+          "detail": "process.env.JWT_SECRET",
+          "role": "basis"
+        },
+        {
+          "file": "lib/payments.js",
+          "line": 1,
+          "source": "code",
+          "detail": "process.env['STRIPE_SECRET_KEY']",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.dev",
+      "project": "root",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start orders-service (the app)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 4000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "server.js",
+              "line": 7,
+              "source": "code",
+              "detail": "const port = process.env.PORT || 4000;",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 4000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"dev\": nodemon server.js.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 7,
+          "source": "manifest",
+          "detail": "scripts.dev: \"nodemon server.js\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.start",
+      "project": "root",
+      "name": "start",
+      "kind": "dev",
+      "primary": false,
+      "title": "Start orders-service (the app)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "start"
+        ]
+      },
+      "ports": [
+        {
+          "port": 4000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "server.js",
+              "line": 7,
+              "source": "code",
+              "detail": "const port = process.env.PORT || 4000;",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 4000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"start\": node server.js.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.start: \"node server.js\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "conflicts": [],
+  "unknowns": [
+    {
+      "evidence": [],
+      "id": "env-no-template:root",
+      "subject": "env:root",
+      "message": "The project has no env template (.env.example); the variables were found by reading the code and may be incomplete.",
+      "suggestion": "Check the README or ask the maintainers which values are needed."
+    }
+  ],
+  "meta": {
+    "rootName": "no-env-template",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 5,
+      "filesRead": 4,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 2,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": "lib/payments.js",
+        "sha256": "936489b2bda5c47fb5e089ea227f9a9eb5b1d16917058527fef11416ee81fce7"
+      },
+      {
+        "file": "package-lock.json",
+        "sha256": "8f992bc73efca6bac7522facac866c883969d3730268c08ae8207177373db5c2"
+      },
+      {
+        "file": "package.json",
+        "sha256": "6617b45f03d3bade40f4589e7888f65b32d88fb678a1d1ab8e35787e31550d78"
+      },
+      {
+        "file": "server.js",
+        "sha256": "677fb360af87f348aab023f729a3243bf0a88a6f89770f22af3e6dc6393607c1"
+      }
+    ]
+  }
+}

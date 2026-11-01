@@ -1,0 +1,794 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:89e2bdce15a36390589dec56d3fd3d3b3b34db7426a1f51a755932aace88a90e",
+  "summary": {
+    "support": "full",
+    "projects": 1,
+    "steps": 7,
+    "conflicts": 1,
+    "unknowns": 0,
+    "lowestStepConfidence": "medium"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "notes",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [
+        {
+          "id": "nextjs",
+          "name": "Next.js",
+          "version": "14.2.18",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 15,
+              "source": "manifest",
+              "detail": "\"next\": \"14.2.18\"",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "id": "prisma",
+          "name": "Prisma",
+          "version": "^5.22.0",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 19,
+              "source": "manifest",
+              "detail": "\"prisma\": \"^5.22.0\"",
+              "role": "basis"
+            },
+            {
+              "file": "prisma/schema.prisma",
+              "source": "manifest",
+              "detail": "prisma/schema.prisma exists",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "npm",
+          "confidence": "high",
+          "why": "package-lock.json exists",
+          "evidence": [
+            {
+              "file": "package-lock.json",
+              "source": "lockfile",
+              "detail": "package-lock.json present",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "range": ">=18.17.0",
+      "rangeText": ">= 18.17",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "package.json needs Node.js. Next.js 14 requires node >= 18.17.0 (https://nextjs.org/docs/app/getting-started/installation); together: >= 18.17.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 15,
+          "source": "recipe",
+          "detail": "Next.js 14 requires node >= 18.17.0 (https://nextjs.org/docs/app/getting-started/installation)",
+          "role": "basis"
+        },
+        {
+          "file": "package-lock.json",
+          "line": 18,
+          "source": "lockfile",
+          "detail": "locked dependency next@14.2.18 declares engines.node \">=18.17.0\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:npm",
+      "kind": "package-manager",
+      "name": "npm",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "notes uses npm: package-lock.json exists. npm comes with Node.js (some Linux distributions package it separately).",
+      "evidence": []
+    },
+    {
+      "id": "tool:docker",
+      "kind": "tool",
+      "name": "docker",
+      "projects": [
+        "root"
+      ],
+      "optional": true,
+      "status": "ok",
+      "confidence": "high",
+      "why": "Only to start postgres with Compose; a local installation works too.",
+      "evidence": [
+        {
+          "file": "docker-compose.yml",
+          "source": "compose",
+          "detail": "docker-compose.yml present",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "services": [
+    {
+      "id": "service:postgres",
+      "name": "postgres",
+      "category": "database",
+      "version": "16",
+      "ports": [
+        5432
+      ],
+      "provider": {
+        "type": "compose",
+        "file": "docker-compose.yml",
+        "service": "db",
+        "image": "postgres:16-alpine"
+      },
+      "projects": [
+        "root"
+      ],
+      "env": [
+        "DATABASE_URL"
+      ],
+      "optional": false,
+      "confidence": "high",
+      "why": ".env.example sets DATABASE_URL=postgresql://localhost:5432.",
+      "evidence": [
+        {
+          "file": ".env.example",
+          "line": 2,
+          "source": "env-template",
+          "detail": "DATABASE_URL=postgresql://localhost:5432",
+          "role": "basis"
+        },
+        {
+          "file": "prisma/schema.prisma",
+          "line": 6,
+          "source": "manifest",
+          "detail": "datasource provider = \"postgresql\"",
+          "role": "supports"
+        },
+        {
+          "file": "docker-compose.yml",
+          "line": 2,
+          "source": "compose",
+          "detail": "service \"db\": image postgres:16-alpine, port 5432",
+          "role": "supports"
+        }
+      ]
+    }
+  ],
+  "env": [
+    {
+      "project": "root",
+      "file": ".env",
+      "template": ".env.example",
+      "exists": false,
+      "createdBy": "root.env",
+      "vars": [
+        {
+          "name": "DATABASE_URL",
+          "fill": "default",
+          "secret": false,
+          "note": "Connection string for the postgresql database (prisma schema: prisma/schema.prisma).",
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 2,
+              "source": "env-template",
+              "detail": "DATABASE_URL=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "NEXTAUTH_URL",
+          "fill": "default",
+          "secret": false,
+          "confidence": "high",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 3,
+              "source": "env-template",
+              "detail": "NEXTAUTH_URL=…",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "NEXTAUTH_SECRET",
+          "fill": "user",
+          "secret": true,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 4,
+              "source": "env-template",
+              "detail": "NEXTAUTH_SECRET=",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "GITHUB_ID",
+          "fill": "user",
+          "secret": false,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 5,
+              "source": "env-template",
+              "detail": "GITHUB_ID=",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "name": "GITHUB_SECRET",
+          "fill": "user",
+          "secret": true,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": ".env.example",
+              "line": 6,
+              "source": "env-template",
+              "detail": "GITHUB_SECRET=",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "confidence": "high",
+      "why": ".env.example is the template for .env. Prisma reads .env.",
+      "evidence": [
+        {
+          "file": ".env.example",
+          "source": "env-template",
+          "detail": "5 variables",
+          "role": "basis"
+        },
+        {
+          "file": "package.json",
+          "line": 19,
+          "source": "recipe",
+          "detail": "Prisma reads .env",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (npm)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "ci"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:npm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "package.json declares the dependencies; package-lock.json exists. The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "Installing also runs the project's \"postinstall\" script: prisma generate",
+        "If this fails because the lockfile is out of date, run \"npm install\" instead (it may change the lockfile)."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "package-lock.json",
+          "source": "lockfile",
+          "detail": "package-lock.json present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.env",
+      "project": "root",
+      "phase": "configure",
+      "title": "Create .env from .env.example",
+      "cwd": ".",
+      "action": {
+        "type": "copy",
+        "from": ".env.example",
+        "to": ".env"
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [],
+      "confidence": "medium",
+      "why": "The app reads its configuration from .env, which is not committed; .env.example is the template. Prisma reads .env.",
+      "notes": [
+        "Then fill in: NEXTAUTH_SECRET, GITHUB_ID, GITHUB_SECRET."
+      ],
+      "evidence": [
+        {
+          "file": ".env.example",
+          "source": "env-template",
+          "detail": "5 variables",
+          "role": "basis"
+        },
+        {
+          "file": "package.json",
+          "line": 19,
+          "source": "recipe",
+          "detail": "Prisma reads .env",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.services",
+      "project": "root",
+      "phase": "services",
+      "title": "Start postgres with Docker Compose",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "docker",
+          "compose",
+          "up",
+          "-d",
+          "db"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": true,
+      "optional": false,
+      "after": [
+        "root.env"
+      ],
+      "requires": [
+        "tool:docker"
+      ],
+      "confidence": "medium",
+      "why": "docker-compose.yml defines postgres 16, which the app needs. Compose reads the env file in its folder for passwords and ports.",
+      "notes": [
+        "Creates containers and volumes outside the project folder, and downloads images on first run.",
+        "If you already run postgres on this machine, skip this step and point the env file at it.",
+        "Stop them later with: docker compose stop"
+      ],
+      "evidence": [
+        {
+          "file": "docker-compose.yml",
+          "line": 2,
+          "source": "compose",
+          "detail": "service \"db\": image postgres:16-alpine, port 5432",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.prisma-generate",
+      "project": "root",
+      "phase": "generate",
+      "title": "Generate the Prisma Client",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npx",
+          "prisma",
+          "generate"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "The app imports a client generated from the Prisma schema; it does not exist in a fresh clone. (Some setups also generate it on install; running it again is harmless.)",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 19,
+          "source": "recipe",
+          "detail": "Prisma recipe: generate the prisma client",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.prisma-migrate",
+      "project": "root",
+      "phase": "database",
+      "title": "Apply the database migrations (Prisma)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npx",
+          "prisma",
+          "migrate",
+          "deploy"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [
+        "root.env",
+        "root.prisma-generate",
+        "root.services"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "medium",
+      "why": "prisma/migrations holds the migration history; migrate deploy applies it without creating new migrations or resetting data.",
+      "notes": [
+        "Needs DATABASE_URL in the env file pointing at a running database."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 19,
+          "source": "recipe",
+          "detail": "Prisma recipe: apply the database migrations (prisma)",
+          "role": "basis"
+        },
+        {
+          "file": "prisma/migrations",
+          "source": "manifest",
+          "detail": "prisma/migrations/ exists",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.prisma-seed",
+      "project": "root",
+      "phase": "database",
+      "title": "Seed the database (Prisma)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npx",
+          "prisma",
+          "db",
+          "seed"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.prisma-migrate",
+        "root.services"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "medium",
+      "why": "A Prisma seed command is configured. Read it before running: seeds often create demo users.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 19,
+          "source": "recipe",
+          "detail": "Prisma recipe: seed the database (prisma)",
+          "role": "basis"
+        },
+        {
+          "file": "package.json",
+          "line": 11,
+          "source": "manifest",
+          "detail": "prisma.seed: \"tsx prisma/seed.ts\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.build",
+      "project": "root",
+      "phase": "build",
+      "title": "Build notes for production",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "Only needed for the production run target; the dev server builds on the fly.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.build: \"prisma generate && next build\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.dev",
+      "project": "root",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start notes (next dev server)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 5,
+              "source": "manifest",
+              "detail": "next's default port is 3000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [
+        "service:postgres"
+      ],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"dev\": next dev.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 5,
+          "source": "manifest",
+          "detail": "scripts.dev: \"next dev\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.start",
+      "project": "root",
+      "name": "start",
+      "kind": "production",
+      "primary": true,
+      "title": "Serve notes (next server)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "npm",
+          "run",
+          "start"
+        ]
+      },
+      "ports": [
+        {
+          "port": 3000,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 7,
+              "source": "manifest",
+              "detail": "next's default port is 3000",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.build",
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 3000,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"start\": next start (needs a build first).",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 7,
+          "source": "manifest",
+          "detail": "scripts.start: \"next start\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "conflicts": [
+    {
+      "id": "envTarget@root:recipes",
+      "subject": "envTarget@root",
+      "chosen": ".env",
+      "alternatives": [
+        {
+          "value": ".env",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 19,
+              "source": "recipe",
+              "detail": "Prisma reads .env",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "value": ".env.local",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 15,
+              "source": "recipe",
+              "detail": "Next.js reads .env.local",
+              "role": "contradicts"
+            }
+          ]
+        }
+      ],
+      "severity": "info",
+      "message": "Next.js reads .env.local, but Prisma only reads .env; using .env, which every tool here reads.",
+      "rule": "env file every framework reads"
+    }
+  ],
+  "unknowns": [],
+  "meta": {
+    "rootName": "prisma-postgres",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 14,
+      "filesRead": 7,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 2,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": ".env.example",
+        "sha256": "cb2b16052fccfc6b94202fb3b16a99d7c5205044166d81748082299526f6087a"
+      },
+      {
+        "file": "docker-compose.yml",
+        "sha256": "cb7c7ae0a005c44086b9e2ae57bf80863b3235a263686dde1ccf2af1e0c3b2d8"
+      },
+      {
+        "file": "package-lock.json",
+        "sha256": "930d69722708423ba30989c2c94bf1f79a7b241d5f7e6246555b0116eec34033"
+      },
+      {
+        "file": "package.json",
+        "sha256": "25a7a5873477556ec58a5258c3be137656fe78b33ef27864dbbab6071b044150"
+      },
+      {
+        "file": "prisma/schema.prisma",
+        "sha256": "bb1ef630aa7ba6a1dce4843c90837ce38209f8eb67976b246cbf143dc957dbe0"
+      },
+      {
+        "file": "prisma/seed.ts",
+        "sha256": "aa26ab95a166915a9d7c13bd569c8bb2b83bdfe73b57edda7df86726c7b5fb1e"
+      },
+      {
+        "file": "src/app/page.tsx",
+        "sha256": "0ff32b8a64b37143162074511b4a488ab7caa54732adf5760d9f025b5625f2a7"
+      }
+    ]
+  }
+}

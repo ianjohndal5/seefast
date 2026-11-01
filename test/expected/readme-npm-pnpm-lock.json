@@ -1,0 +1,485 @@
+{
+  "schemaVersion": 1,
+  "tool": {
+    "name": "seefast",
+    "version": "0.1.0"
+  },
+  "digest": "sha256:a544fee36830e02510394098416f9ae7855a31c6cd050a21efc6011c20bb80e0",
+  "summary": {
+    "support": "full",
+    "projects": 1,
+    "steps": 3,
+    "conflicts": 1,
+    "unknowns": 1,
+    "lowestStepConfidence": "high"
+  },
+  "projects": [
+    {
+      "id": "root",
+      "root": ".",
+      "name": "widget-studio",
+      "ecosystems": [
+        "node"
+      ],
+      "support": "full",
+      "role": "app",
+      "frameworks": [],
+      "packageManagers": [
+        {
+          "ecosystem": "node",
+          "name": "pnpm",
+          "confidence": "high",
+          "why": "pnpm-lock.yaml exists",
+          "evidence": [
+            {
+              "file": "pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "basis"
+            },
+            {
+              "file": "README.md",
+              "line": 6,
+              "source": "readme",
+              "detail": "npm install",
+              "role": "contradicts"
+            },
+            {
+              "file": "README.md",
+              "line": 7,
+              "source": "readme",
+              "detail": "npm run dev",
+              "role": "contradicts"
+            }
+          ]
+        }
+      ],
+      "dependsOn": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json found",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "runtime:node",
+      "kind": "runtime",
+      "name": "node",
+      "range": ">=18.0.0",
+      "rangeText": ">= 18",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "medium",
+      "why": "package.json needs Node.js. pnpm-lock.yaml: locked dependency vite@5.4.11 declares engines.node \"^18.0.0 || >=20.0.0\".",
+      "evidence": [
+        {
+          "file": "pnpm-lock.yaml",
+          "line": 19,
+          "source": "lockfile",
+          "detail": "locked dependency vite@5.4.11 declares engines.node \"^18.0.0 || >=20.0.0\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "package-manager:pnpm",
+      "kind": "package-manager",
+      "name": "pnpm",
+      "projects": [
+        "root"
+      ],
+      "optional": false,
+      "status": "ok",
+      "confidence": "high",
+      "why": "widget-studio uses pnpm: pnpm-lock.yaml exists.",
+      "evidence": []
+    }
+  ],
+  "services": [],
+  "env": [
+    {
+      "project": "root",
+      "file": ".env",
+      "template": null,
+      "exists": false,
+      "createdBy": "root.env",
+      "vars": [
+        {
+          "name": "VITE_API_BASE",
+          "fill": "unknown",
+          "secret": false,
+          "confidence": "low",
+          "note": "Read by the code; there is no env template to say whether it needs a value.",
+          "evidence": [
+            {
+              "file": "src/main.tsx",
+              "line": 1,
+              "source": "code",
+              "detail": "import.meta.env.VITE_API_BASE",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "confidence": "low",
+      "why": "No template; variables come from the code.",
+      "evidence": []
+    }
+  ],
+  "steps": [
+    {
+      "id": "root.install",
+      "project": "root",
+      "phase": "install",
+      "title": "Install JavaScript dependencies (pnpm)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "install",
+          "--frozen-lockfile",
+          "--config.strict-dep-builds=false"
+        ]
+      },
+      "network": true,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": false,
+      "after": [],
+      "requires": [
+        "package-manager:pnpm",
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "package.json declares the dependencies; pnpm-lock.yaml exists. The command installs exactly the locked versions and does not modify the lockfile.",
+      "notes": [
+        "If this fails because the lockfile is out of date, run \"pnpm install\" instead (it may change the lockfile).",
+        "The project does not list which dependencies may run build scripts, so pnpm skips them (--config.strict-dep-builds=false) instead of stopping, as pnpm 11 and later do. If something needs one, run \"pnpm approve-builds\"."
+      ],
+      "evidence": [
+        {
+          "file": "package.json",
+          "source": "manifest",
+          "detail": "package.json",
+          "role": "basis"
+        },
+        {
+          "file": "pnpm-lock.yaml",
+          "source": "lockfile",
+          "detail": "pnpm-lock.yaml present",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.env",
+      "project": "root",
+      "phase": "configure",
+      "title": "Create .env by hand",
+      "cwd": ".",
+      "action": {
+        "type": "manual",
+        "text": "Create .env with values for: VITE_API_BASE."
+      },
+      "network": false,
+      "thirdPartyCode": false,
+      "outsideProject": false,
+      "optional": true,
+      "after": [],
+      "requires": [],
+      "confidence": "low",
+      "why": "The repo has no env template, but the code reads 1 environment variable. Which ones need real values is unknown.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "src/main.tsx",
+          "line": 1,
+          "source": "code",
+          "detail": "import.meta.env.VITE_API_BASE",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.build",
+      "project": "root",
+      "phase": "build",
+      "title": "Build widget-studio for production",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ]
+      },
+      "network": false,
+      "thirdPartyCode": true,
+      "outsideProject": false,
+      "optional": true,
+      "after": [
+        "root.install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "Only needed for the production run target; the dev server builds on the fly.",
+      "notes": [],
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 7,
+          "source": "manifest",
+          "detail": "scripts.build: \"tsc -b && vite build\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "run": [
+    {
+      "id": "root.dev",
+      "project": "root",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start widget-studio (vite dev server)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "dev"
+        ]
+      },
+      "ports": [
+        {
+          "port": 5173,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 6,
+              "source": "manifest",
+              "detail": "vite's default port is 5173",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 5173,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"dev\": vite.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 6,
+          "source": "manifest",
+          "detail": "scripts.dev: \"vite\"",
+          "role": "basis"
+        },
+        {
+          "file": "README.md",
+          "line": 7,
+          "source": "readme",
+          "detail": "npm run dev",
+          "role": "supports"
+        }
+      ]
+    },
+    {
+      "id": "root.preview",
+      "project": "root",
+      "name": "preview",
+      "kind": "production",
+      "primary": false,
+      "title": "Serve widget-studio (vite server)",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "preview"
+        ]
+      },
+      "ports": [
+        {
+          "port": 4173,
+          "confidence": "medium",
+          "evidence": [
+            {
+              "file": "package.json",
+              "line": 8,
+              "source": "manifest",
+              "detail": "vite's default port is 4173",
+              "role": "basis"
+            }
+          ]
+        }
+      ],
+      "needs": [],
+      "after": [
+        "root.build",
+        "root.install"
+      ],
+      "readiness": {
+        "type": "port",
+        "port": 4173,
+        "timeoutSec": 120
+      },
+      "confidence": "high",
+      "why": "package.json defines \"preview\": vite preview (needs a build first).",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 8,
+          "source": "manifest",
+          "detail": "scripts.preview: \"vite preview\"",
+          "role": "basis"
+        }
+      ]
+    },
+    {
+      "id": "root.test",
+      "project": "root",
+      "name": "test",
+      "kind": "test",
+      "primary": true,
+      "title": "Run widget-studio's tests",
+      "cwd": ".",
+      "action": {
+        "type": "exec",
+        "argv": [
+          "pnpm",
+          "run",
+          "test"
+        ]
+      },
+      "ports": [],
+      "needs": [],
+      "after": [
+        "root.install"
+      ],
+      "readiness": {
+        "type": "exits",
+        "timeoutSec": 1800
+      },
+      "confidence": "high",
+      "why": "package.json defines a test script.",
+      "evidence": [
+        {
+          "file": "package.json",
+          "line": 9,
+          "source": "manifest",
+          "detail": "scripts.test: \"vitest run\"",
+          "role": "basis"
+        }
+      ]
+    }
+  ],
+  "tasks": [],
+  "conflicts": [
+    {
+      "id": "pm:node@root:npm",
+      "subject": "pm:node@root",
+      "chosen": "pnpm",
+      "alternatives": [
+        {
+          "value": "pnpm",
+          "evidence": [
+            {
+              "file": "pnpm-lock.yaml",
+              "source": "lockfile",
+              "detail": "pnpm-lock.yaml present",
+              "role": "basis"
+            }
+          ]
+        },
+        {
+          "value": "npm",
+          "evidence": [
+            {
+              "file": "README.md",
+              "line": 6,
+              "source": "readme",
+              "detail": "npm install",
+              "role": "contradicts"
+            },
+            {
+              "file": "README.md",
+              "line": 7,
+              "source": "readme",
+              "detail": "npm run dev",
+              "role": "contradicts"
+            }
+          ]
+        }
+      ],
+      "severity": "info",
+      "message": "README.md says \"npm install\", but pnpm-lock.yaml exists; using pnpm.",
+      "rule": "stronger source wins"
+    }
+  ],
+  "unknowns": [
+    {
+      "evidence": [],
+      "id": "env-no-template:root",
+      "subject": "env:root",
+      "message": "The project has no env template (.env.example); the variables were found by reading the code and may be incomplete.",
+      "suggestion": "Check the README or ask the maintainers which values are needed."
+    }
+  ],
+  "meta": {
+    "rootName": "readme-npm-pnpm-lock",
+    "knowledgeBase": "2026-11-01",
+    "stats": {
+      "entriesSeen": 5,
+      "filesRead": 4,
+      "secretFilesNotRead": [],
+      "skipped": {},
+      "parseErrors": [],
+      "readmeCommandsIgnored": 0,
+      "codeFilesScanned": 1,
+      "truncated": false
+    },
+    "inputs": [
+      {
+        "file": "README.md",
+        "sha256": "9f60b21395f88c3a63fd1571f836231b792b0ebe405c7459f36517c4905fc39a"
+      },
+      {
+        "file": "package.json",
+        "sha256": "f71646eb3f3f2679a2b5a699fd52cdf54720b69889a7b7b71aa6ffb481ecfd59"
+      },
+      {
+        "file": "pnpm-lock.yaml",
+        "sha256": "7bc306cfd0bc3eba724b7a8c8cfbd80fdac371b84219395518af13d90f2e8da1"
+      },
+      {
+        "file": "src/main.tsx",
+        "sha256": "d3247a05c23189cffa9a35f1e593542c20d08b0b317c427b45f8ad1b5ee11f69"
+      }
+    ]
+  }
+}
