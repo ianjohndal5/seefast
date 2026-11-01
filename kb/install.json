@@ -1,0 +1,159 @@
+{
+  "reviewed": "2026-11-01",
+  "about": "Offline install advice per tool and OS family. `{v}` is replaced by the recommended version (or its major), `{major}` by the major version. Version managers already on the machine are suggested first (see versionManagers). Entries were written from the projects' official install pages; `check` marks advice that varies by distribution release.",
+  "families": {
+    "debian": ["debian", "ubuntu", "linuxmint", "pop", "elementary", "zorin", "kali", "raspbian", "neon"],
+    "fedora": ["fedora", "rhel", "centos", "rocky", "almalinux", "ol", "amzn"],
+    "arch": ["arch", "manjaro", "endeavouros", "garuda", "artix", "cachyos"],
+    "alpine": ["alpine"],
+    "suse": ["opensuse", "opensuse-leap", "opensuse-tumbleweed", "sles"]
+  },
+  "versionManagers": {
+    "node": [
+      { "probe": "mise", "advice": "mise use node@{full}" },
+      { "probe": "fnm", "advice": "fnm install {full} && fnm use {full}" },
+      { "env": "NVM_DIR", "advice": "nvm install {full} && nvm use {full}" },
+      { "probe": "volta", "advice": "volta install node@{full}" },
+      { "probe": "asdf", "advice": "asdf install nodejs {full}" }
+    ],
+    "python": [
+      { "probe": "uv", "advice": "uv python install {full}" },
+      { "probe": "mise", "advice": "mise use python@{full}" },
+      { "probe": "pyenv", "advice": "pyenv install {full}" }
+    ],
+    "go": [{ "probe": "mise", "advice": "mise use go@{full}" }],
+    "ruby": [{ "probe": "mise", "advice": "mise use ruby@{full}" }, { "probe": "rbenv", "advice": "rbenv install {full}" }],
+    "java": [{ "probe": "mise", "advice": "mise use java@{full}" }],
+    "bun": [{ "probe": "mise", "advice": "mise use bun@{full}" }],
+    "deno": [{ "probe": "mise", "advice": "mise use deno@{full}" }]
+  },
+  "tools": {
+    "node": {
+      "debian": ["The distribution's nodejs package is often older than projects need; prefer a version manager (fnm, nvm, mise) or the NodeSource packages for Node.js {major}."],
+      "fedora": ["sudo dnf install nodejs  (check the version: dnf module list nodejs)"],
+      "arch": ["sudo pacman -S nodejs npm  (always the current release; use nodejs-lts-* packages or a version manager for an older line)"],
+      "alpine": ["sudo apk add nodejs npm"],
+      "suse": ["sudo zypper install nodejs{major}"],
+      "macos": ["brew install node@{major}"],
+      "windows": ["winget install OpenJS.NodeJS.LTS", "or a version manager: fnm (winget install Schniz.fnm) or nvm-windows"],
+      "linux": ["Use a version manager (fnm, nvm or mise) to install Node.js {major}."]
+    },
+    "npm": {
+      "debian": ["sudo apt install npm  (Debian and Ubuntu package npm separately from nodejs)"],
+      "arch": ["sudo pacman -S npm"],
+      "fedora": ["sudo dnf install npm"],
+      "alpine": ["sudo apk add npm"],
+      "macos": ["npm comes with Node.js: brew install node"],
+      "windows": ["npm comes with Node.js: winget install OpenJS.NodeJS.LTS"],
+      "linux": ["npm comes with Node.js from nodejs.org and version managers."]
+    },
+    "pnpm": {
+      "any": ["corepack enable pnpm  (Corepack ships with Node.js up to 24; on Node.js 25+ first run: npm install -g corepack)", "or: npm install -g pnpm@{v}"]
+    },
+    "yarn": {
+      "any": ["corepack enable yarn  (uses the version in package.json's packageManager field; on Node.js 25+ first run: npm install -g corepack)", "or: npm install -g yarn  (Yarn 1)"]
+    },
+    "bun": {
+      "macos": ["brew install oven-sh/bun/bun"],
+      "windows": ["powershell -c \"irm bun.sh/install.ps1 | iex\"  (official installer; downloads from bun.sh)"],
+      "linux": ["curl -fsSL https://bun.sh/install | bash  (official installer; read it first)"],
+      "arch": ["Bun is in the AUR (bun-bin), or use the official installer."]
+    },
+    "php": {
+      "debian": ["sudo apt install php-cli  (Ubuntu 24.04 ships PHP 8.3, Debian 12 ships 8.2; for other versions add the ondrej/php PPA on Ubuntu or packages.sury.org on Debian, then install php{v}-cli)"],
+      "fedora": ["sudo dnf install php-cli  (for other versions: the Remi repository, dnf module enable php:remi-{v})"],
+      "arch": ["sudo pacman -S php  (always the current release; older lines are in the AUR, e.g. php83)"],
+      "alpine": ["sudo apk add php{nodot}  (e.g. php83; extensions are separate php{nodot}-* packages)"],
+      "suse": ["sudo zypper install php8"],
+      "macos": ["brew install php@{v}  (or brew install php for the current release; brew link php@{v} --force to make it the default)"],
+      "windows": ["scoop install php  (scoop bucket add versions; scoop install php{nodot} for another version)", "or download the x64 Non Thread Safe zip from windows.php.net, unzip it, add the folder to PATH, and copy php.ini-development to php.ini"]
+    },
+    "composer": {
+      "debian": ["sudo apt install composer  (or the installer from getcomposer.org for the latest release)"],
+      "fedora": ["sudo dnf install composer"],
+      "arch": ["sudo pacman -S composer"],
+      "alpine": ["sudo apk add composer"],
+      "macos": ["brew install composer"],
+      "windows": ["scoop install composer", "or Composer-Setup.exe from getcomposer.org"],
+      "linux": ["Follow the installer instructions at getcomposer.org/download."]
+    },
+    "docker": {
+      "debian": ["Docker Engine from Docker's apt repository (docs.docker.com/engine/install), or on Ubuntu: sudo apt install docker.io docker-compose-v2", "Add yourself to the docker group to run it without sudo: sudo usermod -aG docker $USER (log out and in)"],
+      "fedora": ["sudo dnf install moby-engine docker-compose  (or Docker CE from docs.docker.com/engine/install/fedora)", "sudo systemctl enable --now docker"],
+      "arch": ["sudo pacman -S docker docker-compose && sudo systemctl enable --now docker.service"],
+      "alpine": ["sudo apk add docker docker-cli-compose && sudo rc-update add docker && sudo service docker start"],
+      "macos": ["brew install --cask docker  (Docker Desktop), or OrbStack / Colima"],
+      "windows": ["winget install Docker.DockerDesktop  (needs WSL 2)"]
+    },
+    "git": {
+      "debian": ["sudo apt install git"], "fedora": ["sudo dnf install git"], "arch": ["sudo pacman -S git"], "alpine": ["sudo apk add git"],
+      "macos": ["xcode-select --install  (or brew install git)"], "windows": ["winget install Git.Git"]
+    },
+    "git-lfs": {
+      "debian": ["sudo apt install git-lfs && git lfs install"], "fedora": ["sudo dnf install git-lfs && git lfs install"], "arch": ["sudo pacman -S git-lfs && git lfs install"],
+      "alpine": ["sudo apk add git-lfs && git lfs install"], "macos": ["brew install git-lfs && git lfs install"], "windows": ["Git for Windows includes Git LFS; run: git lfs install"]
+    },
+    "make": {
+      "debian": ["sudo apt install make"], "fedora": ["sudo dnf install make"], "arch": ["sudo pacman -S make"], "alpine": ["sudo apk add make"],
+      "macos": ["xcode-select --install"], "windows": ["scoop install make  (or run the commands from the Makefile by hand)"]
+    },
+    "just": {
+      "debian": ["sudo apt install just  (Ubuntu 24.04+ / Debian 13+)"], "fedora": ["sudo dnf install just"], "arch": ["sudo pacman -S just"], "alpine": ["sudo apk add just"],
+      "macos": ["brew install just"], "windows": ["winget install Casey.Just"]
+    },
+    "python": {
+      "debian": ["sudo apt install python3 python3-venv python3-pip"], "fedora": ["sudo dnf install python3"], "arch": ["sudo pacman -S python"], "alpine": ["sudo apk add python3 py3-pip"],
+      "macos": ["brew install python@{v}"], "windows": ["winget install Python.Python.{v}"]
+    },
+    "uv": { "any": ["pipx install uv  (or the official installer from docs.astral.sh/uv)"], "macos": ["brew install uv"], "arch": ["sudo pacman -S uv"], "windows": ["winget install astral-sh.uv"] },
+    "poetry": { "any": ["pipx install poetry"] },
+    "pipenv": { "any": ["pipx install pipenv"] },
+    "pdm": { "any": ["pipx install pdm"] },
+    "go": {
+      "debian": ["sudo apt install golang-go  (often older; for Go {v} use the tarball from go.dev/dl)"], "fedora": ["sudo dnf install golang"], "arch": ["sudo pacman -S go"], "alpine": ["sudo apk add go"],
+      "macos": ["brew install go"], "windows": ["winget install GoLang.Go"]
+    },
+    "rust": {
+      "any": ["Install rustup from rustup.rs, then: rustup toolchain install {v}"], "arch": ["sudo pacman -S rustup && rustup default stable"], "macos": ["brew install rustup && rustup default stable"], "windows": ["winget install Rustlang.Rustup"]
+    },
+    "ruby": {
+      "debian": ["sudo apt install ruby-full  (for a specific version use rbenv or mise)"], "fedora": ["sudo dnf install ruby ruby-devel"], "arch": ["sudo pacman -S ruby"], "alpine": ["sudo apk add ruby ruby-dev"],
+      "macos": ["brew install ruby@{v}"], "windows": ["RubyInstaller with Devkit from rubyinstaller.org"]
+    },
+    "bundler": { "any": ["gem install bundler"] },
+    "java": {
+      "debian": ["sudo apt install openjdk-{v}-jdk"], "fedora": ["sudo dnf install java-{v}-openjdk-devel"], "arch": ["sudo pacman -S jdk{v}-openjdk"], "alpine": ["sudo apk add openjdk{v}"],
+      "macos": ["brew install openjdk@{v}"], "windows": ["winget install EclipseAdoptium.Temurin.{v}.JDK"]
+    },
+    "maven": { "debian": ["sudo apt install maven"], "fedora": ["sudo dnf install maven"], "arch": ["sudo pacman -S maven"], "macos": ["brew install maven"], "windows": ["scoop install maven"] },
+    "gradle": { "any": ["Use the project's ./gradlew wrapper if it has one; otherwise sdk install gradle (SDKMAN)"], "macos": ["brew install gradle"] },
+    "dotnet": {
+      "debian": ["sudo apt install dotnet-sdk-{v}  (Ubuntu 22.04+; on Debian add Microsoft's package repository)"], "fedora": ["sudo dnf install dotnet-sdk-{v}"], "arch": ["sudo pacman -S dotnet-sdk"],
+      "macos": ["brew install --cask dotnet-sdk"], "windows": ["winget install Microsoft.DotNet.SDK.{major}"]
+    },
+    "deno": { "any": ["See deno.com for the installer"], "macos": ["brew install deno"], "arch": ["sudo pacman -S deno"], "windows": ["winget install DenoLand.Deno"] },
+    "elixir": { "debian": ["sudo apt install elixir"], "fedora": ["sudo dnf install elixir"], "arch": ["sudo pacman -S elixir"], "macos": ["brew install elixir"], "windows": ["See elixir-lang.org/install.html"] }
+  },
+  "services": {
+    "mysql": {
+      "debian": ["sudo apt install mysql-server  (or mariadb-server)"], "fedora": ["sudo dnf install community-mysql-server && sudo systemctl enable --now mysqld"], "arch": ["sudo pacman -S mariadb && sudo mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql && sudo systemctl enable --now mariadb"],
+      "alpine": ["sudo apk add mariadb mariadb-client"], "macos": ["brew install mysql && brew services start mysql"], "windows": ["winget install Oracle.MySQL  (or run it in Docker)"],
+      "docker": "docker run -d --name mysql -p 3306:3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e MYSQL_DATABASE=app mysql:8"
+    },
+    "postgres": {
+      "debian": ["sudo apt install postgresql"], "fedora": ["sudo dnf install postgresql-server && sudo postgresql-setup --initdb && sudo systemctl enable --now postgresql"], "arch": ["sudo pacman -S postgresql  (then initdb, see the Arch wiki)"],
+      "alpine": ["sudo apk add postgresql"], "macos": ["brew install postgresql@17 && brew services start postgresql@17"], "windows": ["The installer from postgresql.org/download/windows, or run it in Docker"],
+      "docker": "docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:17"
+    },
+    "redis": {
+      "debian": ["sudo apt install redis-server"], "fedora": ["sudo dnf install valkey  (Redis-compatible; or redis on older releases)"], "arch": ["sudo pacman -S valkey  (Redis-compatible)"], "alpine": ["sudo apk add redis"],
+      "macos": ["brew install redis && brew services start redis"], "windows": ["Run it in Docker or WSL; there is no official Windows build"],
+      "docker": "docker run -d --name redis -p 6379:6379 redis:7"
+    },
+    "mongodb": { "any": ["See mongodb.com/docs/manual/installation"], "docker": "docker run -d --name mongo -p 27017:27017 mongo:7" },
+    "memcached": { "debian": ["sudo apt install memcached"], "macos": ["brew install memcached"], "docker": "docker run -d --name memcached -p 11211:11211 memcached:1" },
+    "mailpit": { "macos": ["brew install mailpit"], "docker": "docker run -d --name mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit" },
+    "meilisearch": { "macos": ["brew install meilisearch"], "docker": "docker run -d --name meilisearch -p 7700:7700 getmeili/meilisearch:latest" },
+    "rabbitmq": { "macos": ["brew install rabbitmq"], "docker": "docker run -d --name rabbitmq -p 5672:5672 rabbitmq:3" }
+  }
+}

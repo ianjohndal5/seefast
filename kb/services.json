@@ -1,0 +1,320 @@
+{
+  "reviewed": "2026-11-01",
+  "about": "Well-known backing services: how to recognise them in Compose/CI images, in env templates, and their default ports.",
+  "services": [
+    {
+      "name": "mysql",
+      "category": "database",
+      "port": 3306,
+      "images": [
+        "mysql",
+        "mysql/mysql-server",
+        "bitnami/mysql",
+        "percona",
+        "percona/percona-server"
+      ]
+    },
+    {
+      "name": "mariadb",
+      "category": "database",
+      "port": 3306,
+      "images": [
+        "mariadb",
+        "bitnami/mariadb"
+      ]
+    },
+    {
+      "name": "postgres",
+      "category": "database",
+      "port": 5432,
+      "images": [
+        "postgres",
+        "postgis/postgis",
+        "bitnami/postgresql",
+        "timescale/timescaledb",
+        "pgvector/pgvector",
+        "supabase/postgres",
+        "ankane/pgvector"
+      ]
+    },
+    {
+      "name": "sqlserver",
+      "category": "database",
+      "port": 1433,
+      "images": [
+        "mcr.microsoft.com/mssql/server",
+        "mcr.microsoft.com/azure-sql-edge"
+      ]
+    },
+    {
+      "name": "mongodb",
+      "category": "database",
+      "port": 27017,
+      "images": [
+        "mongo",
+        "mongodb/mongodb-community-server",
+        "bitnami/mongodb"
+      ]
+    },
+    {
+      "name": "redis",
+      "category": "cache",
+      "port": 6379,
+      "images": [
+        "redis",
+        "redis/redis-stack",
+        "redis/redis-stack-server",
+        "bitnami/redis",
+        "valkey/valkey",
+        "eqalpha/keydb"
+      ]
+    },
+    {
+      "name": "memcached",
+      "category": "cache",
+      "port": 11211,
+      "images": [
+        "memcached",
+        "bitnami/memcached"
+      ]
+    },
+    {
+      "name": "rabbitmq",
+      "category": "queue",
+      "port": 5672,
+      "images": [
+        "rabbitmq",
+        "bitnami/rabbitmq"
+      ]
+    },
+    {
+      "name": "kafka",
+      "category": "queue",
+      "port": 9092,
+      "images": [
+        "confluentinc/cp-kafka",
+        "bitnami/kafka",
+        "apache/kafka",
+        "redpandadata/redpanda",
+        "vectorized/redpanda"
+      ]
+    },
+    {
+      "name": "nats",
+      "category": "queue",
+      "port": 4222,
+      "images": [
+        "nats"
+      ]
+    },
+    {
+      "name": "mailpit",
+      "category": "mail",
+      "port": 1025,
+      "images": [
+        "axllent/mailpit"
+      ]
+    },
+    {
+      "name": "mailhog",
+      "category": "mail",
+      "port": 1025,
+      "images": [
+        "mailhog/mailhog"
+      ]
+    },
+    {
+      "name": "meilisearch",
+      "category": "search",
+      "port": 7700,
+      "images": [
+        "getmeili/meilisearch"
+      ]
+    },
+    {
+      "name": "elasticsearch",
+      "category": "search",
+      "port": 9200,
+      "images": [
+        "elasticsearch",
+        "docker.elastic.co/elasticsearch/elasticsearch",
+        "bitnami/elasticsearch"
+      ]
+    },
+    {
+      "name": "opensearch",
+      "category": "search",
+      "port": 9200,
+      "images": [
+        "opensearchproject/opensearch"
+      ]
+    },
+    {
+      "name": "typesense",
+      "category": "search",
+      "port": 8108,
+      "images": [
+        "typesense/typesense"
+      ]
+    },
+    {
+      "name": "minio",
+      "category": "storage",
+      "port": 9000,
+      "images": [
+        "minio/minio",
+        "bitnami/minio",
+        "quay.io/minio/minio"
+      ]
+    },
+    {
+      "name": "localstack",
+      "category": "storage",
+      "port": 4566,
+      "images": [
+        "localstack/localstack"
+      ]
+    },
+    {
+      "name": "clickhouse",
+      "category": "database",
+      "port": 8123,
+      "images": [
+        "clickhouse/clickhouse-server",
+        "yandex/clickhouse-server"
+      ]
+    },
+    {
+      "name": "soketi",
+      "category": "queue",
+      "port": 6001,
+      "images": [
+        "quay.io/soketi/soketi"
+      ]
+    },
+    {
+      "name": "selenium",
+      "category": "other",
+      "port": 4444,
+      "images": [
+        "selenium/standalone-chrome",
+        "selenium/standalone-chromium",
+        "selenium/standalone-firefox"
+      ]
+    },
+    {
+      "name": "inbucket",
+      "category": "mail",
+      "port": 2500,
+      "images": [
+        "inbucket/inbucket"
+      ]
+    },
+    {
+      "name": "maildev",
+      "category": "mail",
+      "port": 1025,
+      "images": [
+        "maildev/maildev"
+      ]
+    },
+    {
+      "name": "smtp4dev",
+      "category": "mail",
+      "port": 25,
+      "images": [
+        "rnwood/smtp4dev"
+      ]
+    },
+    {
+      "name": "gotenberg",
+      "category": "other",
+      "port": 3000,
+      "images": [
+        "gotenberg/gotenberg"
+      ]
+    },
+    {
+      "name": "spicedb",
+      "category": "other",
+      "port": 50051,
+      "images": [
+        "authzed/spicedb"
+      ]
+    },
+    {
+      "name": "keycloak",
+      "category": "other",
+      "port": 8080,
+      "images": [
+        "quay.io/keycloak/keycloak",
+        "jboss/keycloak",
+        "keycloak/keycloak"
+      ]
+    },
+    {
+      "name": "cube",
+      "category": "other",
+      "port": 4000,
+      "images": [
+        "cubejs/cube"
+      ]
+    }
+  ],
+  "envDrivers": {
+    "about": "Values of driver variables that name a service (Laravel, generic).",
+    "DB_CONNECTION": {
+      "mysql": "mysql",
+      "mariadb": "mariadb",
+      "pgsql": "postgres",
+      "postgres": "postgres",
+      "postgresql": "postgres",
+      "sqlsrv": "sqlserver",
+      "mongodb": "mongodb",
+      "sqlite": null
+    },
+    "CACHE_DRIVER": {
+      "redis": "redis",
+      "memcached": "memcached"
+    },
+    "CACHE_STORE": {
+      "redis": "redis",
+      "memcached": "memcached"
+    },
+    "QUEUE_CONNECTION": {
+      "redis": "redis",
+      "rabbitmq": "rabbitmq",
+      "sqs": null,
+      "beanstalkd": null
+    },
+    "SESSION_DRIVER": {
+      "redis": "redis",
+      "memcached": "memcached"
+    },
+    "BROADCAST_DRIVER": {
+      "redis": "redis"
+    },
+    "BROADCAST_CONNECTION": {
+      "redis": "redis"
+    },
+    "SCOUT_DRIVER": {
+      "meilisearch": "meilisearch",
+      "typesense": "typesense"
+    },
+    "MAIL_MAILER": {}
+  },
+  "urlSchemes": {
+    "mysql": "mysql",
+    "mariadb": "mariadb",
+    "postgres": "postgres",
+    "postgresql": "postgres",
+    "mongodb": "mongodb",
+    "mongodb+srv": "mongodb",
+    "redis": "redis",
+    "rediss": "redis",
+    "amqp": "rabbitmq",
+    "amqps": "rabbitmq",
+    "sqlserver": "sqlserver",
+    "nats": "nats"
+  }
+}

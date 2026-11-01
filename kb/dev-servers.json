@@ -1,0 +1,497 @@
+{
+  "reviewed": "2026-11-01",
+  "about": "Default ports and kinds of well-known dev and production server commands, matched on the binary and its first positional argument. Used to read package.json scripts, Procfiles and READMEs statically.",
+  "servers": [
+    {
+      "bin": "next",
+      "sub": [
+        "dev",
+        ""
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portFlags": [
+        "-p",
+        "--port"
+      ],
+      "portEnv": "PORT"
+    },
+    {
+      "bin": "next",
+      "sub": [
+        "start"
+      ],
+      "kind": "production",
+      "port": 3000,
+      "portFlags": [
+        "-p",
+        "--port"
+      ],
+      "portEnv": "PORT",
+      "needsBuild": true
+    },
+    {
+      "bin": "vite",
+      "sub": [
+        "",
+        "dev",
+        "serve"
+      ],
+      "kind": "dev",
+      "port": 5173,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "vite",
+      "sub": [
+        "preview"
+      ],
+      "kind": "production",
+      "port": 4173,
+      "portFlags": [
+        "--port"
+      ],
+      "needsBuild": true
+    },
+    {
+      "bin": "nuxt",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portFlags": [
+        "--port",
+        "-p"
+      ],
+      "portEnv": "PORT"
+    },
+    {
+      "bin": "nuxi",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portFlags": [
+        "--port",
+        "-p"
+      ],
+      "portEnv": "PORT"
+    },
+    {
+      "bin": "astro",
+      "sub": [
+        "dev",
+        ""
+      ],
+      "kind": "dev",
+      "port": 4321,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "astro",
+      "sub": [
+        "preview"
+      ],
+      "kind": "production",
+      "port": 4321,
+      "portFlags": [
+        "--port"
+      ],
+      "needsBuild": true
+    },
+    {
+      "bin": "react-scripts",
+      "sub": [
+        "start"
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portEnv": "PORT"
+    },
+    {
+      "bin": "ng",
+      "sub": [
+        "serve"
+      ],
+      "kind": "dev",
+      "port": 4200,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "vue-cli-service",
+      "sub": [
+        "serve"
+      ],
+      "kind": "dev",
+      "port": 8080,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "gatsby",
+      "sub": [
+        "develop"
+      ],
+      "kind": "dev",
+      "port": 8000,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "remix",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 3000
+    },
+    {
+      "bin": "remix",
+      "sub": [
+        "vite:dev"
+      ],
+      "kind": "dev",
+      "port": 5173,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "react-router",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 5173,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "svelte-kit",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 5173,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "webpack",
+      "sub": [
+        "serve"
+      ],
+      "kind": "dev",
+      "port": 8080,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "webpack-dev-server",
+      "sub": [
+        ""
+      ],
+      "kind": "dev",
+      "port": 8080,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "parcel",
+      "sub": [
+        "",
+        "serve"
+      ],
+      "kind": "dev",
+      "port": 1234,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "storybook",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 6006,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "start-storybook",
+      "sub": [
+        ""
+      ],
+      "kind": "dev",
+      "port": 6006,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "docusaurus",
+      "sub": [
+        "start"
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "eleventy",
+      "sub": [
+        ""
+      ],
+      "kind": "dev",
+      "port": 8080,
+      "portFlags": [
+        "--port"
+      ],
+      "requiresFlag": "--serve"
+    },
+    {
+      "bin": "wrangler",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 8787,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "vercel",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portFlags": [
+        "-l",
+        "--listen"
+      ]
+    },
+    {
+      "bin": "netlify",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 8888,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "serve",
+      "sub": [
+        "",
+        "."
+      ],
+      "kind": "production",
+      "port": 3000,
+      "portFlags": [
+        "-l",
+        "--listen",
+        "-p"
+      ]
+    },
+    {
+      "bin": "http-server",
+      "sub": [
+        ""
+      ],
+      "kind": "dev",
+      "port": 8080,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "json-server",
+      "sub": [
+        ""
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "nest",
+      "sub": [
+        "start"
+      ],
+      "kind": "dev",
+      "port": null,
+      "note": "the port is set in the app's code (the Nest template uses 3000)"
+    },
+    {
+      "bin": "expo",
+      "sub": [
+        "start"
+      ],
+      "kind": "dev",
+      "port": 8081,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "artisan",
+      "sub": [
+        "serve"
+      ],
+      "kind": "dev",
+      "port": 8000,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "symfony",
+      "sub": [
+        "serve",
+        "server:start"
+      ],
+      "kind": "dev",
+      "port": 8000,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "rails",
+      "sub": [
+        "server",
+        "s"
+      ],
+      "kind": "dev",
+      "port": 3000,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "manage.py",
+      "sub": [
+        "runserver"
+      ],
+      "kind": "dev",
+      "port": 8000
+    },
+    {
+      "bin": "flask",
+      "sub": [
+        "run"
+      ],
+      "kind": "dev",
+      "port": 5000,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "uvicorn",
+      "sub": [
+        "*"
+      ],
+      "kind": "dev",
+      "port": 8000,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "fastapi",
+      "sub": [
+        "dev"
+      ],
+      "kind": "dev",
+      "port": 8000,
+      "portFlags": [
+        "--port"
+      ]
+    },
+    {
+      "bin": "hugo",
+      "sub": [
+        "server",
+        "serve"
+      ],
+      "kind": "dev",
+      "port": 1313,
+      "portFlags": [
+        "-p",
+        "--port"
+      ]
+    },
+    {
+      "bin": "jekyll",
+      "sub": [
+        "serve",
+        "s"
+      ],
+      "kind": "dev",
+      "port": 4000,
+      "portFlags": [
+        "-P",
+        "--port"
+      ]
+    }
+  ],
+  "orchestrators": [
+    "turbo",
+    "nx",
+    "concurrently",
+    "npm-run-all",
+    "run-p",
+    "run-s",
+    "lerna",
+    "foreman",
+    "overmind",
+    "honcho",
+    "wireit"
+  ],
+  "genericServers": [
+    "node",
+    "nodemon",
+    "tsx",
+    "ts-node",
+    "ts-node-dev",
+    "bun",
+    "deno",
+    "babel-node",
+    "pm2",
+    "forever"
+  ]
+}

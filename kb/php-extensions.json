@@ -1,0 +1,56 @@
+{
+  "reviewed": "2026-11-01",
+  "about": "Where each PHP extension comes from, per OS family. `builtin` extensions are compiled into the PHP binary on every common build. `{nodot}` is the PHP version without its dot (83), `{v}` with it (8.3). Windows lists the php.ini line for extensions shipped as DLLs with the official builds, or how to get the others.",
+  "aliases": { "zend opcache": "opcache", "mysqlnd": "mysqlnd", "pdo mysql": "pdo_mysql", "xdebug": "xdebug" },
+  "builtin": ["core", "standard", "spl", "pcre", "date", "reflection", "hash", "random", "json", "filter", "ctype", "tokenizer", "session"],
+  "unavailable": { "windows": ["pcntl", "posix", "sysvmsg", "sysvsem", "sysvshm", "readline"] },
+  "packages": {
+    "debian": {
+      "pattern": "php{v}-{pkg}",
+      "note": "With the distribution's default PHP, php-{pkg} also works. Restart PHP-FPM or your web server afterwards.",
+      "pkg": {
+        "pdo_mysql": "mysql", "mysqli": "mysql", "mysqlnd": "mysql", "pdo_pgsql": "pgsql", "pgsql": "pgsql", "pdo_sqlite": "sqlite3", "sqlite3": "sqlite3",
+        "mbstring": "mbstring", "xml": "xml", "dom": "xml", "simplexml": "xml", "xmlreader": "xml", "xmlwriter": "xml", "xsl": "xml",
+        "curl": "curl", "zip": "zip", "gd": "gd", "intl": "intl", "bcmath": "bcmath", "redis": "redis", "memcached": "memcached", "imagick": "imagick",
+        "soap": "soap", "ldap": "ldap", "gmp": "gmp", "opcache": "opcache", "readline": "readline", "xdebug": "xdebug", "pcov": "pcov", "apcu": "apcu",
+        "mongodb": "mongodb", "igbinary": "igbinary", "msgpack": "msgpack", "bz2": "bz2", "tidy": "tidy", "enchant": "enchant", "snmp": "snmp", "odbc": "odbc",
+        "pdo_odbc": "odbc", "amqp": "amqp", "yaml": "yaml", "swoole": "swoole", "uuid": "uuid", "decimal": "decimal", "ds": "ds"
+      },
+      "common": ["calendar", "ctype", "exif", "ffi", "fileinfo", "ftp", "gettext", "iconv", "pdo", "phar", "posix", "shmop", "sockets", "sysvmsg", "sysvsem", "sysvshm", "tokenizer", "openssl", "sodium", "zlib", "pcntl"]
+    },
+    "fedora": {
+      "pattern": "php-{pkg}",
+      "note": "Package names for the distribution PHP and the Remi repository.",
+      "pkg": {
+        "pdo_mysql": "mysqlnd", "mysqli": "mysqlnd", "mysqlnd": "mysqlnd", "pdo_pgsql": "pgsql", "pgsql": "pgsql", "pdo_sqlite": "pdo", "sqlite3": "pdo", "pdo": "pdo",
+        "mbstring": "mbstring", "xml": "xml", "dom": "xml", "simplexml": "xml", "xmlreader": "xml", "xmlwriter": "xml", "xsl": "xml",
+        "zip": "pecl-zip", "gd": "gd", "intl": "intl", "bcmath": "bcmath", "redis": "pecl-redis6", "memcached": "pecl-memcached", "imagick": "pecl-imagick-im7",
+        "soap": "soap", "ldap": "ldap", "gmp": "gmp", "opcache": "opcache", "sodium": "sodium", "xdebug": "pecl-xdebug3", "apcu": "pecl-apcu", "mongodb": "pecl-mongodb",
+        "process": "process", "posix": "process", "pcntl": "process", "tidy": "tidy", "odbc": "odbc", "pdo_odbc": "odbc"
+      },
+      "common": ["calendar", "ctype", "curl", "exif", "fileinfo", "ftp", "gettext", "iconv", "phar", "sockets", "tokenizer", "openssl", "zlib"],
+      "check": "Remi and Fedora renamed some PECL packages across releases (redis5/redis6, imagick/imagick-im7); `dnf search php-pecl` shows the current names."
+    },
+    "arch": {
+      "pattern": "php-{pkg}",
+      "note": "Most extensions ship inside the php package but are disabled: uncomment `extension={ext}` in /etc/php/php.ini.",
+      "pkg": { "gd": "gd", "intl": "intl", "pgsql": "pgsql", "pdo_pgsql": "pgsql", "sqlite3": "sqlite", "pdo_sqlite": "sqlite", "sodium": "sodium", "tidy": "tidy", "xsl": "xsl", "snmp": "snmp", "odbc": "odbc", "redis": "redis", "imagick": "imagick", "apcu": "apcu", "memcached": "memcached", "xdebug": "xdebug", "igbinary": "igbinary", "mongodb": "mongodb" },
+      "inPhpPackage": ["bcmath", "bz2", "calendar", "curl", "dba", "exif", "ftp", "gettext", "gmp", "iconv", "mysqli", "pdo_mysql", "shmop", "soap", "sockets", "sysvmsg", "sysvsem", "sysvshm", "zip", "mbstring", "xml", "dom", "simplexml", "xmlreader", "xmlwriter", "openssl", "fileinfo", "pdo", "phar", "posix", "pcntl", "opcache", "zlib", "ffi", "ldap", "readline"]
+    },
+    "alpine": {
+      "pattern": "php{nodot}-{pkg}",
+      "pkg": { "redis": "pecl-redis", "imagick": "pecl-imagick", "xdebug": "pecl-xdebug", "apcu": "pecl-apcu", "memcached": "pecl-memcached", "mongodb": "pecl-mongodb", "igbinary": "pecl-igbinary", "msgpack": "pecl-msgpack", "amqp": "pecl-amqp", "yaml": "pecl-yaml", "mysqlnd": "mysqlnd" },
+      "default": "{ext}"
+    },
+    "macos": {
+      "note": "Homebrew's php includes most extensions. PECL ones are installed with `pecl install {ext}` and enabled in the php.ini that `php --ini` names.",
+      "pecl": ["redis", "imagick", "xdebug", "apcu", "memcached", "mongodb", "igbinary", "msgpack", "pcov", "amqp", "yaml", "swoole", "sqlsrv", "pdo_sqlsrv", "ds", "decimal"]
+    },
+    "windows": {
+      "note": "Edit php.ini (the path is in `php --ini`; copy php.ini-development to php.ini if there is none) and uncomment or add `extension={ext}`.",
+      "bundled": ["pdo_mysql", "mysqli", "pdo_pgsql", "pgsql", "pdo_sqlite", "sqlite3", "mbstring", "curl", "openssl", "fileinfo", "gd", "intl", "zip", "exif", "sodium", "bz2", "ftp", "gettext", "gmp", "ldap", "soap", "sockets", "xsl", "tidy", "odbc", "pdo_odbc", "shmop", "com_dotnet", "ffi", "opcache"],
+      "builtinOnWindows": ["bcmath", "calendar", "ctype", "dom", "iconv", "json", "libxml", "mysqlnd", "pdo", "phar", "simplexml", "tokenizer", "xml", "xmlreader", "xmlwriter", "zlib", "session", "filter", "hash", "random", "reflection", "spl", "standard", "date", "pcre"],
+      "download": "Download the DLL matching your PHP version, architecture and thread safety (php -i | findstr \"Thread\") from pecl.php.net or the extension's GitHub releases into PHP's ext folder, then add `extension={ext}` to php.ini."
+    }
+  }
+}

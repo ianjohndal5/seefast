@@ -1,0 +1,157 @@
+{
+  "id": "prisma",
+  "name": "Prisma",
+  "ecosystem": "node",
+  "reviewed": "2026-11-01",
+  "sources": [
+    "https://www.prisma.io/docs/orm/prisma-migrate/workflows/development-and-production",
+    "https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/generating-prisma-client"
+  ],
+  "detect": {
+    "all": [
+      {
+        "any": [
+          {
+            "dep": "prisma"
+          },
+          {
+            "dep": "@prisma/client"
+          }
+        ]
+      },
+      {
+        "any": [
+          {
+            "file": "prisma/schema.prisma"
+          },
+          {
+            "dir": "prisma/schema"
+          },
+          {
+            "file": "schema.prisma"
+          }
+        ]
+      }
+    ]
+  },
+  "version": {
+    "dep": "prisma"
+  },
+  "requires": [],
+  "env": {
+    "file": ".env",
+    "reads": [
+      ".env"
+    ],
+    "required": [
+      "DATABASE_URL"
+    ]
+  },
+  "functions": [
+    "prismaService"
+  ],
+  "steps": [
+    {
+      "id": "prisma-generate",
+      "phase": "generate",
+      "order": 40,
+      "title": "Generate the Prisma Client",
+      "exec": [
+        "{exec:prisma}",
+        "generate"
+      ],
+      "after": [
+        "install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "confidence": "high",
+      "why": "The app imports a client generated from the Prisma schema; it does not exist in a fresh clone. (Some setups also generate it on install; running it again is harmless.)"
+    },
+    {
+      "id": "prisma-migrate",
+      "phase": "database",
+      "order": 50,
+      "title": "Apply the database migrations (Prisma)",
+      "exec": [
+        "{exec:prisma}",
+        "migrate",
+        "deploy"
+      ],
+      "after": [
+        "prisma-generate",
+        "env?"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "when": {
+        "dir": "prisma/migrations"
+      },
+      "confidence": "high",
+      "lowerConfidenceWhen": {
+        "not": {
+          "fn": "prismaIsSqlite"
+        }
+      },
+      "why": "prisma/migrations holds the migration history; migrate deploy applies it without creating new migrations or resetting data.",
+      "notes": [
+        "Needs DATABASE_URL in the env file pointing at a running database."
+      ]
+    },
+    {
+      "id": "prisma-push",
+      "phase": "database",
+      "order": 50,
+      "title": "Create the database schema (Prisma db push)",
+      "exec": [
+        "{exec:prisma}",
+        "db",
+        "push"
+      ],
+      "after": [
+        "prisma-generate",
+        "env?"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "when": {
+        "not": {
+          "dir": "prisma/migrations"
+        }
+      },
+      "confidence": "medium",
+      "why": "There are no migration files, so the schema is pushed to the database directly.",
+      "notes": [
+        "Needs DATABASE_URL in the env file pointing at a running database."
+      ]
+    },
+    {
+      "id": "prisma-seed",
+      "phase": "database",
+      "order": 55,
+      "title": "Seed the database (Prisma)",
+      "exec": [
+        "{exec:prisma}",
+        "db",
+        "seed"
+      ],
+      "after": [
+        "prisma-migrate?",
+        "prisma-push?"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "when": {
+        "fn": "prismaHasSeed"
+      },
+      "optional": true,
+      "confidence": "medium",
+      "why": "A Prisma seed command is configured. Read it before running: seeds often create demo users."
+    }
+  ],
+  "run": []
+}

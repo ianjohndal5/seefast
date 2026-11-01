@@ -1,0 +1,534 @@
+{
+  "id": "laravel",
+  "name": "Laravel",
+  "ecosystem": "php",
+  "reviewed": "2026-11-01",
+  "sources": [
+    "https://laravel.com/docs/12.x/installation",
+    "https://laravel.com/docs/12.x/releases#support-policy"
+  ],
+  "detect": {
+    "all": [
+      {
+        "composer": "laravel/framework"
+      },
+      {
+        "file": "artisan"
+      }
+    ]
+  },
+  "version": {
+    "composer": "laravel/framework"
+  },
+  "requires": [
+    {
+      "tool": "php",
+      "byMajor": {
+        "6": ">=7.2.0",
+        "7": ">=7.2.5",
+        "8": ">=7.3.0",
+        "9": ">=8.0.2",
+        "10": ">=8.1.0",
+        "11": ">=8.2.0",
+        "12": ">=8.2.0"
+      }
+    }
+  ],
+  "env": {
+    "file": ".env",
+    "generated": {
+      "APP_KEY": "key"
+    },
+    "optional": [
+      "AWS_*",
+      "PUSHER_*",
+      "VITE_PUSHER_*",
+      "VITE_REVERB_*",
+      "REVERB_*",
+      "MAIL_USERNAME",
+      "MAIL_PASSWORD",
+      "MAIL_FROM_ADDRESS",
+      "MEMCACHED_HOST",
+      "REDIS_PASSWORD",
+      "MAILGUN_*",
+      "POSTMARK_*",
+      "RESEND_*",
+      "SLACK_*",
+      "SES_*",
+      "SENTRY_*",
+      "BUGSNAG_*",
+      "LOG_SLACK_*",
+      "PAPERTRAIL_*",
+      "MIX_PUSHER_*",
+      "SCOUT_*",
+      "MEILISEARCH_KEY",
+      "TYPESENSE_*",
+      "ALGOLIA_*",
+      "STRIPE_*",
+      "GOOGLE_*",
+      "GITHUB_*",
+      "FACEBOOK_*",
+      "TWITTER_*",
+      "BROADCAST_*"
+    ],
+    "fillWhen": {
+      "DB_PASSWORD": {
+        "envValue": [
+          "DB_CONNECTION",
+          "mysql",
+          "mariadb",
+          "pgsql",
+          "sqlsrv"
+        ]
+      },
+      "DB_USERNAME": {
+        "envValue": [
+          "DB_CONNECTION",
+          "mysql",
+          "mariadb",
+          "pgsql",
+          "sqlsrv"
+        ]
+      }
+    },
+    "reads": [
+      ".env"
+    ]
+  },
+  "functions": [
+    "laravelServices"
+  ],
+  "steps": [
+    {
+      "id": "key",
+      "phase": "configure",
+      "order": 30,
+      "title": "Generate the application key (APP_KEY)",
+      "exec": [
+        "php",
+        "artisan",
+        "key:generate"
+      ],
+      "after": [
+        "composer-install",
+        "env?"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "when": {
+        "envKey": "APP_KEY"
+      },
+      "optionalWhen": {
+        "envFileExists": true
+      },
+      "confidence": "high",
+      "why": "Laravel encrypts sessions and cookies with APP_KEY, and the template leaves it empty. Without it every page fails with \"No application encryption key has been specified\".",
+      "notes": [
+        {
+          "when": {
+            "envFileExists": true
+          },
+          "text": "The env file already exists; generating a key replaces the one in it, which logs everyone out and makes encrypted data unreadable. Skip this if the app already has a key."
+        }
+      ]
+    },
+    {
+      "id": "storage-link",
+      "phase": "configure",
+      "order": 35,
+      "title": "Link public/storage to storage/app/public",
+      "exec": [
+        "php",
+        "artisan",
+        "storage:link"
+      ],
+      "after": [
+        "composer-install",
+        "env?"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "when": {
+        "dir": "storage/app/public"
+      },
+      "optional": true,
+      "confidence": "medium",
+      "why": "Uploaded files on the public disk are served through this link. The app starts without it, but uploads and generated files 404.",
+      "notes": [
+        "On Windows, creating a symbolic link needs Developer Mode or an administrator prompt; this tool never elevates."
+      ]
+    },
+    {
+      "id": "passport-keys",
+      "phase": "configure",
+      "order": 32,
+      "title": "Create the OAuth encryption keys (Laravel Passport)",
+      "exec": [
+        "php",
+        "artisan",
+        "passport:keys"
+      ],
+      "after": [
+        "composer-install",
+        "env?"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "when": {
+        "all": [
+          {
+            "composer": "laravel/passport"
+          },
+          {
+            "not": {
+              "file": "storage/oauth-private.key"
+            }
+          }
+        ]
+      },
+      "confidence": "medium",
+      "why": "laravel/passport signs tokens with storage/oauth-private.key and oauth-public.key, which are not committed. Without them, login and API calls that issue tokens fail."
+    },
+    {
+      "id": "sqlite",
+      "phase": "database",
+      "order": 45,
+      "title": "Create the SQLite database file",
+      "touch": "database/database.sqlite",
+      "when": {
+        "all": [
+          {
+            "envValue": [
+              "DB_CONNECTION",
+              "sqlite"
+            ]
+          },
+          {
+            "not": {
+              "envKeyActive": "DB_DATABASE"
+            }
+          }
+        ]
+      },
+      "confidence": "high",
+      "why": "DB_CONNECTION=sqlite with no DB_DATABASE uses database/database.sqlite, which is not committed. Laravel asks interactively to create it otherwise."
+    },
+    {
+      "id": "migrate",
+      "phase": "database",
+      "order": 50,
+      "title": "Create the database tables (migrations)",
+      "exec": [
+        "php",
+        "artisan",
+        "migrate"
+      ],
+      "after": [
+        "key?",
+        "sqlite?",
+        "composer-install"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "when": {
+        "dir": "database/migrations"
+      },
+      "confidence": "high",
+      "lowerConfidenceWhen": {
+        "not": {
+          "envValue": [
+            "DB_CONNECTION",
+            "sqlite"
+          ]
+        }
+      },
+      "why": "database/migrations holds the schema. The app's first request fails on missing tables until they are created.",
+      "notes": [
+        {
+          "when": {
+            "not": {
+              "envValue": [
+                "DB_CONNECTION",
+                "sqlite"
+              ]
+            }
+          },
+          "text": "Needs the database server running and DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME and DB_PASSWORD in the env file to match it; the database itself must exist."
+        }
+      ]
+    },
+    {
+      "id": "seed",
+      "phase": "database",
+      "order": 55,
+      "title": "Fill the database with seed data",
+      "exec": [
+        "php",
+        "artisan",
+        "db:seed"
+      ],
+      "after": [
+        "migrate"
+      ],
+      "requires": [
+        "runtime:php"
+      ],
+      "when": {
+        "file": "database/seeders/DatabaseSeeder.php"
+      },
+      "optional": true,
+      "confidence": "medium",
+      "why": "database/seeders/DatabaseSeeder.php exists. Seeding adds sample or required records (often an admin user); read the seeder before running it."
+    },
+    {
+      "id": "build",
+      "phase": "build",
+      "order": 60,
+      "title": "Build the frontend assets",
+      "exec": [
+        "{run:build}"
+      ],
+      "after": [
+        "install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "when": {
+        "all": [
+          {
+            "any": [
+              {
+                "dep": "laravel-vite-plugin"
+              },
+              {
+                "dep": "vite"
+              },
+              {
+                "dep": "laravel-mix"
+              },
+              {
+                "dep": "webpack"
+              }
+            ]
+          },
+          {
+            "script": "build"
+          }
+        ]
+      },
+      "optional": false,
+      "confidence": "medium",
+      "why": "Blade templates load compiled CSS and JavaScript (@vite reads public/build/manifest.json; mix() reads public/mix-manifest.json). Without a build, pages fail or render unstyled unless a dev/watch server runs."
+    },
+    {
+      "id": "build",
+      "phase": "build",
+      "order": 60,
+      "title": "Build the frontend assets",
+      "exec": [
+        "{run:production}"
+      ],
+      "after": [
+        "install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "when": {
+        "all": [
+          {
+            "any": [
+              {
+                "dep": "laravel-mix"
+              },
+              {
+                "dep": "webpack"
+              },
+              {
+                "dep": "vite"
+              }
+            ]
+          },
+          {
+            "not": {
+              "script": "build"
+            }
+          },
+          {
+            "script": "production"
+          }
+        ]
+      },
+      "optional": false,
+      "confidence": "medium",
+      "why": "Blade templates load compiled CSS and JavaScript (@vite reads public/build/manifest.json; mix() reads public/mix-manifest.json). Without a build, pages fail or render unstyled unless a dev/watch server runs."
+    },
+    {
+      "id": "build",
+      "phase": "build",
+      "order": 60,
+      "title": "Build the frontend assets",
+      "exec": [
+        "{run:build:production}"
+      ],
+      "after": [
+        "install"
+      ],
+      "requires": [
+        "runtime:node"
+      ],
+      "when": {
+        "all": [
+          {
+            "any": [
+              {
+                "dep": "laravel-mix"
+              },
+              {
+                "dep": "webpack"
+              },
+              {
+                "dep": "vite"
+              }
+            ]
+          },
+          {
+            "not": {
+              "script": "build"
+            }
+          },
+          {
+            "not": {
+              "script": "production"
+            }
+          },
+          {
+            "script": "build:production"
+          }
+        ]
+      },
+      "optional": false,
+      "confidence": "medium",
+      "why": "Blade templates load compiled CSS and JavaScript (@vite reads public/build/manifest.json; mix() reads public/mix-manifest.json). Without a build, pages fail or render unstyled unless a dev/watch server runs."
+    }
+  ],
+  "run": [
+    {
+      "id": "composer-dev",
+      "name": "dev",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start the Laravel app with its dev script (server, queue, logs, Vite)",
+      "exec": [
+        "composer",
+        "run",
+        "dev"
+      ],
+      "port": 8000,
+      "after": [
+        "composer-install",
+        "key?",
+        "migrate?",
+        "install?"
+      ],
+      "when": {
+        "composerScript": "dev"
+      },
+      "demote": [
+        "dev",
+        "artisan-serve",
+        "artisan-queue"
+      ],
+      "confidence": "high",
+      "why": "composer.json defines a dev script, the maintainers' own way to start everything together.",
+      "notes": [
+        {
+          "when": {
+            "composerScriptContains": [
+              "dev",
+              "pail"
+            ]
+          },
+          "text": "It runs `php artisan pail`, which needs the pcntl extension that PHP for Windows lacks. On Windows run `php artisan serve` and the Vite dev server separately."
+        }
+      ]
+    },
+    {
+      "id": "artisan-serve",
+      "name": "serve",
+      "kind": "dev",
+      "primary": true,
+      "title": "Start the Laravel development server",
+      "exec": [
+        "php",
+        "artisan",
+        "serve"
+      ],
+      "port": 8000,
+      "after": [
+        "composer-install",
+        "key?",
+        "migrate?"
+      ],
+      "confidence": "high",
+      "why": "php artisan serve listens on http://127.0.0.1:8000 by default."
+    },
+    {
+      "id": "artisan-queue",
+      "name": "queue",
+      "kind": "worker",
+      "primary": true,
+      "title": "Process queued jobs",
+      "exec": [
+        "php",
+        "artisan",
+        "queue:work"
+      ],
+      "after": [
+        "migrate?"
+      ],
+      "when": {
+        "envValueNot": [
+          "QUEUE_CONNECTION",
+          "sync",
+          "null"
+        ]
+      },
+      "confidence": "medium",
+      "why": "QUEUE_CONNECTION is not sync, so jobs wait in a queue until a worker processes them."
+    },
+    {
+      "id": "artisan-test",
+      "name": "test",
+      "kind": "test",
+      "primary": true,
+      "title": "Run the test suite",
+      "exec": [
+        "php",
+        "artisan",
+        "test"
+      ],
+      "after": [
+        "composer-install",
+        "key?"
+      ],
+      "when": {
+        "any": [
+          {
+            "file": "phpunit.xml"
+          },
+          {
+            "file": "phpunit.xml.dist"
+          }
+        ]
+      },
+      "confidence": "high",
+      "why": "phpunit.xml configures the tests; php artisan test runs them."
+    }
+  ]
+}

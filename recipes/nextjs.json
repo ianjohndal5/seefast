@@ -1,0 +1,43 @@
+{
+  "id": "nextjs",
+  "name": "Next.js",
+  "ecosystem": "node",
+  "reviewed": "2026-11-01",
+  "sources": [
+    "https://nextjs.org/docs/app/getting-started/installation",
+    "https://nextjs.org/docs/app/guides/environment-variables"
+  ],
+  "detect": {
+    "dep": "next"
+  },
+  "version": {
+    "dep": "next"
+  },
+  "requires": [
+    {
+      "tool": "node",
+      "byMajor": {
+        "12": ">=12.22.0",
+        "13": ">=16.14.0",
+        "14": ">=18.17.0",
+        "15": ">=18.18.0",
+        "16": ">=20.9.0"
+      }
+    }
+  ],
+  "env": {
+    "file": ".env.local",
+    "fileConfidence": "medium",
+    "notes": {
+      "NEXT_PUBLIC_*": "Inlined into the browser bundle when the app is built: changing it needs a rebuild, and it must not hold a secret."
+    },
+    "reads": [
+      ".env.local",
+      ".env.development.local",
+      ".env.development",
+      ".env"
+    ]
+  },
+  "steps": [],
+  "run": []
+}
