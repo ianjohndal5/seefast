@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; form-action 'none'; base-uri 'none'">
+  <title>SeeFast</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="shell" data-state="bubble">
+    <button id="bubble" type="button" aria-label="SeeFast: choose a project folder to analyze. Drag to move, arrow keys to nudge, right-click for recent projects." title="SeeFast: click to pick a project, drag to move">
+      <span class="ring" aria-hidden="true"></span>
+    </button>
+    <section id="panel" role="dialog" aria-labelledby="panel-title" aria-modal="false" hidden>
+      <header class="bar">
+        <button id="back" class="icon" type="button" aria-label="Back to the overview" hidden></button>
+        <span id="bar-mascot" aria-hidden="true"></span>
+        <div class="titles">
+          <h1 id="panel-title" tabindex="-1">SeeFast</h1>
+          <p id="panel-sub" class="sub"></p>
+        </div>
+        <button id="settings-btn" class="icon" type="button" aria-label="Settings"></button>
+        <button id="collapse" class="icon" type="button" aria-label="Collapse to the bubble (Escape)"></button>
+      </header>
+      <main id="content" class="content"></main>
+      <footer id="dock" class="dock" hidden></footer>
+    </section>
+    <div id="live" class="sr-only" role="status" aria-live="polite"></div>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

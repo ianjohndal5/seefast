@@ -1,0 +1,21 @@
+{
+  "name": "seefast-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SeeFast launcher: a floating bubble that analyzes a project folder and morphs into setup panels.",
+  "type": "module",
+  "main": "out/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-preload.mjs",
+    "start": "npm run build && electron .",
+    "smoke": "npm run build && electron . --smoke"
+  },
+  "dependencies": {
+    "seefast": "file:.."
+  },
+  "devDependencies": {
+    "electron": "44.7.2",
+    "typescript": "6.0.3",
+    "@types/node": "24.10.1"
+  }
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Monochrome tray / menu-bar icon (macOS template image): the robot's sphere, side modules and camera eye. -->
+  <rect x="0.8" y="11" width="4.4" height="10" rx="1.8" fill="#000"/>
+  <rect x="26.8" y="11" width="4.4" height="10" rx="1.8" fill="#000"/>
+  <circle cx="16" cy="16.2" r="12.6" fill="none" stroke="#000" stroke-width="2.4"/>
+  <circle cx="16" cy="15.8" r="7.2" fill="none" stroke="#000" stroke-width="2.6"/>
+  <circle cx="16" cy="15.8" r="3.2" fill="#000"/>
+  <rect x="12.6" y="25.4" width="6.8" height="2" rx="1" fill="#000"/>
+</svg>

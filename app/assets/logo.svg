@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- SeeFast's character (idle): an armored sphere robot with one camera eye. Source of the app and tray icons. --><style>
+.module{fill:#3a4157;stroke:#1c1a2b;stroke-width:2.2}
+.glow{fill:#3cd2ff}
+.shade{fill:#c4cbdb}
+.shell{fill:#eef1f7}
+.seam{fill:none;stroke:#1c1a2b;stroke-width:1.3;stroke-linecap:round;opacity:.42}
+.gleam{fill:none;stroke:#fff;stroke-width:2.8;stroke-linecap:round}
+.rivet{fill:#8e97ad}
+.vent{fill:#2b3042;stroke:#1c1a2b;stroke-width:1.6}
+.outline{fill:none;stroke:#1c1a2b;stroke-width:3}
+.housing{fill:#2b3042;stroke:#1c1a2b;stroke-width:2.6}
+.notch{fill:#4a526b}
+.lights{fill:none;stroke:#3cd2ff;stroke-width:2.2;stroke-dasharray:5.1 2.06}
+.glass{fill:#0f1220}
+.halo{fill:#3cd2ff;opacity:.25}
+.iris{fill:#1677f0}
+.core{fill:#effcff}
+.glint{fill:#fff}
+.glint.small{opacity:.8}
+.sheen{fill:none;stroke:#fff;stroke-width:1.4;stroke-linecap:round;opacity:.3}
+.lid{fill:#2b3042}
+.lid-edge{fill:none;stroke:#3cd2ff;stroke-width:1.8;stroke-linecap:round}
+.lid-happy,.lid-worried{display:none}
+.pupils{transform:translate(0px,0px)}
+</style>
+  <rect class="module" x="2.4" y="22.5" width="9.6" height="19" rx="3.6"/><rect class="module" x="52" y="22.5" width="9.6" height="19" rx="3.6"/>
+  <rect class="glow" x="4.6" y="27.2" width="2.4" height="9.6" rx="1.2"/><rect class="glow" x="57" y="27.2" width="2.4" height="9.6" rx="1.2"/>
+  <circle class="shade" cx="32" cy="32.5" r="25.5"/>
+  <circle class="shell" cx="30" cy="30" r="23"/>
+  <path class="seam" d="M14.4 31.5H7M49.6 31.5H57M20.4 44.5l-5.6 5.8M43.6 44.5l5.6 5.8"/>
+  <circle class="seam" cx="32" cy="31.5" r="17.6"/>
+  <path class="gleam" d="M11.5 24.5c1.6-5.2 5-9.6 9.6-12.6"/>
+  <rect class="glow" x="13.2" y="17" width="2.4" height="6.4" rx="1.2" transform="rotate(40 14.4 20.2)"/>
+  <rect class="glow" x="48.4" y="17" width="2.4" height="6.4" rx="1.2" transform="rotate(-40 49.6 20.2)"/>
+  <circle class="rivet" cx="16.4" cy="40.6" r="1"/><circle class="rivet" cx="47.6" cy="40.6" r="1"/><circle class="rivet" cx="26.6" cy="10.4" r="1"/><circle class="rivet" cx="37.4" cy="10.4" r="1"/>
+  <rect class="vent" x="24.6" y="52" width="14.8" height="5.2" rx="2.6"/>
+  <rect class="glow" x="27.4" y="53.8" width="9.2" height="1.6" rx=".8"/>
+  <circle class="outline" cx="32" cy="32.5" r="25.5"/>
+  <circle class="housing" cx="32" cy="31.5" r="14"/>
+  <rect class="notch" x="29.4" y="18.1" width="5.2" height="1.7" rx=".85"/>
+  <circle class="lights" cx="32" cy="31.5" r="11.4"/>
+  <g class="lens">
+    <circle class="glass" cx="32" cy="31.5" r="9.5"/>
+    <g class="pupils" transform="translate(0 0)">
+      <circle class="halo" cx="32" cy="31.5" r="7.6"/>
+      <circle class="iris" cx="32" cy="31.5" r="5.8"/>
+      <circle class="glow" cx="32" cy="31.5" r="3.7"/>
+      <circle class="core" cx="32" cy="31.5" r="1.8"/>
+      <circle class="glint" cx="35.1" cy="28.1" r="1.9"/><circle class="glint small" cx="28.9" cy="34.7" r=".85"/>
+    </g>
+    <path class="sheen" d="M25.2 28.6a7.6 7.6 0 0 1 4.2-4.6"/>
+  </g>
+  <g class="lid-happy"><path class="lid" d="M20.4 35.7Q32 23 43.6 35.7A12.3 12.3 0 0 1 20.4 35.7z"/><path class="lid-edge" d="M20.4 35.7Q32 23 43.6 35.7"/></g>
+  <g class="lid-worried"><path class="lid" d="M20.8 26.5Q32 18.5 43.2 26.5A12.3 12.3 0 0 0 20.8 26.5z"/><path class="lid-edge" d="M20.8 26.5Q32 18.5 43.2 26.5"/></g>
+</svg>
