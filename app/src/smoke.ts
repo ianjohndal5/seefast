@@ -280,7 +280,7 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
       await sleep(300);
       await shot('consent-2-finished');
     }
-    // Optional: SEEFAST_SMOKE_EXTRA=<folder> also screenshots that project's guide and overview in both shells (layout checks).
+    // Optional: SEEFAST_SMOKE_EXTRA=<folder> also screenshots that project's guide and overview in both shells, and Do it for me (layout checks).
     const extra = process.env.SEEFAST_SMOKE_EXTRA;
     if (extra) {
       await js(`window.__seefast.analyzeFolder(${JSON.stringify(extra)})`);
@@ -294,6 +294,9 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
         await sleep(700);
         await shot(`extra-overview-${sh}`);
       }
+      await js(`window.__seefast.state.shell = 'posix'; window.__seefast.open('auto')`);
+      await sleep(700);
+      await shot('extra-auto');
     }
   } catch (e) {
     check('smoke run', false, (e as Error).stack ?? String(e));

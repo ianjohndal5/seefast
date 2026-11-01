@@ -17,8 +17,9 @@ First release.
   CONTRIBUTING and development guides, env templates, env reads in code, git submodules and LFS.
 - Recipes as declarative JSON: Laravel, Next.js, Prisma.
 - Generic support for Python, Go, Rust, Ruby, Java, .NET, Deno and Elixir, and for Makefile-only repos.
-- Evidence (file and line) and a confidence level on every item; conflicts explained in plain language; unknowns
-  reported; secrets never read or written; deterministic and portable output; a plan digest.
+- Evidence (file and line) and a confidence level on every item; conflicts explained in plain language (projects
+  sharing a port get one warning naming them all, not one per pair); unknowns reported; secrets never read or
+  written; deterministic and portable output; a plan digest.
 
 ### Interfaces
 - CLI: `guide`, `plan`, `explain`, `doctor`, `setup`, `start`, `setup-md`, `diff`, `support`; POSIX and PowerShell

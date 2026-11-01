@@ -88,3 +88,20 @@ describe('env files and start commands', () => {
     expect(plan.steps.find((s) => s.id === 'root.docs-app-init')).toMatchObject({ optional: false, confidence: 'low' });
   });
 });
+
+describe('ports', () => {
+  const next = (name: string) => ({ name, scripts: { dev: 'next dev' }, dependencies: { next: '15.1.0', react: '19.0.0' } });
+  it('three projects on one port are one warning naming all three, not one per pair (HomesPH)', () => {
+    const plan = analyze(project({ 'alpha/package.json': next('alpha'), 'beta/package.json': next('beta'), 'gamma/package.json': next('gamma') }));
+    const clashes = plan.conflicts.filter((c) => c.subject === 'port:3000');
+    expect(clashes).toHaveLength(1);
+    expect(clashes[0].message).toMatch(/^alpha, beta and gamma all start on port 3000; only the first one started gets it/);
+    expect(clashes[0].alternatives.map((a) => a.value)).toEqual(['alpha', 'beta', 'gamma']);
+  });
+  it('two projects on one port keep the two-project wording', () => {
+    const plan = analyze(project({ 'alpha/package.json': next('alpha'), 'beta/package.json': next('beta') }));
+    expect(plan.conflicts.filter((c) => c.subject === 'port:3000').map((c) => c.message)).toEqual([
+      'alpha and beta both start on port 3000; the second one will fail or pick another port. Start one at a time, or change one port.',
+    ]);
+  });
+});

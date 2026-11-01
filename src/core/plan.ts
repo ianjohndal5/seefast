@@ -621,21 +621,32 @@ export function linkProjects(ctx: Ctx, services: Service[]): void {
       }
     }
   }
+  // One warning per port, naming every project that starts on it (three projects on 3000 are one problem, not three
+  // pairs). Projects that share several ports are reported once, on the first.
   const primaries = ctx.runs.filter((r) => r.primary && (r.kind === 'dev' || r.kind === 'worker'));
-  for (let i = 0; i < primaries.length; i++) {
-    for (let j = i + 1; j < primaries.length; j++) {
-      const a = primaries[i];
-      const b = primaries[j];
-      const shared = a.ports.find((x) => b.ports.some((y) => y.port === x.port));
-      if (!shared || a.project === b.project) continue;
-      ctx.conflict({
-        id: `port:${shared.port}:${a.project}:${b.project}`, subject: `port:${shared.port}`, chosen: null,
-        alternatives: [{ value: a.project, evidence: shared.evidence }, { value: b.project, evidence: b.ports.find((y) => y.port === shared.port)!.evidence }],
-        severity: 'warning',
-        message: `${ctx.project(a.project)!.name} and ${ctx.project(b.project)!.name} both start on port ${shared.port}; the second one will fail or pick another port. Start one at a time, or change one port.`,
-        rule: 'two run targets on one port',
-      });
+  const byPort = new Map<number, { project: string; evidence: Evidence[] }[]>();
+  for (const r of primaries) {
+    for (const p of r.ports) {
+      const users = byPort.get(p.port) ?? [];
+      if (!users.some((u) => u.project === r.project)) users.push({ project: r.project, evidence: p.evidence });
+      byPort.set(p.port, users);
     }
+  }
+  const reported = new Set<string>();
+  for (const [port, users] of byPort) {
+    const key = users.map((u) => u.project).join(':');
+    if (users.length < 2 || reported.has(key)) continue;
+    reported.add(key);
+    const names = users.map((u) => ctx.project(u.project)!.name);
+    ctx.conflict({
+      id: `port:${port}:${key}`, subject: `port:${port}`, chosen: null,
+      alternatives: users.map((u) => ({ value: u.project, evidence: u.evidence })),
+      severity: 'warning',
+      message: users.length === 2
+        ? `${names[0]} and ${names[1]} both start on port ${port}; the second one will fail or pick another port. Start one at a time, or change one port.`
+        : `${names.slice(0, -1).join(', ')} and ${names.at(-1)} all start on port ${port}; only the first one started gets it, the others will fail or pick another port. Start one at a time, or give each its own port.`,
+      rule: 'run targets on one port',
+    });
   }
 }
 
