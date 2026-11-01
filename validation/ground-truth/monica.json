@@ -1,0 +1,24 @@
+{
+  "id": "monica",
+  "sources": ["README.md", ".devcontainer/devcontainer.json", ".devcontainer/postCreate.sh", ".env.example", ".env.example.sail", "sail-init.sh", "docker-compose.yml", ".tool-versions", "composer.json", "package.json", "app/Console/Commands/SetupApplication.php", ".github/workflows/tests.yml"],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "vue"], "packageManagers": ["composer", "yarn"] }
+  ],
+  "runtimes": { "php": "8.3", "node": "22" },
+  "services": [],
+  "steps": [
+    { "kind": "env-copy", "source": "docs", "evidence": ".devcontainer/postCreate.sh:21" },
+    { "kind": "other:create-sqlite-file", "source": "docs", "evidence": ".devcontainer/postCreate.sh:24 (touch database/database.sqlite; .env.example uses DB_CONNECTION=sqlite)" },
+    { "kind": "install:composer", "source": "docs", "evidence": ".devcontainer/postCreate.sh:35" },
+    { "kind": "artisan:key:generate", "source": "docs", "evidence": ".devcontainer/postCreate.sh:44; .env.example APP_KEY is empty" },
+    { "kind": "artisan:monica:setup", "source": "docs", "evidence": ".devcontainer/postCreate.sh:45; SetupApplication.php runs storage:link, migrate --force, scout:setup, scribe:setup" },
+    { "kind": "install:yarn", "source": "docs", "evidence": ".devcontainer/postCreate.sh:39 (yarn install --immutable; packageManager yarn@4.6.0)" },
+    { "kind": "build-assets", "source": "docs", "evidence": ".devcontainer/postCreate.sh:40 (yarn run build)" }
+  ],
+  "optionalSteps": [
+    { "kind": "artisan:monica:dummy", "source": "docs", "evidence": ".devcontainer/postCreate.sh:49 (only with the `dummy` argument)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "php artisan serve", "port": 8000 }],
+  "readmeCommands": [],
+  "notes": "The README only links to docs.monicahq.com/developers/setup-local-development (external, not readable) and has no commands. The fullest in-repo setup is the devcontainer's postCreate.sh. It uses the default .env.example (SQLite, database cache/session, sync queue, log mailer), so no backing services are needed. Steps are listed in the script's execution order. The devcontainer serves the app through Apache on port 8080. `php artisan serve` on port 8000 (APP_URL in .env.example) is a convention for a plain host setup, not something the repo says. An alternative Laravel Sail path exists: .env.example.sail:4-7 says cp .env.example.sail .env, composer install via a laravelsail docker image (also sail-init.sh), then ./vendor/bin/sail up -d. That stack uses mariadb, redis, memcached, meilisearch and mailpit (docker-compose.yml) but never mentions key:generate or monica:setup. The Sail comment uses the php83 composer image, while sail-init.sh and the compose runtime use 8.4. CI calls reusable workflows from monicahq/workflows that cannot be read here; it shows only PHP 8.3/8.4, SQLite as the default connection and Node 22. .tool-versions pins php 8.3.16, nodejs 22.13.1 and yarn 4.6.0. The README warns this branch is the beta (5.x), while the stable version is on the 4.x branch."
+}

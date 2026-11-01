@@ -1,0 +1,36 @@
+{
+  "id": "pixelfed",
+  "sources": [
+    "README.md",
+    "DOCKER_COMPOSE_SETUP.md",
+    "docker-compose.yml",
+    "Dockerfile",
+    ".env.docker.example",
+    ".env.example",
+    ".github/workflows/php-laravel-tests.yml",
+    "composer.json",
+    "package.json",
+    ".node-version",
+    ".ddev/config.yaml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "vue"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.4", "node": "14.20.1" },
+  "services": ["mysql", "redis"],
+  "steps": [
+    { "kind": "other:chown-storage-www-data", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:18 (sudo chown -R www-data:www-data storage/ bootstrap/cache/; storage is bind-mounted into the www-data container, docker-compose.yml:80)" },
+    { "kind": "env-copy", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:23 (cp .env.docker.example .env)" },
+    { "kind": "env-manual", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:26-30 (set APP_KEY - empty in .env.docker.example:7 -, APP_URL/APP_DOMAIN/ADMIN_DOMAIN/SESSION_DOMAIN, DB_PASSWORD/DB_ROOT_PASSWORD)" },
+    { "kind": "compose-up", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:34 (docker compose build), :47-49 (up -d db redis, wait, up -d); migrations and storage:link auto-run in the container via AUTORUN_* (docker-compose.yml:71-74)" },
+    { "kind": "artisan:instance:actor", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:54" },
+    { "kind": "artisan:import:cities", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:55" },
+    { "kind": "artisan:passport:keys", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:56 (CI also generates storage/oauth-*.key, php-laravel-tests.yml:76-83)" },
+    { "kind": "artisan:passport:client", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:57 (passport:client --personal)" },
+    { "kind": "artisan:user:create", "source": "docs", "evidence": "DOCKER_COMPOSE_SETUP.md:62 (create admin user; OPEN_REGISTRATION=false in .env.docker.example:12)" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "docker compose up -d", "port": 8080 }],
+  "readmeCommands": [],
+  "notes": "README.md:61 recommends Docker Compose and defers all other docs to docs.pixelfed.org / developers.pixelfed.org (external, not read). The only in-repo setup guide is DOCKER_COMPOSE_SETUP.md, written for a production-style deploy behind a reverse proxy; for local use APP_URL etc. can point at http://localhost:8080. All artisan steps are run via 'docker compose exec pixelfed php artisan ...'. The image COPYs the source (no code bind mount, opcache timestamps off, route/view/config caching on), so code edits need a rebuild - poor fit for active development. Alternatives present but undocumented: a .ddev/ config (MariaDB 11.8 + Redis, preset APP_KEY, PHP 8.5) and a bare-metal path implied by CI + .env.example: composer install, cp .env.example .env, php artisan key:generate, create MySQL DB, php artisan migrate, passport:keys, instance:actor, storage:link, php artisan serve (needs PHP ext-redis, ext-ffi and libvips since IMAGE_DRIVER=vips). CI only runs tests (cp .env.testing .env, key:generate, SQLite + Redis), never a running instance. Compiled JS/CSS are committed in public/ (CONTRIBUTING says maintainers build them), so no npm step is needed; .node-version (v14.20.1) is stale relative to esbuild 0.25 / webpack 5 deps. PHP: composer allows ^8.4, README recommends 8.5, CI tests 8.5 only. DB: README says MySQL 8+ / MariaDB 11+ (Postgres best-effort); compose uses mysql:9."
+}

@@ -1,0 +1,30 @@
+{
+  "id": "ai-chatbot",
+  "sources": [
+    "README.md",
+    "package.json",
+    "pnpm-lock.yaml",
+    ".env.example",
+    "drizzle.config.ts",
+    "lib/db/migrate.ts",
+    "lib/ratelimit.ts",
+    ".github/workflows/playwright.yml",
+    ".github/workflows/lint.yml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["nextjs", "drizzle", "authjs", "ai-sdk"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": { "node": "20" },
+  "services": ["postgres"],
+  "steps": [
+    { "kind": "manual:provision-postgres", "source": "docs", "evidence": "README.md:32 (Neon Postgres); .env.example:12 POSTGRES_URL" },
+    { "kind": "manual:ai-gateway-api-key", "source": "docs", "evidence": "README.md:45 (AI_GATEWAY_API_KEY required outside Vercel)" },
+    { "kind": "env-manual", "source": "docs", "evidence": "README.md:57-63 (env vars from .env.example; `vercel link` + `vercel env pull`)" },
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:66" },
+    { "kind": "db:migrate", "source": "docs", "evidence": "README.md:67 (`pnpm db:migrate` = tsx lib/db/migrate.ts, Drizzle migrator)" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "pnpm dev", "port": 3000 }],
+  "readmeCommands": ["npm i -g vercel", "vercel link", "vercel env pull", "pnpm install", "pnpm db:migrate", "pnpm dev"],
+  "notes": "Env must hold real values before start: AUTH_SECRET (random secret), POSTGRES_URL, AI_GATEWAY_API_KEY (non-Vercel; Vercel uses OIDC); BLOB_READ_WRITE_TOKEN (Vercel Blob, file uploads) and REDIS_URL (resumable streams/rate limit, code skips it when unset) are optional. .env.example values are '****' placeholders. README's main path is Vercel CLI (`vercel link`, `vercel env pull`) which writes .env.local; README also says 'a .env file is all that is necessary', but lib/db/migrate.ts and drizzle.config.ts load only .env.local, so with a plain .env `pnpm db:migrate` prints 'POSTGRES_URL not defined, skipping migrations' and exits 0. pnpm (packageManager pnpm@10.32.1, pnpm-lock.yaml; CI pnpm install --frozen-lockfile). No engines/.nvmrc; Node 20 is the CI floor (lint.yml matrix [20]; playwright.yml uses lts/*); Next 16.2. `pnpm build` also runs migrations. Postgres is expected to be a hosted (Neon) database; no compose file."
+}

@@ -1,0 +1,47 @@
+{
+  "id": "fastapi-template",
+  "sources": [
+    "README.md",
+    "development.md",
+    "backend/README.md",
+    "frontend/README.md",
+    "CONTRIBUTING.md",
+    ".env",
+    "frontend/.env",
+    ".python-version",
+    "pyproject.toml",
+    "backend/pyproject.toml",
+    "uv.lock",
+    "package.json",
+    "bun.lock",
+    "compose.yml",
+    "compose.override.yml",
+    "backend/scripts/prestart.sh",
+    "backend/app/main.py",
+    "backend/app/core/config.py",
+    ".github/workflows/test-backend.yml",
+    ".github/workflows/playwright.yml"
+  ],
+  "projects": [
+    { "root": "backend", "stack": ["fastapi", "sqlmodel", "alembic"], "packageManagers": ["uv"] },
+    { "root": "frontend", "stack": ["react", "vite"], "packageManagers": ["bun"] }
+  ],
+  "runtimes": { "python": "3.14", "bun": "1.3.12" },
+  "services": ["postgres", "mailpit"],
+  "steps": [
+    { "kind": "compose-up", "source": "docs", "evidence": "development.md:10 (docker compose up -d db mailpit); test-backend.yml:29" },
+    { "kind": "install:uv", "source": "docs", "evidence": "development.md:16 (uv sync, from backend/)" },
+    { "kind": "db:migrate", "source": "docs", "evidence": "development.md:17 (uv run bash scripts/prestart.sh = alembic upgrade head + app/initial_data.py); test-backend.yml:31" },
+    { "kind": "install:bun", "source": "docs", "evidence": "development.md:29 (bun install, from repo root)" }
+  ],
+  "optionalSteps": [
+    { "kind": "build-assets", "source": "docs", "evidence": "development.md:47-53 (bun run build in frontend/ to have FastAPI serve the SPA at :8000)" },
+    { "kind": "other:prek-install", "source": "docs", "evidence": "development.md:119 (uv run prek install -f, git hooks)" }
+  ],
+  "dev": [
+    { "cwd": "backend", "command": "uv run fastapi dev", "port": 8000 },
+    { "cwd": ".", "command": "bun run dev", "port": 5173 }
+  ],
+  "readmeCommands": [],
+  "notes": "README.md has no commands; it links to development.md, backend/README.md and frontend/README.md, which agree on the flow. The .env (root) and frontend/.env are tracked with working local defaults (FASTAPI_ENV=development makes the 'changethis' secrets a warning, not an error), so no env step. prestart.sh also creates the first superuser (admin@example.com / changethis). uv workspace: pyproject.toml + uv.lock at the root with backend as member; .venv is at the repo root. bun workspaces (root package.json + bun.lock); `bun run dev` from root filters to frontend. Python >=3.14 (.python-version, backend requires-python); bun 1.3.12 is what CI pins (no engines). Alternative full stack in Docker: `docker compose run --rm backend bash scripts/prestart.sh` then `docker compose watch` (app on :8000)."
+}

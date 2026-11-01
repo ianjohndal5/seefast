@@ -1,0 +1,36 @@
+{
+  "id": "formbricks",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "AGENTS.md",
+    "docs/development/overview.mdx",
+    "docs/agents/monorepo-builds.md",
+    "package.json",
+    "turbo.json",
+    ".nvmrc",
+    ".env.example",
+    "docker-compose.dev.yml",
+    "scripts/setup-dev-env.sh",
+    "scripts/dev-authzed-up.sh",
+    "packages/database/package.json",
+    "apps/web/package.json",
+    ".devcontainer/devcontainer.json",
+    ".devcontainer/post-create.sh",
+    ".github/workflows/e2e.yml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["turborepo"], "packageManagers": ["pnpm"] },
+    { "root": "apps/web", "stack": ["nextjs", "prisma"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": { "node": "24" },
+  "services": ["postgres", "spicedb", "mailpit", "redis", "rustfs", "hub", "cube"],
+  "steps": [
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:150-154 (pnpm install)" },
+    { "kind": "script:go", "source": "docs", "evidence": "README.md:156-162 (pnpm go); package.json:29 go = pnpm db:up && pnpm dev:authzed && turbo run go --concurrency 20" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "pnpm go", "port": 3000 }],
+  "readmeCommands": ["pnpm install", "pnpm go"],
+  "notes": "Package manager pnpm (pnpm-lock.yaml, packageManager pnpm@11.7.0, CI pnpm/action-setup); docs agree. Node: engines >=24.0.0 <25, .nvmrc 24.22.2, CI uses .nvmrc. Docker and openssl are required (setup-dev-env.sh checks openssl). 'pnpm go' is both setup and dev start: (1) db:up -> dev:setup (scripts/setup-dev-env.sh: copies .env.example to .env if missing and generates ENCRYPTION_KEY, BETTER_AUTH_SECRET, CRON_SECRET, CUBEJS_API_SECRET, AUTHZED_TOKEN, AUTHZED_DATABASE_PASSWORD with openssl) then docker compose -f docker-compose.dev.yml up -d; (2) dev:authzed -> waits for spicedb, runs db:migrate:dev (builds @formbricks/database, prisma generate, applies migrations) and authzed:upgrade prepare/check; (3) turbo run go -> builds ai/cache/database/jobs/logger/storage/redis-config, runs @formbricks/database db:setup (migrations + SAML database), starts vite watch builds for surveys/js-core/survey-ui/etc., and next dev -p 3000 --turbopack in apps/web. Decomposed equivalent: env-copy + secret generation, compose-up, workspace-build, prisma:generate, prisma:migrate. No manual env editing is needed for a basic start. Services per README.md:146 and docker-compose.dev.yml: PostgreSQL (pgvector pg18), SpiceDB (authz, required: AUTHZED_ENABLED=true is enforced), MailHog (recorded as mailpit), Valkey (Redis-compatible, recorded as redis), RustFS (S3-compatible object storage, MinIO-like), Formbricks Hub (+hub-worker), Cube. Compose profiles taxonomy, qwen, authzed-tools, authzed-ui are optional and not started by default. Later runs can use 'pnpm dev' (turbo run dev --parallel), mentioned in docs/agents/monorepo-builds.md:75 but not in the README. CONTRIBUTING.md has no setup steps; docs/development/overview.mdx defers to the README."
+}

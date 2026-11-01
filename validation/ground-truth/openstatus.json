@@ -1,0 +1,39 @@
+{
+  "id": "openstatus",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "AGENTS.md",
+    "apps/dashboard/README.md",
+    "apps/dashboard/package.json",
+    "apps/dashboard/.env.example",
+    "packages/db/package.json",
+    "packages/db/.env.example",
+    "packages/db/env.ts",
+    "package.json",
+    "pnpm-workspace.yaml",
+    "turbo.json",
+    "devbox.json",
+    "process-compose.yaml",
+    "DOCKER.md",
+    "docker-compose.yaml",
+    ".github/workflows/dx.yml",
+    ".github/workflows/test.yml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["turborepo"], "packageManagers": ["pnpm"] },
+    { "root": "apps/dashboard", "stack": ["nextjs", "drizzle", "authjs"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": { "node": "26.2" },
+  "services": ["libsql"],
+  "steps": [
+    { "kind": "env-copy", "source": "docs", "evidence": "apps/dashboard/README.md:20 (cp apps/dashboard/.env.example apps/dashboard/.env; dummy values work locally)" },
+    { "kind": "install:pnpm", "source": "docs", "evidence": "apps/dashboard/README.md:32; dx.yml:42" },
+    { "kind": "other:start-libsql-server", "source": "docs", "evidence": "apps/dashboard/README.md:38 (`pnpm --filter '@openstatus/db' dev` = turso dev --db-file ../../openstatus-dev.db on :8080; needs Turso CLI); CI uses a sqld service (dx.yml:16-19)" },
+    { "kind": "script:dx", "source": "docs", "evidence": "apps/dashboard/README.md:44-51 (`pnpm -w dx`); dx.yml:45" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "pnpm -w dev:dashboard", "port": 3001 }],
+  "readmeCommands": ["cp .env.docker.example .env.docker", "docker compose up -d"],
+  "notes": "Scope: apps/dashboard, the app CONTRIBUTING.md:26 points to for local setup (root README's Manual Setup also has one-liners for apps/status-page `pnpm -w dev:status-page` and the marketing site apps/web `pnpm -w dev:web`). `pnpm -w dx` runs turbo env -> migrate -> seed: copies packages/db/.env.example to packages/db/.env, applies Drizzle migrations to the libSQL server, seeds workspace/user ping@openstatus.dev, monitors and a status page. After dx the docs say to STOP the libSQL server from their step 2 (apps/dashboard/README.md:53-55) because `pnpm -w dev:dashboard` starts its own on :8080 (port conflict otherwise). Login via magic link printed to the dashboard terminal. Requirements: Node >=26.2 (dashboard README; devbox.json and CI pin 26.8.1), pnpm (packageManager pnpm@12.3.4, pnpm-lock.yaml), Turso CLI; Bun optional. Without Turso CLI, `node scripts/dev-stack.mjs up` does the libSQL/dx/dev steps. Tinybird, apps/server and the Go checker are optional. readmeCommands: the root README's recommended Docker path (builds production images of all services; its `open http://localhost:3002` lines omitted); the README's dashboard manual setup just links to apps/dashboard/README.md."
+}

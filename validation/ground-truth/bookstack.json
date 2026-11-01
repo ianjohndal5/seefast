@@ -1,0 +1,19 @@
+{
+  "id": "bookstack",
+  "sources": ["readme.md", "dev/docs/development.md", "dev/docs/php-testing.md", "docker-compose.yml", "dev/docker/Dockerfile", "dev/docker/entrypoint.app.sh", "dev/docker/entrypoint.node.sh", ".env.example", "composer.json", "package.json", ".gitignore", ".forgejo/workflows/test-php.yml", ".forgejo/workflows/test-migrations.yml"],
+  "projects": [
+    { "root": ".", "stack": ["laravel"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.3", "node": "22" },
+  "services": ["mysql", "mailpit"],
+  "steps": [
+    { "kind": "env-copy", "source": "docs", "evidence": "dev/docs/development.md:83" },
+    { "kind": "env-manual", "source": "docs", "evidence": "dev/docs/development.md:83: set APP_KEY to a random 32-char string (template has APP_KEY=SomeRandomString, .env.example:12) and APP_ENV=local" },
+    { "kind": "other:chgrp-docker-storage", "source": "docs", "evidence": "dev/docs/development.md:85 (chgrp -R docker storage)" },
+    { "kind": "compose-up", "source": "docs", "evidence": "dev/docs/development.md:86; containers run composer install + artisan migrate (dev/docker/entrypoint.app.sh:10-12) and npm install + npm run watch (dev/docker/entrypoint.node.sh:20-23)" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "docker-compose up", "port": 8080 }],
+  "readmeCommands": [],
+  "notes": "The README has no commands. It links to dev/docs/development.md, which is the source used here, and to the website's install guide (external, not readable). The only complete local workflow in the repo is the Docker Compose one. composer install, migrations, npm install and asset building (public/dist is gitignored) all run inside the containers, so they are not separate developer steps. Login is admin@admin.com / password. Port 8080 can be changed with DEV_PORT. MailHog is at localhost:8025. A non-Docker setup would also need composer install, key:generate, a MySQL database, artisan migrate, npm install and npm run build, but the in-repo docs only show the npm commands. Runtimes: composer.json requires PHP ^8.3 and the CI matrix floor is 8.3, while the dev Docker image uses PHP 8.5. The docs say Node v22.0+ and the compose node image is node:22. The node entrypoint still runs `npm rebuild node-sass` although the project now uses `sass` (likely stale but harmless). CI (Forgejo) only tests against a separate mysql_testing database. The docs use the legacy `docker-compose` command."
+}

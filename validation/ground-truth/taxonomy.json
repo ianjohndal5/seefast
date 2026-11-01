@@ -1,0 +1,19 @@
+{
+  "id": "taxonomy",
+  "sources": ["README.md", "package.json", "pnpm-lock.yaml", ".nvmrc", ".env.example", "env.mjs", "next.config.mjs", "prisma/schema.prisma"],
+  "projects": [
+    { "root": ".", "stack": ["nextjs", "prisma", "contentlayer"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": { "node": "16.18" },
+  "services": ["mysql"],
+  "steps": [
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:63-67 (postinstall runs prisma generate, package.json:16)" },
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:69-73 (.env.example -> .env.local); env.mjs validates every server var at next.config import" }
+  ],
+  "optionalSteps": [
+    { "kind": "prisma:migrate", "source": "convention", "evidence": "prisma/migrations (MySQL); README is silent, needed for sign-in/dashboard but not for the dev server to start" }
+  ],
+  "dev": [{ "cwd": ".", "command": "pnpm dev", "port": 3000 }],
+  "readmeCommands": ["pnpm install", "cp .env.example .env.local", "pnpm dev"],
+  "notes": "Archived project. pnpm per README and pnpm-lock.yaml (lockfile v6, i.e. pnpm 8); no packageManager field and no CI. next.config.mjs imports env.mjs (@t3-oss/env-nextjs), which requires every server variable to be non-empty, so `pnpm dev` fails until .env.local fills NEXTAUTH_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_ACCESS_TOKEN, SMTP_FROM, POSTMARK_API_TOKEN, POSTMARK_SIGN_IN_TEMPLATE, POSTMARK_ACTIVATION_TEMPLATE, STRIPE_API_KEY, STRIPE_WEBHOOK_SECRET and STRIPE_PRO_MONTHLY_PLAN_ID. DATABASE_URL and NEXT_PUBLIC_APP_URL have defaults. Any non-empty values let it start, but sign-in needs real GitHub OAuth or Postmark credentials. The database is MySQL (PlanetScale per README/.env.example). The README never says how to create it or apply the schema. Prisma client generation happens automatically in postinstall. .nvmrc pins v16.18.0. `pnpm dev` runs contentlayer dev and next dev concurrently."
+}

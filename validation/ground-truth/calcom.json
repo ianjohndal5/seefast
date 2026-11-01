@@ -1,0 +1,39 @@
+{
+  "id": "calcom",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "agents/commands.md",
+    "package.json",
+    "turbo.json",
+    ".yarnrc.yml",
+    ".env.example",
+    ".env.appStore.example",
+    "packages/prisma/package.json",
+    "packages/prisma/docker-compose.yml",
+    "packages/emails/docker-compose.yml",
+    "apps/web/package.json",
+    ".github/actions/yarn-install/action.yml",
+    ".github/workflows/e2e.yml",
+    ".gitpod.yml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["turborepo"], "packageManagers": ["yarn"] },
+    { "root": "apps/web", "stack": ["nextjs", "prisma"], "packageManagers": ["yarn"] }
+  ],
+  "runtimes": { "node": "20" },
+  "services": ["postgres", "mailpit"],
+  "steps": [
+    { "kind": "install:yarn", "source": "docs", "evidence": "README.md:98-102 (yarn); CI .github/actions/yarn-install; postinstall runs turbo post-install -> prisma generate" },
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:104-106 (duplicate .env.example to .env); .gitpod.yml:4" },
+    { "kind": "env-manual", "source": "docs", "evidence": "README.md:107-108 (openssl rand -base64 32 -> NEXTAUTH_SECRET, openssl rand -base64 24 -> CALENDSO_ENCRYPTION_KEY); .gitpod.yml:5-8" },
+    { "kind": "script:dx", "source": "docs", "evidence": "README.md:132-139 (yarn dx, requires Docker); package.json:48 dx = turbo run dx; turbo.json:339-342,395-398,518-521; agents/commands.md:89" }
+  ],
+  "optionalSteps": [
+    { "kind": "env-copy", "source": "docs", "evidence": "agents/commands.md:88 (.env.appStore.example -> .env.appStore for app store development); README.md:223" },
+    { "kind": "other:node-options-memory", "source": "docs", "evidence": "README.md:157 (export NODE_OPTIONS=--max-old-space-size=16384)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "yarn dev", "port": 3000 }],
+  "readmeCommands": ["yarn", "openssl rand -base64 32", "openssl rand -base64 24", "yarn dx"],
+  "notes": "This repository is Cal.diy (the MIT community fork of Cal.com, README.md:37-49), package calcom-monorepo. Package manager Yarn Berry 4.12.0 (yarn.lock, packageManager yarn@4.12.0, yarnPath .yarn/releases, nodeLinker node-modules, root engines yarn >=4.12.0); apps/web/package.json still declares engines yarn 3.4.1 (stale). Node: README.md:73 says >=18.x and step 5 says 'nvm use', but there is no .nvmrc in the repo; CI yarn-install action defaults to Node v20.x and apps/web uses Next 16.4 (needs >=20.9), so 20 is recorded. 'yarn dx' = turbo run dx: first //#env-check:common and //#env-check:app-store (dotenv-checker against .env.example/.env.appStore.example; turbo declares .env and .env.appStore as outputs, so it creates/updates them and may prompt), then @calcom/prisma dx = db-setup = db-up (docker compose up -d in packages/prisma: postgres:18 on port 5450 matching .env.example DATABASE_URL) + db-deploy (prisma migrate deploy) + db-seed (test users, credentials in README.md:141-148), @calcom/emails dx (docker compose up mailhog on 1025/8025), @calcom/ui dx (build icons), and @calcom/web dx = yarn dev, so yarn dx also starts the app on http://localhost:3000. Decomposed: compose-up, prisma:migrate, seed, then dev. Afterwards 'yarn dev' (turbo dev for @calcom/web, also runs env-check). Alternative 'Manual setup' (README.md:191-261): own Postgres + DATABASE_URL, copy DATABASE_URL into .env.appStore, yarn workspace @calcom/prisma db-migrate, mailhog via docker run, yarn dev. Env values that must be filled: NEXTAUTH_SECRET, CALENDSO_ENCRYPTION_KEY (empty in .env.example); DATABASE_URL/DATABASE_DIRECT_URL default to the dx Postgres. Windows needs packages/prisma/.env symlink replaced (README.md:110-115). The root docker-compose.yml is the self-hosting stack, not the dev path. MailHog is recorded as mailpit. readmeCommands omit git clone / cd (fresh clone assumed) and the conditional 'nvm use' / 'nvm install && nvm use' (would fail: no .nvmrc)."
+}

@@ -1,0 +1,19 @@
+{
+  "id": "commerce",
+  "sources": ["README.md", "package.json", "pnpm-lock.yaml", ".env.example", "lib/utils.ts", ".vscode/launch.json"],
+  "projects": [
+    { "root": ".", "stack": ["nextjs"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": {},
+  "services": [],
+  "steps": [
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:46 (variables from .env.example; 'a .env file is all that is necessary')" },
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:55" }
+  ],
+  "optionalSteps": [
+    { "kind": "other:vercel-env-pull", "source": "docs", "evidence": "README.md:50-52 (npm i -g vercel, vercel link, vercel env pull; recommended alternative to a hand-made .env, requires a Vercel project)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "pnpm dev", "port": 3000 }],
+  "readmeCommands": ["npm i -g vercel", "vercel link", "vercel env pull", "pnpm install", "pnpm dev"],
+  "notes": "Archived and deprecated (moved to vercel/shop). pnpm per README, pnpm-lock.yaml (v9) and .vscode/launch.json; no packageManager field and no CI. The env must hold real Shopify values: SHOPIFY_STORE_DOMAIN (with the [placeholder] brackets removed, which lib/utils.ts checks) and SHOPIFY_STOREFRONT_ACCESS_TOKEN from a Shopify store. Every page fetches from the Shopify Storefront API, so nothing renders without them. SHOPIFY_REVALIDATION_SECRET only matters for webhooks; COMPANY_NAME/SITE_NAME have defaults. The README's numbered route is the Vercel CLI (`vercel env pull`, which writes .env.local in current CLI versions), but it also says a .env file is enough. No local backing services: Shopify is a hosted external API. No Node version is stated."
+}

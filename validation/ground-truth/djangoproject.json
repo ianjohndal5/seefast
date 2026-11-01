@@ -1,0 +1,65 @@
+{
+  "id": "djangoproject",
+  "sources": [
+    "README.rst",
+    "Makefile",
+    "Procfile",
+    ".github/workflows/tests.yml",
+    ".github/workflows/docker-test-build.yml",
+    "docker-compose.yml",
+    "docker-entrypoint.dev.sh",
+    "Dockerfile",
+    "pyproject.toml",
+    "requirements/dev.txt",
+    "uv.lock",
+    "djangoproject/settings/common.py",
+    "djangoproject/settings/dev.py",
+    "manage.py"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["django"], "packageManagers": ["pip"] }
+  ],
+  "runtimes": { "python": "3.12" },
+  "services": ["postgres"],
+  "steps": [
+    { "kind": "other:create-virtualenv", "source": "docs", "evidence": "README.rst:15 (create and activate a Python 3.12 virtualenv)" },
+    { "kind": "install:pip", "source": "docs", "evidence": "README.rst:19 (python3 -m pip install -r requirements/dev.txt; or 'make install', README.rst:23 / Makefile:22-23)" },
+    { "kind": "env-manual", "source": "docs", "evidence": "README.rst:25-48 (mkdir -p ~/.djangoproject/conf, hand-write conf/secrets.json with secret_key and db/trac_db credentials, export DJANGOPROJECT_DATA_DIR in the shell rc; read by djangoproject/settings/common.py:12-19)" },
+    { "kind": "manual:create-databases", "source": "docs", "evidence": "README.rst:50-68 (createuser/createdb for djangoproject and code.djangoproject, then set their passwords in psql to match secrets.json); CI does the same, tests.yml:45-52" },
+    { "kind": "other:load-trac-schema", "source": "docs", "evidence": "README.rst:72 (psql -d code.djangoproject < tracdb/trac.sql); CI tests.yml:53-55" },
+    { "kind": "db:migrate", "source": "docs", "evidence": "README.rst:74 (python -m manage migrate)" },
+    { "kind": "other:createsuperuser", "source": "docs", "evidence": "README.rst:76-78 (python -m manage createsuperuser)" },
+    { "kind": "other:loaddata-dev_sites", "source": "docs", "evidence": "README.rst:80-82 (python -m manage loaddata dev_sites; populates www/docs hostnames in django.contrib.sites)" },
+    { "kind": "build-assets", "source": "docs", "evidence": "README.rst:112-114 (make compile-scss; only SCSS sources are committed; Makefile:16-17 runs pysassc)" }
+  ],
+  "optionalSteps": [
+    { "kind": "script:compilemessages", "source": "docs", "evidence": "README.rst:84-89 (make compilemessages; 'only needs to happen once to support running the locale tests')" },
+    { "kind": "other:loaddata-doc_releases", "source": "docs", "evidence": "README.rst:91-93 (only for the docs site)" },
+    { "kind": "other:update_docs", "source": "docs", "evidence": "README.rst:94 (python -m manage update_docs; needs gettext, slow)" },
+    { "kind": "other:loaddata-dashboard_production_metrics", "source": "docs", "evidence": "README.rst:96-104 (dashboard data; or dashboard_example_data)" },
+    { "kind": "other:update_metrics", "source": "docs", "evidence": "README.rst:106-110 (makes API calls)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "make run", "port": 8000 }],
+  "readmeCommands": [
+    "python3 -m pip install -r requirements/dev.txt",
+    "mkdir -p ~/.djangoproject/conf",
+    "export DJANGOPROJECT_DATA_DIR=~/.djangoproject",
+    "createuser -d djangoproject --superuser",
+    "createdb -O djangoproject djangoproject",
+    "createuser -d code.djangoproject --superuser",
+    "createdb -O code.djangoproject code.djangoproject",
+    "psql",
+    "psql -d code.djangoproject < tracdb/trac.sql",
+    "python -m manage migrate",
+    "python -m manage createsuperuser",
+    "python -m manage loaddata dev_sites",
+    "make compilemessages",
+    "python -m manage loaddata doc_releases",
+    "python -m manage update_docs",
+    "python -m manage loaddata dashboard_production_metrics",
+    "python -m manage update_metrics",
+    "make compile-scss",
+    "make run"
+  ],
+  "notes": "Steps follow README's 'virtual environment' path. README also documents a Docker path (README.rst:459-488): docker compose build, docker compose up (the dev entrypoint runs migrate, compile-scss and collectstatic, docker-entrypoint.dev.sh:3-5), then optionally docker compose run --rm web make reset-local-db; Postgres 17 runs in compose. readmeCommands: the secrets.json content and the ALTER USER statements typed inside psql are not shell commands and are omitted; the export line is meant to go into ~/.bashrc followed by 'source ~/.bashrc'; the 'make install' and 'loaddata dashboard_example_data' alternatives are omitted. secrets.json is technically optional (settings fall back to defaults when missing, common.py:17-24), but the DB passwords set in step 4 have to reach Django through it. createsuperuser is listed as a normal step but is only needed to use the admin. make run serves www, docs and dashboard on port 8000 via *.djangoproject.localhost hostnames (an /etc/hosts entry may be needed, README.rst:406-413). uv.lock exists and requirements/*.txt are exported from it, but the docs and CI use pip. Python is pinned ==3.12.* (pyproject.toml:5, CI PYTHON_VERSION 3.12). gettext is needed for compilemessages/update_docs (CI installs it)."
+}

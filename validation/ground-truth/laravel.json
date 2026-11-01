@@ -1,0 +1,22 @@
+{
+  "id": "laravel",
+  "sources": ["README.md", "composer.json", "package.json", ".env.example", ".github/workflows/tests.yml", "resources/views/welcome.blade.php", "config/database.php"],
+  "projects": [
+    { "root": ".", "stack": ["laravel"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.3" },
+  "services": [],
+  "steps": [
+    { "kind": "install:composer", "source": "ci", "evidence": ".github/workflows/tests.yml:40; composer.json:36 (setup script)" },
+    { "kind": "env-copy", "source": "ci", "evidence": ".github/workflows/tests.yml:43; composer.json:37" },
+    { "kind": "artisan:key:generate", "source": "ci", "evidence": ".github/workflows/tests.yml:46; .env.example:3 leaves APP_KEY empty" },
+    { "kind": "artisan:migrate", "source": "convention", "evidence": "composer.json:39 (setup script); .env.example:30,40 use database sessions/cache on SQLite, so tables must exist. migrate offers to create the missing database/database.sqlite (default yes)" },
+    { "kind": "install:npm", "source": "convention", "evidence": "composer.json:40 (setup script); composer.json:43-46 dev script runs `artisan dev`, which also starts Vite" }
+  ],
+  "optionalSteps": [
+    { "kind": "build-assets", "source": "convention", "evidence": "composer.json:41 (setup script); welcome.blade.php:12 falls back when no build/hot exists, and `composer run dev` serves assets through Vite" }
+  ],
+  "dev": [{ "cwd": ".", "command": "composer run dev", "port": 8000 }],
+  "readmeCommands": [],
+  "notes": "This is the bare Laravel application skeleton. The README has no local-setup section, only links to laravel.com, and its two commands (composer require laravel/boost --dev, php artisan boost:install) are for optional AI-agent tooling, not setup. The canonical sequence is the composer `setup` script (composer install, copy .env, key:generate, migrate --force, npm install --ignore-scripts, npm run build), so `composer run setup` does every step above in one go. CI only goes as far as key:generate because tests run on in-memory SQLite. There is no lockfile, so npm is inferred from the scripts. No Node version is stated anywhere. Port 8000 comes from APP_URL and artisan serve's default."
+}

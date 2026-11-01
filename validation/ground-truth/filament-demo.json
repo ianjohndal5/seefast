@@ -1,0 +1,31 @@
+{
+  "id": "filament-demo",
+  "sources": [
+    "README.md",
+    "composer.json",
+    "composer.lock",
+    "package.json",
+    "package-lock.json",
+    ".env.example",
+    "vite.config.js",
+    "app/Providers/Filament/AdminPanelProvider.php",
+    ".github/workflows/tests.yml",
+    ".agents/setup",
+    "CLAUDE.md"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "filament", "livewire", "vite"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.4", "node": "20" },
+  "services": [],
+  "steps": [
+    { "kind": "install:composer", "source": "docs", "evidence": "README.md:11" },
+    { "kind": "script:setup", "source": "docs", "evidence": "README.md:12; composer.json:68-75" },
+    { "kind": "install:npm", "source": "ci", "evidence": ".github/workflows/tests.yml:56 (npm ci)" },
+    { "kind": "build-assets", "source": "ci", "evidence": ".github/workflows/tests.yml:57; panel uses ->viteTheme() (AdminPanelProvider.php:28) and layouts use @vite, so a Vite manifest or running dev server is needed" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "php artisan serve", "port": 8000 }],
+  "readmeCommands": ["composer install", "composer setup", "php artisan serve"],
+  "notes": "`composer setup` (composer.json:68-75) copies .env.example to .env if missing, php artisan key:generate, touches database/database.sqlite, php artisan migrate, php artisan db:seed, php artisan storage:link. The README stops there, but the Filament panel registers a Vite theme (resources/css/filament/admin/theme.css) and public/build is gitignored, so without `npm install` + `npm run build` (or `npm run dev`) pages fail with a Vite manifest error; CI and the maintainer agent script both run npm ci + npm run build, and CLAUDE.md:200 mentions the manifest error. SQLite (DB_CONNECTION=sqlite), no services; CI uses Postgres only for one schema-reset test. PHP: composer.json says ^8.1, but the lockfile needs >=8.4.1 (Symfony 8 packages) and CI uses 8.4, so 8.4 is the real floor. Node 20 from CI (no engines/.nvmrc). Login admin@filamentphp.com / password per README."
+}

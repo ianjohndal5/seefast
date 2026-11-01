@@ -1,0 +1,28 @@
+{
+  "id": "next-auth-example",
+  "sources": [
+    "README.md",
+    "package.json",
+    ".env.local.example",
+    "auth.ts",
+    "middleware.ts",
+    "Dockerfile",
+    "docker-compose.yml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["nextjs", "authjs"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": { "node": "20" },
+  "services": [],
+  "steps": [
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:49" },
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:57 (cp .env.local.example .env.local); AUTH_SECRET must be filled (.env.local.example:1)" }
+  ],
+  "optionalSteps": [
+    { "kind": "manual:oauth-provider-credentials", "source": "docs", "evidence": "README.md:60,72-82 (add AUTH_<PROVIDER>_ID/SECRET for one or more providers; callback http://localhost:3000/api/auth/callback/<provider>)" },
+    { "kind": "manual:database-adapter", "source": "docs", "evidence": "README.md:62-66 (database can be skipped; JWT sessions by default)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "pnpm run dev", "port": 3000 }],
+  "readmeCommands": ["pnpm install", "cp .env.local.example .env.local", "pnpm run dev"],
+  "notes": "No lockfile is committed (Dockerfile copies pnpm-lock.yaml* optionally); pnpm is chosen only by README and Dockerfile (corepack pnpm). Dependencies are unpinned (next: latest, next-auth: beta), so installs drift. AUTH_SECRET is empty in the template and Auth.js v5 needs it (middleware.ts runs auth on every page), generate with `npx auth secret` or `openssl rand -hex 32` (template comment; README never mentions it). Provider credentials are needed to actually sign in but not to start the app. Node >=20 (package.json engines; Dockerfile node:20). docker-compose.yml/test-docker.sh are for the upstream monorepo's Keycloak e2e test, not local dev. README's cd line after git clone is omitted from readmeCommands; production commands (pnpm run build/start) also omitted."
+}

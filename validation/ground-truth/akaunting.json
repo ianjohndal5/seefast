@@ -1,0 +1,39 @@
+{
+  "id": "akaunting",
+  "sources": [
+    "README.md",
+    ".github/workflows/tests.yml",
+    "composer.json",
+    "package.json",
+    ".npmrc",
+    ".env.example",
+    ".gitignore",
+    "app/Console/Commands/Install.php",
+    "app/Utilities/Installer.php"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "vue"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.2", "node": "18" },
+  "services": ["mysql"],
+  "steps": [
+    { "kind": "install:composer", "source": "docs", "evidence": "README.md:30 (composer install)" },
+    { "kind": "install:npm", "source": "docs", "evidence": "README.md:30 (npm install); CI tests.yml:42" },
+    { "kind": "build-assets", "source": "docs", "evidence": "README.md:30 (npm run dev); CI uses npm run production (tests.yml:45); public/js and mix-manifest.json are gitignored" },
+    { "kind": "manual:create-database", "source": "convention", "evidence": "README.md:34 passes --db-name=\"akaunting\" but never says to create it; Installer::createDbTables checks the DB is reachable first (app/Utilities/Installer.php:150)" },
+    { "kind": "artisan:install", "source": "docs", "evidence": "README.md:34 (php artisan install --db-name=... --admin-email=... --admin-password=...); it moves .env.example to .env, sets APP_KEY, runs migrate + permissions seed, creates company and admin (Installer.php:135-166)" }
+  ],
+  "optionalSteps": [
+    { "kind": "artisan:sample-data:seed", "source": "docs", "evidence": "README.md:37 (optional)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "php artisan serve", "port": 8000 }],
+  "readmeCommands": [
+    "composer install",
+    "npm install",
+    "npm run dev",
+    "php artisan install --db-name=\"akaunting\" --db-username=\"root\" --db-password=\"pass\" --admin-email=\"admin@company.com\" --admin-password=\"123456\"",
+    "php artisan sample-data:seed",
+    "php artisan serve"
+  ],
+  "notes": "README.md:30 writes 'composer install ; npm install ; npm run dev' on one line (split here); the git clone line is omitted. There is no separate env-copy or key:generate step: 'php artisan install' renames .env.example to .env and writes APP_KEY and DB_* itself. README's primary serving advice is a web server whose document root is the project root (README.md:39-41); 'php artisan serve' is offered as a quick alternative (README.md:43). README lists MariaDB/MySQL/PostgreSQL/SQLite, but .env.example uses DB_CONNECTION=mysql and the CLI installer only takes host/port/name/user/password, so MySQL/MariaDB is the practical default. Node must be 18-20 (README.md:18, engines '>=18 <21', advisory only via .npmrc engine-strict=false); node-sass ^9 needs a native build. CI runs tests only (cp .env.testing .env with SQLite in-memory, npm install, npm run production, composer test); its PHP matrix floor is 8.2. Full requirements live at akaunting.com/hc/docs (external, not read)."
+}

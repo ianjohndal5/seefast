@@ -1,0 +1,32 @@
+{
+  "id": "chatbot-ui",
+  "sources": ["README.md", "package.json", "package-lock.json", ".nvmrc", ".env.local.example", "supabase/config.toml", "supabase/migrations/20240108234540_setup.sql"],
+  "projects": [
+    { "root": ".", "stack": ["nextjs", "supabase"], "packageManagers": ["npm"] }
+  ],
+  "runtimes": { "node": "20.11" },
+  "services": ["supabase"],
+  "steps": [
+    { "kind": "install:npm", "source": "docs", "evidence": "README.md:83-89" },
+    { "kind": "manual:install-docker-and-supabase-cli", "source": "docs", "evidence": "README.md:105-122" },
+    { "kind": "other:supabase-start", "source": "docs", "evidence": "README.md:124-130 (local Supabase stack in Docker; applies supabase/migrations and seed.sql)" },
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:136-150 (.env.local.example -> .env.local, values from supabase status)" },
+    { "kind": "manual:edit-setup-migration", "source": "docs", "evidence": "README.md:154-161 (put service_role_key/project_url into supabase/migrations/20240108234540_setup.sql:53-54)" }
+  ],
+  "optionalSteps": [
+    { "kind": "manual:install-ollama", "source": "docs", "evidence": "README.md:163-165 (only for local models)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "npm run chat", "port": 3000 }],
+  "readmeCommands": [
+    "git clone https://github.com/mckaywrigley/chatbot-ui.git",
+    "npm install",
+    "brew install supabase/tap/supabase",
+    "scoop bucket add supabase https://github.com/supabase/scoop-bucket.git",
+    "scoop install supabase",
+    "supabase start",
+    "cp .env.local.example .env.local",
+    "supabase status",
+    "npm run chat"
+  ],
+  "notes": "npm per README and package-lock.json (v3); no CI workflows (.github only has funding.yaml). .env.local must hold real local-Supabase values: NEXT_PUBLIC_SUPABASE_URL (the API URL), NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY, all from `supabase status`. LLM provider keys are optional (users can enter them in the UI). The Supabase stack (Postgres, auth, storage, studio on :54323) runs through the Supabase CLI on Docker, not docker compose. Migrations are applied by `supabase start` itself. The README's SQL edit step comes after `supabase start` has already applied that migration, so it only takes effect after `npm run db-reset`. The README says it prevents storage-file deletion issues, so it is not needed for the app to start. `npm run chat` = supabase start && npm run db-types && next dev; plain `npm run dev` also works once Supabase is up. Node: the README says 'i.e. v18', while .nvmrc pins v20.11.0. npm install runs `husky install` via prepare."
+}

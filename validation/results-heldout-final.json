@@ -1,0 +1,537 @@
+{
+  "set": "heldout",
+  "summary": {
+    "repos": 8,
+    "scored": 8,
+    "steps": {
+      "gt": 33,
+      "correct": 20,
+      "wrong": 0,
+      "missing": 13,
+      "extra": 20,
+      "extraOptionalInGt": 0,
+      "planSteps": 40
+    },
+    "readme": {
+      "gt": 33,
+      "correct": 7,
+      "wrong": 0,
+      "missing": 26,
+      "extra": 4,
+      "extraOptionalInGt": 0,
+      "planSteps": 11
+    },
+    "packageManager": {
+      "correct": 7,
+      "wrong": 0,
+      "missing": 0,
+      "applicable": 7
+    },
+    "readmePackageManager": {
+      "correct": 2,
+      "wrong": 0,
+      "notStated": 5
+    },
+    "runtimes": {
+      "same": 9,
+      "compatible": 1,
+      "differs": 1,
+      "unknown": 1
+    },
+    "services": {
+      "gt": 6,
+      "found": 3,
+      "missed": 3,
+      "extra": 2
+    },
+    "dev": {
+      "correct": 5,
+      "different": 3,
+      "missing": 0,
+      "applicable": 8
+    },
+    "devPort": {
+      "correct": 5,
+      "different": 2,
+      "applicable": 7
+    }
+  },
+  "rows": [
+    {
+      "id": "laravelio",
+      "group": "laravel",
+      "steps": {
+        "gt": 3,
+        "plan": 6,
+        "correct": [
+          "install:composer"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:create-database",
+          "script:setup"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "install:npm",
+          "env-copy",
+          "artisan:key:generate",
+          "artisan:migrate",
+          "build-assets"
+        ]
+      },
+      "readme": {
+        "gt": 3,
+        "plan": 2,
+        "correct": [
+          "install:composer"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:create-database",
+          "script:setup"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "artisan:serve"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql"
+        ],
+        "plan": [],
+        "found": [],
+        "missed": [
+          "mysql"
+        ],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "`composer setup` (composer.json:89-95) is the one-command setup: copies .env.example to .env if missing, php artisan key:generate, php artisan migrate --seed, npm install, npm run build. So env-copy, key:generate, migrate, db:seed, install:npm and build-assets all happen inside script:setup. Caveat: .env.example has no DB_CONNECTION and config/database.php:20 defaults to sqlite, so unless the developer adds DB_CONNECTION=mysql the app silently uses a SQLite file named 'laravel' (DB_DATABASE) instead of the MySQL database the README asks for; the maintainer agent script adds DB_CONNECTION=mysql (.agents/setup:87). The template's DB_USERNAME=root / DB_PASSWORD=password must match the local MySQL. PHP pinned to 8.5.* (composer.json:7); Node 24.x (package.json engines, README, CI). npm with package-lock.json (CI: npm ci). `npm run dev` (README Commands table) is optional because setup already builds assets. Seeded login: testing / password. Herd users have polyscope.json (herd link, migrate, storage:link, npm install), not referenced by the README."
+    },
+    {
+      "id": "lychee",
+      "group": "laravel",
+      "steps": {
+        "gt": 6,
+        "plan": 8,
+        "correct": [
+          "install:composer",
+          "install:npm",
+          "env-copy",
+          "artisan:key:generate",
+          "artisan:migrate"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:create-database"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "submodules",
+          "other:sqlite-file",
+          "build-assets"
+        ]
+      },
+      "readme": {
+        "gt": 6,
+        "plan": 1,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:composer",
+          "install:npm",
+          "env-copy",
+          "artisan:key:generate",
+          "manual:create-database",
+          "artisan:migrate"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "compose-up"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "compatible"
+      },
+      "services": {
+        "gt": [
+          "mysql"
+        ],
+        "plan": [],
+        "found": [],
+        "missed": [
+          "mysql"
+        ],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "n/a",
+      "unknowns": 0,
+      "conflicts": 1,
+      "notes": "Dev setup lives in docs/Contribute.md (README only links to it; README's Installation section is a Docker quick-try of the published image, which is what readmeCommands holds, not a from-source dev setup). composer.json post-install-cmd (lines 149-152) already copies .env.example to .env and runs key:generate --no-override, so env-copy/key:generate happen automatically during composer install. Database: docs say create a DB and set credentials (php-mysql 'usually used for your local database'), hence mysql; but .env.example:67 defaults to DB_CONNECTION=sqlite (database/database.sqlite, which migrate offers to create), so a SQLite setup works with no DB server. CI tests mariadb/postgresql/sqlite. .env.example ships APP_ENV=production / APP_DEBUG=false; a developer may want local/true. Frontend uses the Vite+ CLI `vp` (package.json dev script = `vp dev`, so `npm run dev` / `npx vp dev` also work); CI installs with `vp install --frozen-lockfile` against package-lock.json (npm). The docs never say how to serve the PHP side: `php artisan serve` (or Valet/Herd/nginx) is inferred; `vp dev` only serves assets (or proxies API with VITE_LOCAL_DEV=true + VITE_HTTP_PROXY_TARGET=http://localhost:8000). PHP ^8.4 (composer.json:40); Node floor 24 from CI matrix (24, 26), no engines field. .gitmodules lists public/Lychee-front but there is no gitlink, so no submodule step. Contribute.md also lists many PHP extensions (imagick, exif, gd, bcmath, intl, redis...)."
+    },
+    {
+      "id": "filament-demo",
+      "group": "laravel",
+      "steps": {
+        "gt": 4,
+        "plan": 7,
+        "correct": [
+          "install:composer",
+          "install:npm",
+          "build-assets"
+        ],
+        "wrong": [],
+        "missing": [
+          "script:setup"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "env-copy",
+          "artisan:key:generate",
+          "other:sqlite-file",
+          "artisan:migrate"
+        ]
+      },
+      "readme": {
+        "gt": 4,
+        "plan": 2,
+        "correct": [
+          "install:composer"
+        ],
+        "wrong": [],
+        "missing": [
+          "script:setup",
+          "install:npm",
+          "build-assets"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "artisan:serve"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "`composer setup` (composer.json:68-75) copies .env.example to .env if missing, php artisan key:generate, touches database/database.sqlite, php artisan migrate, php artisan db:seed, php artisan storage:link. The README stops there, but the Filament panel registers a Vite theme (resources/css/filament/admin/theme.css) and public/build is gitignored, so without `npm install` + `npm run build` (or `npm run dev`) pages fail with a Vite manifest error; CI and the maintainer agent script both run npm ci + npm run build, and CLAUDE.md:200 mentions the manifest error. SQLite (DB_CONNECTION=sqlite), no services; CI uses Postgres only for one schema-reset test. PHP: composer.json says ^8.1, but the lockfile needs >=8.4.1 (Symfony 8 packages) and CI uses 8.4, so 8.4 is the real floor. Node 20 from CI (no engines/.nvmrc). Login admin@filamentphp.com / password per README."
+    },
+    {
+      "id": "linkstack",
+      "group": "laravel",
+      "steps": {
+        "gt": 5,
+        "plan": 6,
+        "correct": [
+          "install:composer",
+          "artisan:migrate"
+        ],
+        "wrong": [],
+        "missing": [
+          "artisan:key:generate",
+          "artisan:db:seed",
+          "manual:web-server"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "install:npm",
+          "env-copy",
+          "manual:mysql",
+          "build-assets"
+        ]
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:composer",
+          "artisan:key:generate",
+          "artisan:migrate",
+          "artisan:db:seed",
+          "manual:web-server"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "n/a",
+      "readmePm": "n/a",
+      "runtimes": {
+        "php": "differs"
+      },
+      "services": {
+        "gt": [],
+        "plan": [
+          "mysql"
+        ],
+        "found": [],
+        "missed": [],
+        "extra": [
+          "mysql"
+        ]
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 1,
+      "notes": "README only covers installing a release zip (no commands) and a separate Docker section (`docker pull linkstackorg/linkstack`); the from-source dev steps are in CONTRIBUTING.md. The repo commits a ready .env (DB_CONNECTION=sqlite, empty APP_KEY), an empty database/database.sqlite and an INSTALLING marker (which routes to the web setup wizard), so no env-copy step and no DB service; .env.example (MySQL) is a stale Laravel default and copying it would break the SQLite setup. APP_KEY generation is not documented for source checkouts; the release workflow touches storage/app/ISINSTALLED so routes/web.php generates the key there. CONTRIBUTING uses `composer update -vvv` (re-resolves); composer.lock as committed needs PHP >=8.2 (Symfony 7.4 packages) while composer.json says >=8.0 and release CI uses PHP 8.0 with composer update. Seeded admin: admin@admin.com / 12345678. Docs say to serve via a local web server (Apache etc.; index.php is at the repo root and bootstrap/app.php binds public path to the root); `php artisan serve` is inferred, not documented. package.json/laravel-mix exist but no view uses mix() and assets are committed under assets/, so no npm step."
+    },
+    {
+      "id": "ai-chatbot",
+      "group": "nextjs",
+      "steps": {
+        "gt": 5,
+        "plan": 3,
+        "correct": [
+          "env-manual",
+          "install:pnpm",
+          "db:migrate"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:provision-postgres",
+          "manual:ai-gateway-api-key"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 2,
+        "correct": [
+          "install:pnpm",
+          "db:migrate"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:provision-postgres",
+          "manual:ai-gateway-api-key",
+          "env-manual"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "postgres"
+        ],
+        "plan": [],
+        "found": [],
+        "missed": [
+          "postgres"
+        ],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "Env must hold real values before start: AUTH_SECRET (random secret), POSTGRES_URL, AI_GATEWAY_API_KEY (non-Vercel; Vercel uses OIDC); BLOB_READ_WRITE_TOKEN (Vercel Blob, file uploads) and REDIS_URL (resumable streams/rate limit, code skips it when unset) are optional. .env.example values are '****' placeholders. README's main path is Vercel CLI (`vercel link`, `vercel env pull`) which writes .env.local; README also says 'a .env file is all that is necessary', but lib/db/migrate.ts and drizzle.config.ts load only .env.local, so with a plain .env `pnpm db:migrate` prints 'POSTGRES_URL not defined, skipping migrations' and exits 0. pnpm (packageManager pnpm@10.32.1, pnpm-lock.yaml; CI pnpm install --frozen-lockfile). No engines/.nvmrc; Node 20 is the CI floor (lint.yml matrix [20]; playwright.yml uses lts/*); Next 16.2. `pnpm build` also runs migrations. Postgres is expected to be a hosted (Neon) database; no compose file."
+    },
+    {
+      "id": "next-auth-example",
+      "group": "nextjs",
+      "steps": {
+        "gt": 2,
+        "plan": 2,
+        "correct": [
+          "install:pnpm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "readme": {
+        "gt": 2,
+        "plan": 2,
+        "correct": [
+          "install:pnpm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "No lockfile is committed (Dockerfile copies pnpm-lock.yaml* optionally); pnpm is chosen only by README and Dockerfile (corepack pnpm). Dependencies are unpinned (next: latest, next-auth: beta), so installs drift. AUTH_SECRET is empty in the template and Auth.js v5 needs it (middleware.ts runs auth on every page), generate with `npx auth secret` or `openssl rand -hex 32` (template comment; README never mentions it). Provider credentials are needed to actually sign in but not to start the app. Node >=20 (package.json engines; Dockerfile node:20). docker-compose.yml/test-docker.sh are for the upstream monorepo's Keycloak e2e test, not local dev. README's cd line after git clone is omitted from readmeCommands; production commands (pnpm run build/start) also omitted."
+    },
+    {
+      "id": "openstatus",
+      "group": "nextjs-monorepo",
+      "steps": {
+        "gt": 4,
+        "plan": 6,
+        "correct": [
+          "env-copy",
+          "install:pnpm"
+        ],
+        "wrong": [],
+        "missing": [
+          "other:start-libsql-server",
+          "script:dx"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "install:go",
+          "workspace-build",
+          "compose-up",
+          "db:migrate"
+        ]
+      },
+      "readme": {
+        "gt": 4,
+        "plan": 2,
+        "correct": [
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [
+          "install:pnpm",
+          "other:start-libsql-server",
+          "script:dx"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "compose-up"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "libsql"
+        ],
+        "plan": [
+          "libsql",
+          "server"
+        ],
+        "found": [
+          "libsql"
+        ],
+        "missed": [],
+        "extra": [
+          "server"
+        ]
+      },
+      "dev": "different",
+      "devPort": "different",
+      "unknowns": 7,
+      "conflicts": 4,
+      "notes": "Scope: apps/dashboard, the app CONTRIBUTING.md:26 points to for local setup (root README's Manual Setup also has one-liners for apps/status-page `pnpm -w dev:status-page` and the marketing site apps/web `pnpm -w dev:web`). `pnpm -w dx` runs turbo env -> migrate -> seed: copies packages/db/.env.example to packages/db/.env, applies Drizzle migrations to the libSQL server, seeds workspace/user ping@openstatus.dev, monitors and a status page. After dx the docs say to STOP the libSQL server from their step 2 (apps/dashboard/README.md:53-55) because `pnpm -w dev:dashboard` starts its own on :8080 (port conflict otherwise). Login via magic link printed to the dashboard terminal. Requirements: Node >=26.2 (dashboard README; devbox.json and CI pin 26.8.1), pnpm (packageManager pnpm@12.3.4, pnpm-lock.yaml), Turso CLI; Bun optional. Without Turso CLI, `node scripts/dev-stack.mjs up` does the libSQL/dx/dev steps. Tinybird, apps/server and the Go checker are optional. readmeCommands: the root README's recommended Docker path (builds production images of all services; its `open http://localhost:3002` lines omitted); the README's dashboard manual setup just links to apps/dashboard/README.md."
+    },
+    {
+      "id": "fastapi-template",
+      "group": "generic",
+      "steps": {
+        "gt": 4,
+        "plan": 2,
+        "correct": [
+          "compose-up",
+          "install:uv"
+        ],
+        "wrong": [],
+        "missing": [
+          "db:migrate",
+          "install:bun"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "readme": {
+        "gt": 4,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "compose-up",
+          "install:uv",
+          "db:migrate",
+          "install:bun"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "python": "same",
+        "bun": "unknown"
+      },
+      "services": {
+        "gt": [
+          "postgres",
+          "mailpit"
+        ],
+        "plan": [
+          "mailpit",
+          "postgres"
+        ],
+        "found": [
+          "postgres",
+          "mailpit"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "different",
+      "unknowns": 5,
+      "conflicts": 1,
+      "notes": "README.md has no commands; it links to development.md, backend/README.md and frontend/README.md, which agree on the flow. The .env (root) and frontend/.env are tracked with working local defaults (FASTAPI_ENV=development makes the 'changethis' secrets a warning, not an error), so no env step. prestart.sh also creates the first superuser (admin@example.com / changethis). uv workspace: pyproject.toml + uv.lock at the root with backend as member; .venv is at the repo root. bun workspaces (root package.json + bun.lock); `bun run dev` from root filters to frontend. Python >=3.14 (.python-version, backend requires-python); bun 1.3.12 is what CI pins (no engines). Alternative full stack in Docker: `docker compose run --rm backend bash scripts/prestart.sh` then `docker compose watch` (app on :8000)."
+    }
+  ]
+}

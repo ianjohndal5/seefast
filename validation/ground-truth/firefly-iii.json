@@ -1,0 +1,23 @@
+{
+  "id": "firefly-iii",
+  "sources": ["readme.md", ".github/contributing.md", ".env.example", ".ci/.env.ci", "composer.json", "package.json", "resources/assets/v3/package.json", "resources/assets/v3/vite.config.js", ".gitignore", ".github/workflows/release.yml", "app/Http/Middleware/Installer.php", "app/Http/Controllers/System/InstallController.php"],
+  "projects": [
+    { "root": ".", "stack": ["laravel"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.5", "node": "24" },
+  "services": ["mysql"],
+  "steps": [
+    { "kind": "install:composer", "source": "ci", "evidence": ".github/workflows/release.yml:159" },
+    { "kind": "env-copy", "source": "ci", "evidence": ".github/workflows/release.yml:122,130,150,155" },
+    { "kind": "env-manual", "source": "docs", "evidence": ".env.example:88-99: DB_HOST=db is a Docker hostname and the database must exist with valid credentials (or switch DB_CONNECTION to sqlite/pgsql)" },
+    { "kind": "install:npm", "source": "ci", "evidence": ".github/workflows/release.yml:186 (npm workspaces: resources/assets/v3)" },
+    { "kind": "build-assets", "source": "ci", "evidence": ".github/workflows/release.yml:189 (npm run build --workspace=v3); views use @vite and public/build is gitignored" }
+  ],
+  "optionalSteps": [
+    { "kind": "artisan:migrate", "source": "convention", "evidence": "Not needed by hand: app/Http/Middleware/Installer.php:69 redirects to /install when no tables exist, and InstallController.php:65-70 runs create-database, migrate --seed, Passport key generation and firefly-iii:upgrade-database" },
+    { "kind": "artisan:key:generate", "source": "docs", "evidence": ".env.example:14-27 asks you to replace the placeholder APP_KEY (the placeholder is exactly 32 chars, so the app still boots)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "php artisan serve", "port": 8000 }],
+  "readmeCommands": [],
+  "notes": "There are no development docs in the repo. The README and .github/contributing.md only link to docs.firefly-iii.org (not readable). The only CI that builds the app is release.yml, a release pipeline, not a dev setup. It removes composer.lock and runs composer update; a local developer should run composer install against the committed lockfile. The `php artisan serve` dev command is a framework convention; nothing in the repo names a dev server. The v3 Vite dev server cannot be used outside the maintainer's machine: vite.config.js:28-31 reads TLS certificates from /vagrant/... and its origin is hard-coded to a LAN IP, so assets must be built. The .env.example defaults (APP_ENV=production, DB_HOST=db) target Docker/production, while .ci/.env.ci uses APP_ENV=local with SQLite. SQLite needs storage/database/database.sqlite to exist. composer.json requires PHP >=8.5. Node 24 comes only from the release workflow, since no engines field or .nvmrc exists. The repo's agents.md has instructions aimed at AI agents filing PRs, which do not apply here."
+}

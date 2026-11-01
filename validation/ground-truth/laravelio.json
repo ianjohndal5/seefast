@@ -1,0 +1,34 @@
+{
+  "id": "laravelio",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "composer.json",
+    "package.json",
+    "package-lock.json",
+    ".env.example",
+    "config/database.php",
+    "phpunit.xml",
+    ".github/workflows/tests.yml",
+    ".agents/setup",
+    "polyscope.json"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "livewire", "filament", "vite"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.5", "node": "24" },
+  "services": ["mysql"],
+  "steps": [
+    { "kind": "install:composer", "source": "docs", "evidence": "README.md:50" },
+    { "kind": "manual:create-database", "source": "docs", "evidence": "README.md:51 (local database named 'laravel'; MySQL per README.md:55 and CI mysql service)" },
+    { "kind": "script:setup", "source": "docs", "evidence": "README.md:52; composer.json:89-95" }
+  ],
+  "optionalSteps": [
+    { "kind": "manual:mail-driver", "source": "docs", "evidence": "README.md:53 (e.g. Mailtrap; app starts without it)" },
+    { "kind": "manual:create-testing-database", "source": "docs", "evidence": "README.md:55 (MySQL 'testing' DB, only for the test suite; phpunit.xml:26-27)" },
+    { "kind": "manual:optional-integrations", "source": "docs", "evidence": "README.md:60-151 (GitHub OAuth, Algolia + scout:import, X/Bluesky, Telegram, Fathom, Unsplash)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "php artisan serve", "port": 8000 }],
+  "readmeCommands": ["composer install", "composer setup", "php artisan serve"],
+  "notes": "`composer setup` (composer.json:89-95) is the one-command setup: copies .env.example to .env if missing, php artisan key:generate, php artisan migrate --seed, npm install, npm run build. So env-copy, key:generate, migrate, db:seed, install:npm and build-assets all happen inside script:setup. Caveat: .env.example has no DB_CONNECTION and config/database.php:20 defaults to sqlite, so unless the developer adds DB_CONNECTION=mysql the app silently uses a SQLite file named 'laravel' (DB_DATABASE) instead of the MySQL database the README asks for; the maintainer agent script adds DB_CONNECTION=mysql (.agents/setup:87). The template's DB_USERNAME=root / DB_PASSWORD=password must match the local MySQL. PHP pinned to 8.5.* (composer.json:7); Node 24.x (package.json engines, README, CI). npm with package-lock.json (CI: npm ci). `npm run dev` (README Commands table) is optional because setup already builds assets. Seeded login: testing / password. Herd users have polyscope.json (herd link, migrate, storage:link, npm install), not referenced by the README."
+}

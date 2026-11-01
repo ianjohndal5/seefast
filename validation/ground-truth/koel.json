@@ -1,0 +1,20 @@
+{
+  "id": "koel",
+  "sources": ["README.md", "docs/development.md", "docs/guide/getting-started.md", "composer.json", "package.json", ".env.example", "app/Console/Commands/InitCommand.php", ".github/workflows/test-backend-sqlite.yml", ".github/workflows/test-backend-mariadb.yml", ".github/workflows/unit-frontend.yml"],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "vue"], "packageManagers": ["composer", "pnpm"] }
+  ],
+  "runtimes": { "php": "8.3", "node": "22.18" },
+  "services": ["mysql"],
+  "steps": [
+    { "kind": "install:composer", "source": "docs", "evidence": "docs/development.md:27" },
+    { "kind": "env-copy", "source": "docs", "evidence": "docs/guide/getting-started.md:106-108; done automatically by composer post-install-cmd (composer.json:106)" },
+    { "kind": "install:pnpm", "source": "docs", "evidence": "docs/development.md:28" },
+    { "kind": "manual:create-database", "source": "docs", "evidence": "docs/guide/getting-started.md:19 (needs a MySQL/MariaDB/PostgreSQL/SQLite database); .env.example:28 defaults to mysql" },
+    { "kind": "script:koel:init", "source": "docs", "evidence": "docs/guide/getting-started.md:72; composer.json:122 -> artisan koel:init (InitCommand.php:63-74)" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "composer dev", "port": 8000 }],
+  "readmeCommands": [],
+  "notes": "The README only links to docs.koel.dev, but that site is built from the in-repo docs/ folder, which was used here. docs/development.md says only `composer install`, `pnpm install`, `composer dev` and leaves out the app key, database and migrations, so on its own it does not give a working app. getting-started.md (Building from Source) fills that gap with `composer koel:init`, an interactive wizard. It generates APP_KEY, asks for DB credentials and writes them to .env, migrates, seeds an admin account (shown at the end), runs storage:link, asks for a media path, and runs pnpm install plus pnpm run build unless given --no-assets. That covers key:generate, migrate, db:seed and build-assets, so they are not listed separately. CI only runs composer install (whose post-install hook copies .env), key:generate and tests. Runtimes: composer.json requires PHP >=8.3 and package.json engines require Node ^22.18 || ^24.11 || >=26, with CI on 8.3 and 22. getting-started.md still says PHP >=8.2 and Node >=20 (stale). MySQL is only the template default; the wizard also accepts PostgreSQL or SQLite."
+}

@@ -1,0 +1,32 @@
+{
+  "id": "zoxide",
+  "sources": [
+    "README.md",
+    "Cargo.toml",
+    "Cargo.lock",
+    "justfile",
+    "shell.nix",
+    ".envrc",
+    ".cargo/config.toml",
+    ".github/workflows/ci.yml",
+    ".github/workflows/release.yml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["rust"], "packageManagers": ["cargo"] }
+  ],
+  "runtimes": { "rust": "1.88" },
+  "services": [],
+  "steps": [
+    { "kind": "install:cargo", "source": "ci", "evidence": "No contributor docs; CI builds and tests the crate via 'just lint test' (ci.yml:57), which runs cargo inside nix-shell (justfile:17-20, 35). Cargo.lock is committed." }
+  ],
+  "optionalSteps": [
+    { "kind": "other:nix-shell", "source": "ci", "evidence": "justfile:4-35 runs every fmt/lint/test recipe through 'nix-shell --pure' (shell.nix provides stable + nightly Rust, cargo-nextest, shells, linters); .envrc 'use nix' for direnv" },
+    { "kind": "other:install-fzf", "source": "docs", "evidence": "README.md:348-354 (fzf optional, >= 0.51.0, for interactive selection)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "cargo run" }],
+  "readmeCommands": [
+    "curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh",
+    "eval \"$(zoxide init bash)\""
+  ],
+  "notes": "There is no CONTRIBUTING or development doc. README's Installation section only installs a released binary (install script, package managers, or 'cargo install zoxide --locked' from crates.io) and then hooks it into the shell; it never builds the local clone. readmeCommands record the Linux/WSL recommended path plus the Bash hook line (which README says to add to the end of ~/.bashrc); other OS/shell variants are omitted. Local development is therefore by Cargo convention: cargo build / cargo run. zoxide is a CLI without a default action, so a useful run passes a subcommand (e.g. 'cargo run -- init bash', 'cargo run -- query foo'); there is no port. The maintainers' own workflow (justfile, CI) is Nix-based: 'just test' = cargo nextest in nix-shell; on Windows plain 'cargo +stable test'. MSRV is rust-version 1.88.0 (Cargo.toml:12, checked by cargo msrv verify in 'just lint'); edition 2024. .cargo/config.toml defines an xtask alias, but there is no xtask package."
+}

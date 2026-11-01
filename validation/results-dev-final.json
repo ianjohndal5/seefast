@@ -1,0 +1,1550 @@
+{
+  "set": "dev",
+  "summary": {
+    "repos": 24,
+    "scored": 24,
+    "steps": {
+      "gt": 110,
+      "correct": 77,
+      "wrong": 1,
+      "missing": 32,
+      "extra": 51,
+      "extraOptionalInGt": 8,
+      "planSteps": 134
+    },
+    "readme": {
+      "gt": 110,
+      "correct": 25,
+      "wrong": 0,
+      "missing": 85,
+      "extra": 9,
+      "extraOptionalInGt": 5,
+      "planSteps": 42
+    },
+    "packageManager": {
+      "correct": 22,
+      "wrong": 0,
+      "missing": 0,
+      "applicable": 22
+    },
+    "readmePackageManager": {
+      "correct": 8,
+      "wrong": 2,
+      "notStated": 12
+    },
+    "runtimes": {
+      "same": 26,
+      "compatible": 3,
+      "differs": 1
+    },
+    "services": {
+      "gt": 34,
+      "found": 21,
+      "missed": 13,
+      "extra": 2
+    },
+    "dev": {
+      "correct": 18,
+      "different": 6,
+      "missing": 0,
+      "applicable": 24
+    },
+    "devPort": {
+      "correct": 18,
+      "different": 4,
+      "applicable": 22
+    }
+  },
+  "rows": [
+    {
+      "id": "laravel",
+      "group": "laravel",
+      "steps": {
+        "gt": 5,
+        "plan": 7,
+        "correct": [
+          "install:composer",
+          "env-copy",
+          "artisan:key:generate",
+          "artisan:migrate",
+          "install:npm"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [
+          "build-assets"
+        ],
+        "extra": [
+          "other:sqlite-file"
+        ]
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:composer",
+          "env-copy",
+          "artisan:key:generate",
+          "artisan:migrate",
+          "install:npm"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same"
+      },
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 2,
+      "conflicts": 0,
+      "notes": "This is the bare Laravel application skeleton. The README has no local-setup section, only links to laravel.com, and its two commands (composer require laravel/boost --dev, php artisan boost:install) are for optional AI-agent tooling, not setup. The canonical sequence is the composer `setup` script (composer install, copy .env, key:generate, migrate --force, npm install --ignore-scripts, npm run build), so `composer run setup` does every step above in one go. CI only goes as far as key:generate because tests run on in-memory SQLite. There is no lockfile, so npm is inferred from the scripts. No Node version is stated anywhere. Port 8000 comes from APP_URL and artisan serve's default."
+    },
+    {
+      "id": "koel",
+      "group": "laravel",
+      "steps": {
+        "gt": 5,
+        "plan": 7,
+        "correct": [
+          "install:composer",
+          "env-copy",
+          "install:pnpm",
+          "manual:create-database"
+        ],
+        "wrong": [],
+        "missing": [
+          "script:koel:init"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "artisan:key:generate",
+          "artisan:migrate",
+          "build-assets"
+        ]
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:composer",
+          "env-copy",
+          "install:pnpm",
+          "manual:create-database",
+          "script:koel:init"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql"
+        ],
+        "plan": [
+          "mysql"
+        ],
+        "found": [
+          "mysql"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "The README only links to docs.koel.dev, but that site is built from the in-repo docs/ folder, which was used here. docs/development.md says only `composer install`, `pnpm install`, `composer dev` and leaves out the app key, database and migrations, so on its own it does not give a working app. getting-started.md (Building from Source) fills that gap with `composer koel:init`, an interactive wizard. It generates APP_KEY, asks for DB credentials and writes them to .env, migrates, seeds an admin account (shown at the end), runs storage:link, asks for a media path, and runs pnpm install plus pnpm run build unless given --no-assets. That covers key:generate, migrate, db:seed and build-assets, so they are not listed separately. CI only runs composer install (whose post-install hook copies .env), key:generate and tests. Runtimes: composer.json requires PHP >=8.3 and package.json engines require Node ^22.18 || ^24.11 || >=26, with CI on 8.3 and 22. getting-started.md still says PHP >=8.2 and Node >=20 (stale). MySQL is only the template default; the wizard also accepts PostgreSQL or SQLite."
+    },
+    {
+      "id": "solidtime",
+      "group": "laravel",
+      "steps": {
+        "gt": 8,
+        "plan": 9,
+        "correct": [
+          "install:composer",
+          "env-copy",
+          "compose-up",
+          "artisan:passport:keys",
+          "artisan:migrate",
+          "install:npm",
+          "build-assets"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:traefik-reverse-proxy"
+        ],
+        "extraOptionalInGt": [
+          "artisan:key:generate"
+        ],
+        "extra": [
+          "workspace-build"
+        ]
+      },
+      "readme": {
+        "gt": 8,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:composer",
+          "env-copy",
+          "manual:traefik-reverse-proxy",
+          "compose-up",
+          "artisan:passport:keys",
+          "artisan:migrate",
+          "install:npm",
+          "build-assets"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "postgres",
+          "mailpit",
+          "minio",
+          "gotenberg"
+        ],
+        "plan": [
+          "postgres"
+        ],
+        "found": [
+          "postgres"
+        ],
+        "missed": [
+          "mailpit",
+          "minio",
+          "gotenberg"
+        ],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "n/a",
+      "unknowns": 0,
+      "conflicts": 2,
+      "notes": "There are no local-development docs in the repo. The README only links to self-hosting guides on docs.solidtime.io (not readable here), and CONTRIBUTING only covers lint commands. These steps are reconstructed from docker-compose.yml, .env.example and CI. Steps marked convention come from the compose/Sail configuration rather than prose docs. The compose stack relies on an external Traefik reverse proxy: an external Docker network named reverse-proxy-docker-traefik_routing, a proxy at REVERSE_PROXY_IP 10.100.100.10, and hosts entries for solidtime.test, vite.solidtime.test and storage.solidtime.test. Nothing in the repo explains how to set this up. Inside the container the app runs `artisan serve` on port 80 and is reached at APP_URL https://solidtime.test, so no host port is given. CI runs on the host instead: PHP 8.3, Node 20, Postgres on 127.0.0.1 via .env.ci, with Octane/FrankenPHP serving on port 8000. composer.json pins PHP to 8.3.*. minio (S3 disk) and gotenberg (PDF) are part of the dev stack but probably not needed for the first page to load. Running `npm run dev` makes the build step unnecessary. Whether passport:keys is strictly required for the first page load is unverified; both CI workflows run it."
+    },
+    {
+      "id": "bookstack",
+      "group": "laravel",
+      "steps": {
+        "gt": 4,
+        "plan": 5,
+        "correct": [
+          "env-copy",
+          "env-manual"
+        ],
+        "wrong": [],
+        "missing": [
+          "other:chgrp-docker-storage",
+          "compose-up"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "install:composer",
+          "install:npm",
+          "artisan:key:generate",
+          "artisan:migrate"
+        ]
+      },
+      "readme": {
+        "gt": 4,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "env-copy",
+          "env-manual",
+          "other:chgrp-docker-storage",
+          "compose-up"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "compatible"
+      },
+      "services": {
+        "gt": [
+          "mysql",
+          "mailpit"
+        ],
+        "plan": [],
+        "found": [],
+        "missed": [
+          "mysql",
+          "mailpit"
+        ],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "different",
+      "unknowns": 2,
+      "conflicts": 1,
+      "notes": "The README has no commands. It links to dev/docs/development.md, which is the source used here, and to the website's install guide (external, not readable). The only complete local workflow in the repo is the Docker Compose one. composer install, migrations, npm install and asset building (public/dist is gitignored) all run inside the containers, so they are not separate developer steps. Login is admin@admin.com / password. Port 8080 can be changed with DEV_PORT. MailHog is at localhost:8025. A non-Docker setup would also need composer install, key:generate, a MySQL database, artisan migrate, npm install and npm run build, but the in-repo docs only show the npm commands. Runtimes: composer.json requires PHP ^8.3 and the CI matrix floor is 8.3, while the dev Docker image uses PHP 8.5. The docs say Node v22.0+ and the compose node image is node:22. The node entrypoint still runs `npm rebuild node-sass` although the project now uses `sass` (likely stale but harmless). CI (Forgejo) only tests against a separate mysql_testing database. The docs use the legacy `docker-compose` command."
+    },
+    {
+      "id": "firefly-iii",
+      "group": "laravel",
+      "steps": {
+        "gt": 5,
+        "plan": 8,
+        "correct": [
+          "install:composer",
+          "env-copy",
+          "env-manual",
+          "install:npm"
+        ],
+        "wrong": [],
+        "missing": [
+          "build-assets"
+        ],
+        "extraOptionalInGt": [
+          "artisan:key:generate",
+          "artisan:migrate"
+        ],
+        "extra": [
+          "artisan:passport:keys",
+          "manual:mysql",
+          "workspace-build"
+        ]
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:composer",
+          "env-copy",
+          "env-manual",
+          "install:npm",
+          "build-assets"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "compatible"
+      },
+      "services": {
+        "gt": [
+          "mysql"
+        ],
+        "plan": [
+          "mysql"
+        ],
+        "found": [
+          "mysql"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "There are no development docs in the repo. The README and .github/contributing.md only link to docs.firefly-iii.org (not readable). The only CI that builds the app is release.yml, a release pipeline, not a dev setup. It removes composer.lock and runs composer update; a local developer should run composer install against the committed lockfile. The `php artisan serve` dev command is a framework convention; nothing in the repo names a dev server. The v3 Vite dev server cannot be used outside the maintainer's machine: vite.config.js:28-31 reads TLS certificates from /vagrant/... and its origin is hard-coded to a LAN IP, so assets must be built. The .env.example defaults (APP_ENV=production, DB_HOST=db) target Docker/production, while .ci/.env.ci uses APP_ENV=local with SQLite. SQLite needs storage/database/database.sqlite to exist. composer.json requires PHP >=8.5. Node 24 comes only from the release workflow, since no engines field or .nvmrc exists. The repo's agents.md has instructions aimed at AI agents filing PRs, which do not apply here."
+    },
+    {
+      "id": "monica",
+      "group": "laravel",
+      "steps": {
+        "gt": 7,
+        "plan": 8,
+        "correct": [
+          "env-copy",
+          "install:composer",
+          "artisan:key:generate",
+          "install:yarn",
+          "build-assets"
+        ],
+        "wrong": [],
+        "missing": [
+          "other:create-sqlite-file",
+          "artisan:monica:setup"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "compose-up",
+          "other:sqlite-file",
+          "artisan:migrate"
+        ]
+      },
+      "readme": {
+        "gt": 7,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "env-copy",
+          "other:create-sqlite-file",
+          "install:composer",
+          "artisan:key:generate",
+          "artisan:monica:setup",
+          "install:yarn",
+          "build-assets"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [],
+        "plan": [
+          "redis"
+        ],
+        "found": [],
+        "missed": [],
+        "extra": [
+          "redis"
+        ]
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 2,
+      "notes": "The README only links to docs.monicahq.com/developers/setup-local-development (external, not readable) and has no commands. The fullest in-repo setup is the devcontainer's postCreate.sh. It uses the default .env.example (SQLite, database cache/session, sync queue, log mailer), so no backing services are needed. Steps are listed in the script's execution order. The devcontainer serves the app through Apache on port 8080. `php artisan serve` on port 8000 (APP_URL in .env.example) is a convention for a plain host setup, not something the repo says. An alternative Laravel Sail path exists: .env.example.sail:4-7 says cp .env.example.sail .env, composer install via a laravelsail docker image (also sail-init.sh), then ./vendor/bin/sail up -d. That stack uses mariadb, redis, memcached, meilisearch and mailpit (docker-compose.yml) but never mentions key:generate or monica:setup. The Sail comment uses the php83 composer image, while sail-init.sh and the compose runtime use 8.4. CI calls reusable workflows from monicahq/workflows that cannot be read here; it shows only PHP 8.3/8.4, SQLite as the default connection and Node 22. .tool-versions pins php 8.3.16, nodejs 22.13.1 and yarn 4.6.0. The README warns this branch is the beta (5.x), while the stable version is on the 4.x branch."
+    },
+    {
+      "id": "pixelfed",
+      "group": "laravel",
+      "steps": {
+        "gt": 9,
+        "plan": 8,
+        "correct": [
+          "env-copy",
+          "env-manual",
+          "compose-up",
+          "artisan:passport:keys"
+        ],
+        "wrong": [],
+        "missing": [
+          "other:chown-storage-www-data",
+          "artisan:instance:actor",
+          "artisan:import:cities",
+          "artisan:passport:client",
+          "artisan:user:create"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "install:composer",
+          "install:npm",
+          "artisan:key:generate",
+          "artisan:migrate",
+          "build-assets"
+        ]
+      },
+      "readme": {
+        "gt": 9,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "other:chown-storage-www-data",
+          "env-copy",
+          "env-manual",
+          "compose-up",
+          "artisan:instance:actor",
+          "artisan:import:cities",
+          "artisan:passport:keys",
+          "artisan:passport:client",
+          "artisan:user:create"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql",
+          "redis"
+        ],
+        "plan": [
+          "mysql",
+          "redis"
+        ],
+        "found": [
+          "mysql",
+          "redis"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "different",
+      "unknowns": 0,
+      "conflicts": 2,
+      "notes": "README.md:61 recommends Docker Compose and defers all other docs to docs.pixelfed.org / developers.pixelfed.org (external, not read). The only in-repo setup guide is DOCKER_COMPOSE_SETUP.md, written for a production-style deploy behind a reverse proxy; for local use APP_URL etc. can point at http://localhost:8080. All artisan steps are run via 'docker compose exec pixelfed php artisan ...'. The image COPYs the source (no code bind mount, opcache timestamps off, route/view/config caching on), so code edits need a rebuild - poor fit for active development. Alternatives present but undocumented: a .ddev/ config (MariaDB 11.8 + Redis, preset APP_KEY, PHP 8.5) and a bare-metal path implied by CI + .env.example: composer install, cp .env.example .env, php artisan key:generate, create MySQL DB, php artisan migrate, passport:keys, instance:actor, storage:link, php artisan serve (needs PHP ext-redis, ext-ffi and libvips since IMAGE_DRIVER=vips). CI only runs tests (cp .env.testing .env, key:generate, SQLite + Redis), never a running instance. Compiled JS/CSS are committed in public/ (CONTRIBUTING says maintainers build them), so no npm step is needed; .node-version (v14.20.1) is stale relative to esbuild 0.25 / webpack 5 deps. PHP: composer allows ^8.4, README recommends 8.5, CI tests 8.5 only. DB: README says MySQL 8+ / MariaDB 11+ (Postgres best-effort); compose uses mysql:9."
+    },
+    {
+      "id": "akaunting",
+      "group": "laravel",
+      "steps": {
+        "gt": 5,
+        "plan": 8,
+        "correct": [
+          "install:composer",
+          "install:npm",
+          "build-assets",
+          "manual:create-database",
+          "artisan:install"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": [
+          "env-copy",
+          "artisan:key:generate",
+          "artisan:migrate"
+        ]
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 5,
+        "correct": [
+          "install:composer",
+          "install:npm",
+          "artisan:install"
+        ],
+        "wrong": [],
+        "missing": [
+          "build-assets",
+          "manual:create-database"
+        ],
+        "extraOptionalInGt": [
+          "artisan:sample-data:seed"
+        ],
+        "extra": [
+          "artisan:serve"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql"
+        ],
+        "plan": [
+          "mysql"
+        ],
+        "found": [
+          "mysql"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "README.md:30 writes 'composer install ; npm install ; npm run dev' on one line (split here); the git clone line is omitted. There is no separate env-copy or key:generate step: 'php artisan install' renames .env.example to .env and writes APP_KEY and DB_* itself. README's primary serving advice is a web server whose document root is the project root (README.md:39-41); 'php artisan serve' is offered as a quick alternative (README.md:43). README lists MariaDB/MySQL/PostgreSQL/SQLite, but .env.example uses DB_CONNECTION=mysql and the CLI installer only takes host/port/name/user/password, so MySQL/MariaDB is the practical default. Node must be 18-20 (README.md:18, engines '>=18 <21', advisory only via .npmrc engine-strict=false); node-sass ^9 needs a native build. CI runs tests only (cp .env.testing .env with SQLite in-memory, npm install, npm run production, composer test); its PHP matrix floor is 8.2. Full requirements live at akaunting.com/hc/docs (external, not read)."
+    },
+    {
+      "id": "invoiceninja",
+      "group": "laravel",
+      "steps": {
+        "gt": 4,
+        "plan": 8,
+        "correct": [
+          "env-copy",
+          "install:composer",
+          "manual:create-database"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:web-setup-wizard"
+        ],
+        "extraOptionalInGt": [
+          "artisan:ninja:create-test-data"
+        ],
+        "extra": [
+          "install:npm",
+          "artisan:key:generate",
+          "artisan:migrate",
+          "build-assets"
+        ]
+      },
+      "readme": {
+        "gt": 4,
+        "plan": 6,
+        "correct": [
+          "env-copy",
+          "install:composer"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:create-database",
+          "manual:web-setup-wizard"
+        ],
+        "extraOptionalInGt": [
+          "artisan:migrate:fresh",
+          "artisan:db:seed",
+          "artisan:ninja:create-test-data"
+        ],
+        "extra": [
+          "artisan:serve"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql"
+        ],
+        "plan": [
+          "mysql"
+        ],
+        "found": [
+          "mysql"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "README's 'Quick Hosting Setup' block literally says 'composer i -o --no-dev'; its 'Developer environment' section (README.md:144-158) says developers should use 'composer i -o', which is what readmeCommands records. The git clone line (pinned to tag v5.11.53, older than VERSION.txt 5.13.49) is omitted. The sample-data command is optional (README.md:79) and the alternative to the /setup wizard; either path creates the schema. .env.example already contains a fixed APP_KEY, so key:generate is not required up front (the wizard regenerates it; CI runs it). Compiled assets are committed (public/build, Flutter main.dart.js), so no npm build is required; package.json (Vite/Tailwind) and playwright are only for rebuilding assets / e2e tests. CI (phpunit.yml) differs from local: cp .env.ci .env, composer install, key:generate, config:clear, ninja:post-update, optimize, migrate, db:seed, against MariaDB 10.6 + Redis with redis cache/queue/session; .env.example uses file/sync drivers so Redis is not needed locally. PHP floor 8.2 (composer.json require and config.platform, CI matrix 8.2-8.5). The official developer guide and self-host guide are external (invoiceninja.github.io, not read)."
+    },
+    {
+      "id": "pterodactyl",
+      "group": "laravel",
+      "steps": {
+        "gt": 9,
+        "plan": 7,
+        "correct": [
+          "install:composer",
+          "env-copy",
+          "env-manual",
+          "artisan:key:generate",
+          "artisan:migrate",
+          "install:yarn",
+          "build-assets"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:create-database",
+          "artisan:p:user:make"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "compose-up"
+        ]
+      },
+      "readme": {
+        "gt": 9,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:composer",
+          "env-copy",
+          "env-manual",
+          "artisan:key:generate",
+          "manual:create-database",
+          "artisan:migrate",
+          "install:yarn",
+          "build-assets",
+          "artisan:p:user:make"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "php": "same",
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql",
+          "redis"
+        ],
+        "plan": [
+          "mysql",
+          "redis"
+        ],
+        "found": [
+          "mysql",
+          "redis"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 1,
+      "notes": "The README has no setup commands; it links to external docs (pterodactyl.io panel getting_started, not read) and to the separate pterodactyl/development environment that BUILDING.md 'highly recommends'. In-repo docs cover only frontend assets (BUILDING.md); the PHP-side steps come from CI, the production Docker entrypoint/README and Laravel conventions, so most are tagged convention. No in-repo doc names a PHP dev server: 'php artisan serve' is the Laravel default, while production uses nginx/php-fpm. Redis: .env.example sets QUEUE_CONNECTION=redis (config/queue.php default is redis) and .github/docker/README.md calls a cache 'required'; switching QUEUE_CONNECTION to sync would avoid it. Node version disagreement: BUILDING.md says Node v14 + Yarn 1 (stale), flake.nix/shell.nix use nodejs_18, package.json engines '>=22' and CI/Dockerfile use Node 22. BUILDING.md also lists Go 1.17, but only for Wings (a separate repo), so it is omitted. The yarn serve (HMR) script is hard-wired to https://pterodactyl.test:5173 and local certs, so 'yarn run watch' is the practical dev command. This checkout is the 1.0-develop branch; README says v2 development happens on 2.0-develop."
+    },
+    {
+      "id": "saas-starter",
+      "group": "nextjs",
+      "steps": {
+        "gt": 5,
+        "plan": 5,
+        "correct": [
+          "install:pnpm",
+          "script:db:setup",
+          "db:migrate"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:stripe-cli-login",
+          "script:db:seed"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "env-copy",
+          "manual:postgres"
+        ]
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 4,
+        "correct": [
+          "install:pnpm",
+          "script:db:setup",
+          "db:migrate",
+          "script:db:seed"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:stripe-cli-login"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {},
+      "services": {
+        "gt": [
+          "postgres"
+        ],
+        "plan": [
+          "postgres"
+        ],
+        "found": [
+          "postgres"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "pnpm per README and pnpm-lock.yaml (lockfile v9); there is no packageManager field and no CI. The env file is created by the interactive `pnpm db:setup` script, not by copying: it asks Local (Docker) vs Remote Postgres, generates docker-compose.yml (postgres:16.4 on port 54322) and runs `docker compose up -d` for the local option (no compose file is committed), prompts for STRIPE_SECRET_KEY, gets STRIPE_WEBHOOK_SECRET via `stripe listen --print-secret`, and writes POSTGRES_URL, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, BASE_URL, AUTH_SECRET to .env. The alternative is to copy .env.example to .env (it must be .env, not .env.local) and fill in those values by hand. Seeding calls the Stripe API to create products/prices and creates test@test.com/admin123. The README lists it in the main sequence, but the app starts without it (users can sign up, pricing has fallbacks); only checkout needs the seeded prices. No Node version is stated (Next 15.6 canary)."
+    },
+    {
+      "id": "dub",
+      "group": "nextjs-monorepo",
+      "steps": {
+        "gt": 7,
+        "plan": 6,
+        "correct": [
+          "install:pnpm",
+          "workspace-build",
+          "env-copy",
+          "env-manual",
+          "compose-up",
+          "prisma:migrate"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:tinybird-setup"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "prisma:generate"
+        ]
+      },
+      "readme": {
+        "gt": 7,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:pnpm",
+          "workspace-build",
+          "env-copy",
+          "env-manual",
+          "compose-up",
+          "prisma:migrate",
+          "manual:tinybird-setup"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql",
+          "mailpit",
+          "redis",
+          "tinybird"
+        ],
+        "plan": [
+          "mailpit",
+          "mysql"
+        ],
+        "found": [
+          "mysql",
+          "mailpit"
+        ],
+        "missed": [
+          "redis",
+          "tinybird"
+        ],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "different",
+      "unknowns": 4,
+      "conflicts": 1,
+      "notes": "README has no in-repo setup steps: it defers to the external guide https://dub.co/docs/local-development (README.md:62), which could not be read, so steps are reconstructed from apps/web/.env.example, apps/web/docker-compose.yml, package scripts and CI. Package manager pnpm (pnpm-lock.yaml, packageManager pnpm@9.15.9). Node: README 'Recommended Versions' says node v23.11.0 / pnpm 9.15.9 (README.md:65-70) but CI runs Node 20, so 20 is recorded as the floor. Root 'pnpm dev' = turbo dev, which also runs tsup --watch for @dub/utils and @dub/ui and the react-email preview (packages/email, port 3333); the web dev script (apps/web) runs prisma generate itself, then next dev --turbopack --port 8888, so no separate prisma:generate step. workspace-build may be self-healing when using root turbo dev (tsup --watch builds dist), but is required when starting apps/web alone; CI builds utils explicitly. Env vars needing real values: NEXTAUTH_SECRET, CRON_SECRET, ENCRYPTION_KEY, UPSTASH_REDIS_REST_URL/TOKEN, QSTASH_TOKEN/QSTASH_CURRENT_SIGNING_KEY/QSTASH_NEXT_SIGNING_KEY, TINYBIRD_API_KEY (+TINYBIRD_API_URL), TEAM_ID_VERCEL/VERCEL_API_KEY and RESEND_API_KEY are listed as required; DATABASE_URL, PLANETSCALE_DATABASE_URL and SMTP_* have working local defaults. 'redis' is Upstash Redis over REST (hosted; CI substitutes redis:7 + serverless-redis-http on 8079); 'tinybird' is Tinybird cloud or tinybird-local (CI). QStash (Upstash) is also marked required; CI runs a local qstash-cli dev server. The PlanetScale HTTP simulator (ps-http-sim) is part of the compose stack alongside MySQL. mailhog is recorded as mailpit."
+    },
+    {
+      "id": "umami",
+      "group": "nextjs",
+      "steps": {
+        "gt": 4,
+        "plan": 6,
+        "correct": [
+          "install:pnpm",
+          "env-manual",
+          "prisma:generate",
+          "prisma:migrate"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [
+          "workspace-build"
+        ],
+        "extra": [
+          "compose-up"
+        ]
+      },
+      "readme": {
+        "gt": 4,
+        "plan": 2,
+        "correct": [
+          "install:pnpm"
+        ],
+        "wrong": [],
+        "missing": [
+          "env-manual",
+          "prisma:generate",
+          "prisma:migrate"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "build-assets"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "node": "differs",
+        "pnpm": "same"
+      },
+      "services": {
+        "gt": [
+          "postgres"
+        ],
+        "plan": [
+          "postgres"
+        ],
+        "found": [
+          "postgres"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 2,
+      "conflicts": 1,
+      "notes": "pnpm everywhere: README, CI (pnpm/action-setup 12.3.4), pnpm-lock.yaml, pnpm-workspace.yaml (packages/api-client, packages/mcp). package.json engines.pnpm is pinned to exactly 12.3.4, and pnpm refuses to install with any other version. The README only documents a production-style install (pnpm run build, then pnpm run start). The build runs check:env, prisma generate, check:db (connects to the DB and applies migrations, which create the admin/umami login), tracker/recorder/geo/openapi builds, workspace packages and next build. For development, `pnpm dev` (dotenv next dev --turbo) is in package.json but not in any doc. It needs at least the generated Prisma client and a migrated DB, so in practice run `pnpm run build` once, or `pnpm build:db && pnpm db:migrate`. Node: the README says 18.18+, but packages/mcp engines require >=20, CI and the Dockerfile use 22, and Next 16 needs >=20.9, so the README is stale. Postgres version: the README says v12.14+, check-db.js enforces >=9.4, docker-compose uses postgres:15. The root docker-compose.yml runs the published image plus Postgres (a deployment setup, not dev). APP_SECRET is recommended (falls back to a hash of DATABASE_URL). REDIS_URL/CLICKHOUSE_URL are only needed for cloud mode."
+    },
+    {
+      "id": "precedent",
+      "group": "nextjs",
+      "steps": {
+        "gt": 2,
+        "plan": 2,
+        "correct": [
+          "install:pnpm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "readme": {
+        "gt": 2,
+        "plan": 3,
+        "correct": [
+          "install:pnpm"
+        ],
+        "wrong": [],
+        "missing": [
+          "env-copy"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "wrong",
+      "runtimes": {},
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "The README lists `npm i`, `yarn` and `pnpm i` as interchangeable alternatives, but the repo uses pnpm (packageManager pnpm@9.3.0, pnpm-lock.yaml v9, no other lockfile). The README's only setup route is `npx create-next-app --example`, which a fresh clone skips. It has no env or run instructions; the Clerk keys appear only in the Vercel deploy button. NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY must hold real values from a Clerk application: @clerk/nextjs 5.6.2 (lockfile) has no keyless mode, so ClerkProvider fails at render without a publishable key. Either .env or .env.local works. The dev command comes from package.json (the README never names it). app/middleware.ts sits inside app/, so Next ignores it (harmless for startup). No Node version is stated and there is no CI."
+    },
+    {
+      "id": "breeze-next",
+      "group": "nextjs",
+      "steps": {
+        "gt": 3,
+        "plan": 3,
+        "correct": [
+          "install:npm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:laravel-backend"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "manual:external-8000"
+        ]
+      },
+      "readme": {
+        "gt": 3,
+        "plan": 5,
+        "correct": [
+          "install:npm"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:laravel-backend",
+          "env-copy"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "artisan:breeze:install",
+          "artisan:migrate",
+          "artisan:serve"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "wrong",
+      "runtimes": {},
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 1,
+      "conflicts": 0,
+      "notes": "The README says `yarn install` or `npm install`. Only package-lock.json (lockfile v2) is committed, so npm is the actual package manager. The frontend needs a separately created Laravel Breeze API backend (PHP, Composer and a database, per Laravel's defaults) running at http://localhost:8000. That backend lives outside this repo, so it is recorded as a manual step rather than a service. The Next dev server itself starts without it, but every auth/API call fails. The .env.example default (NEXT_PUBLIC_BACKEND_URL=http://localhost:8000) can be copied unchanged. `yarn install`/`npm install` and the .env copy are written inline or in prose in the README, not in code blocks. The workflows only automate Dependabot, issues and PRs; there is no build/test CI. No Node version is stated."
+    },
+    {
+      "id": "taxonomy",
+      "group": "nextjs",
+      "steps": {
+        "gt": 2,
+        "plan": 5,
+        "correct": [
+          "install:pnpm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [
+          "prisma:migrate"
+        ],
+        "extra": [
+          "manual:mysql",
+          "prisma:generate"
+        ]
+      },
+      "readme": {
+        "gt": 2,
+        "plan": 2,
+        "correct": [
+          "install:pnpm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "mysql"
+        ],
+        "plan": [
+          "mysql"
+        ],
+        "found": [
+          "mysql"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 1,
+      "notes": "Archived project. pnpm per README and pnpm-lock.yaml (lockfile v6, i.e. pnpm 8); no packageManager field and no CI. next.config.mjs imports env.mjs (@t3-oss/env-nextjs), which requires every server variable to be non-empty, so `pnpm dev` fails until .env.local fills NEXTAUTH_SECRET, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_ACCESS_TOKEN, SMTP_FROM, POSTMARK_API_TOKEN, POSTMARK_SIGN_IN_TEMPLATE, POSTMARK_ACTIVATION_TEMPLATE, STRIPE_API_KEY, STRIPE_WEBHOOK_SECRET and STRIPE_PRO_MONTHLY_PLAN_ID. DATABASE_URL and NEXT_PUBLIC_APP_URL have defaults. Any non-empty values let it start, but sign-in needs real GitHub OAuth or Postmark credentials. The database is MySQL (PlanetScale per README/.env.example). The README never says how to create it or apply the schema. Prisma client generation happens automatically in postinstall. .nvmrc pins v16.18.0. `pnpm dev` runs contentlayer dev and next dev concurrently."
+    },
+    {
+      "id": "chatbot-ui",
+      "group": "nextjs",
+      "steps": {
+        "gt": 5,
+        "plan": 2,
+        "correct": [
+          "install:npm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:install-docker-and-supabase-cli",
+          "other:supabase-start",
+          "manual:edit-setup-migration"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "readme": {
+        "gt": 5,
+        "plan": 3,
+        "correct": [
+          "install:npm",
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [
+          "manual:install-docker-and-supabase-cli",
+          "other:supabase-start",
+          "manual:edit-setup-migration"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "script:chat"
+        ]
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "supabase"
+        ],
+        "plan": [],
+        "found": [],
+        "missed": [
+          "supabase"
+        ],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 2,
+      "conflicts": 0,
+      "notes": "npm per README and package-lock.json (v3); no CI workflows (.github only has funding.yaml). .env.local must hold real local-Supabase values: NEXT_PUBLIC_SUPABASE_URL (the API URL), NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY, all from `supabase status`. LLM provider keys are optional (users can enter them in the UI). The Supabase stack (Postgres, auth, storage, studio on :54323) runs through the Supabase CLI on Docker, not docker compose. Migrations are applied by `supabase start` itself. The README's SQL edit step comes after `supabase start` has already applied that migration, so it only takes effect after `npm run db-reset`. The README says it prevents storage-file deletion issues, so it is not needed for the app to start. `npm run chat` = supabase start && npm run db-types && next dev; plain `npm run dev` also works once Supabase is up. Node: the README says 'i.e. v18', while .nvmrc pins v20.11.0. npm install runs `husky install` via prepare."
+    },
+    {
+      "id": "formbricks",
+      "group": "nextjs-monorepo",
+      "steps": {
+        "gt": 2,
+        "plan": 7,
+        "correct": [
+          "install:pnpm"
+        ],
+        "wrong": [],
+        "missing": [
+          "script:go"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "env-copy",
+          "compose-up",
+          "manual:external-8080",
+          "db:migrate",
+          "workspace-build"
+        ]
+      },
+      "readme": {
+        "gt": 2,
+        "plan": 2,
+        "correct": [
+          "install:pnpm",
+          "script:go"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "postgres",
+          "spicedb",
+          "mailpit",
+          "redis",
+          "rustfs",
+          "hub",
+          "cube"
+        ],
+        "plan": [
+          "cube",
+          "postgres",
+          "redis"
+        ],
+        "found": [
+          "postgres",
+          "redis",
+          "cube"
+        ],
+        "missed": [
+          "spicedb",
+          "mailpit",
+          "rustfs",
+          "hub"
+        ],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 1,
+      "conflicts": 2,
+      "notes": "Package manager pnpm (pnpm-lock.yaml, packageManager pnpm@11.7.0, CI pnpm/action-setup); docs agree. Node: engines >=24.0.0 <25, .nvmrc 24.22.2, CI uses .nvmrc. Docker and openssl are required (setup-dev-env.sh checks openssl). 'pnpm go' is both setup and dev start: (1) db:up -> dev:setup (scripts/setup-dev-env.sh: copies .env.example to .env if missing and generates ENCRYPTION_KEY, BETTER_AUTH_SECRET, CRON_SECRET, CUBEJS_API_SECRET, AUTHZED_TOKEN, AUTHZED_DATABASE_PASSWORD with openssl) then docker compose -f docker-compose.dev.yml up -d; (2) dev:authzed -> waits for spicedb, runs db:migrate:dev (builds @formbricks/database, prisma generate, applies migrations) and authzed:upgrade prepare/check; (3) turbo run go -> builds ai/cache/database/jobs/logger/storage/redis-config, runs @formbricks/database db:setup (migrations + SAML database), starts vite watch builds for surveys/js-core/survey-ui/etc., and next dev -p 3000 --turbopack in apps/web. Decomposed equivalent: env-copy + secret generation, compose-up, workspace-build, prisma:generate, prisma:migrate. No manual env editing is needed for a basic start. Services per README.md:146 and docker-compose.dev.yml: PostgreSQL (pgvector pg18), SpiceDB (authz, required: AUTHZED_ENABLED=true is enforced), MailHog (recorded as mailpit), Valkey (Redis-compatible, recorded as redis), RustFS (S3-compatible object storage, MinIO-like), Formbricks Hub (+hub-worker), Cube. Compose profiles taxonomy, qwen, authzed-tools, authzed-ui are optional and not started by default. Later runs can use 'pnpm dev' (turbo run dev --parallel), mentioned in docs/agents/monorepo-builds.md:75 but not in the README. CONTRIBUTING.md has no setup steps; docs/development/overview.mdx defers to the README."
+    },
+    {
+      "id": "documenso",
+      "group": "nextjs-monorepo",
+      "steps": {
+        "gt": 2,
+        "plan": 6,
+        "correct": [
+          "env-copy"
+        ],
+        "wrong": [],
+        "missing": [
+          "script:dx"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "install:npm",
+          "compose-up",
+          "prisma:generate",
+          "prisma:migrate"
+        ]
+      },
+      "readme": {
+        "gt": 2,
+        "plan": 2,
+        "correct": [
+          "env-copy",
+          "script:dx"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "postgres",
+          "mailpit"
+        ],
+        "plan": [
+          "postgres"
+        ],
+        "found": [
+          "postgres"
+        ],
+        "missed": [
+          "mailpit"
+        ],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 4,
+      "conflicts": 0,
+      "notes": "Package manager npm (package-lock.json, packageManager npm@11.19.1, engines npm >=11.17.0; CI: corepack enable npm + npm ci). Node: engines >=24.0.0, README 'v24 or above', CI v24.x. 'npm run dx' works on a fresh clone (pure shell script) and does: npm ci (install:npm), docker compose -f docker/development/compose.yml up -d (compose-up), prisma migrate dev via dotenv (prisma:migrate; also generates the client), prisma db seed. So the decomposed sequence is env-copy, install:npm, compose-up, prisma:migrate, seed. .env must exist before dx because prisma scripts load it via 'with:env' (dotenv -e .env -e .env.local); .env.example defaults (DB on 127.0.0.1:54320, NEXTAUTH_SECRET='secret', encryption keys, SMTP to inbucket) work without edits. 'npm run dev' compiles lingui translations then turbo dev for @documenso/remix on http://localhost:3000. 'npm run d' (README.md:136-140) = dx + translate:compile + dev in one go. README.md:132 says dx starts postgres and inbucket; the compose file also starts redis (only for the optional BullMQ jobs provider) and gotenberg (only for optional DOCX conversion, NEXT_PRIVATE_DOCUMENT_CONVERSION_URL is commented out), so they are not listed as required services. Inbucket (mail catcher, UI :9000, SMTP :2500) is recorded as mailpit. A docs 'Manual Setup' path (manual.mdx) uses npm i, your own Postgres, cp .env.example .env, npm run prisma:migrate-dev, npm run dev. readmeCommands omit the 'git clone' line (fresh clone assumed) and the alternative 'npm run d'."
+    },
+    {
+      "id": "calcom",
+      "group": "nextjs-monorepo",
+      "steps": {
+        "gt": 4,
+        "plan": 9,
+        "correct": [
+          "install:yarn",
+          "env-copy",
+          "env-manual"
+        ],
+        "wrong": [],
+        "missing": [
+          "script:dx"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "manual:external-5555",
+          "workspace-build",
+          "prisma:generate",
+          "compose-up",
+          "manual:external-80",
+          "prisma:migrate"
+        ]
+      },
+      "readme": {
+        "gt": 4,
+        "plan": 2,
+        "correct": [
+          "install:yarn",
+          "script:dx"
+        ],
+        "wrong": [],
+        "missing": [
+          "env-copy",
+          "env-manual"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {
+        "node": "same"
+      },
+      "services": {
+        "gt": [
+          "postgres",
+          "mailpit"
+        ],
+        "plan": [
+          "mailpit",
+          "postgres",
+          "redis"
+        ],
+        "found": [
+          "postgres",
+          "mailpit"
+        ],
+        "missed": [],
+        "extra": [
+          "redis"
+        ]
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 9,
+      "conflicts": 1,
+      "notes": "This repository is Cal.diy (the MIT community fork of Cal.com, README.md:37-49), package calcom-monorepo. Package manager Yarn Berry 4.12.0 (yarn.lock, packageManager yarn@4.12.0, yarnPath .yarn/releases, nodeLinker node-modules, root engines yarn >=4.12.0); apps/web/package.json still declares engines yarn 3.4.1 (stale). Node: README.md:73 says >=18.x and step 5 says 'nvm use', but there is no .nvmrc in the repo; CI yarn-install action defaults to Node v20.x and apps/web uses Next 16.4 (needs >=20.9), so 20 is recorded. 'yarn dx' = turbo run dx: first //#env-check:common and //#env-check:app-store (dotenv-checker against .env.example/.env.appStore.example; turbo declares .env and .env.appStore as outputs, so it creates/updates them and may prompt), then @calcom/prisma dx = db-setup = db-up (docker compose up -d in packages/prisma: postgres:18 on port 5450 matching .env.example DATABASE_URL) + db-deploy (prisma migrate deploy) + db-seed (test users, credentials in README.md:141-148), @calcom/emails dx (docker compose up mailhog on 1025/8025), @calcom/ui dx (build icons), and @calcom/web dx = yarn dev, so yarn dx also starts the app on http://localhost:3000. Decomposed: compose-up, prisma:migrate, seed, then dev. Afterwards 'yarn dev' (turbo dev for @calcom/web, also runs env-check). Alternative 'Manual setup' (README.md:191-261): own Postgres + DATABASE_URL, copy DATABASE_URL into .env.appStore, yarn workspace @calcom/prisma db-migrate, mailhog via docker run, yarn dev. Env values that must be filled: NEXTAUTH_SECRET, CALENDSO_ENCRYPTION_KEY (empty in .env.example); DATABASE_URL/DATABASE_DIRECT_URL default to the dx Postgres. Windows needs packages/prisma/.env symlink replaced (README.md:110-115). The root docker-compose.yml is the self-hosting stack, not the dev path. MailHog is recorded as mailpit. readmeCommands omit git clone / cd (fresh clone assumed) and the conditional 'nvm use' / 'nvm install && nvm use' (would fail: no .nvmrc)."
+    },
+    {
+      "id": "commerce",
+      "group": "nextjs",
+      "steps": {
+        "gt": 2,
+        "plan": 2,
+        "correct": [
+          "env-copy",
+          "install:pnpm"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "readme": {
+        "gt": 2,
+        "plan": 1,
+        "correct": [
+          "install:pnpm"
+        ],
+        "wrong": [],
+        "missing": [
+          "env-copy"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "correct",
+      "runtimes": {},
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "correct",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "Archived and deprecated (moved to vercel/shop). pnpm per README, pnpm-lock.yaml (v9) and .vscode/launch.json; no packageManager field and no CI. The env must hold real Shopify values: SHOPIFY_STORE_DOMAIN (with the [placeholder] brackets removed, which lib/utils.ts checks) and SHOPIFY_STOREFRONT_ACCESS_TOKEN from a Shopify store. Every page fetches from the Shopify Storefront API, so nothing renders without them. SHOPIFY_REVALIDATION_SECRET only matters for webhooks; COMPANY_NAME/SITE_NAME have defaults. The README's numbered route is the Vercel CLI (`vercel env pull`, which writes .env.local in current CLI versions), but it also says a .env file is enough. No local backing services: Shopify is a hosted external API. No Node version is stated."
+    },
+    {
+      "id": "djangoproject",
+      "group": "generic",
+      "steps": {
+        "gt": 9,
+        "plan": 3,
+        "correct": [
+          "db:migrate"
+        ],
+        "wrong": [
+          "install:pip"
+        ],
+        "missing": [
+          "other:create-virtualenv",
+          "env-manual",
+          "manual:create-databases",
+          "other:load-trac-schema",
+          "other:createsuperuser",
+          "other:loaddata-dev_sites",
+          "build-assets"
+        ],
+        "extraOptionalInGt": [],
+        "extra": [
+          "compose-up"
+        ]
+      },
+      "readme": {
+        "gt": 9,
+        "plan": 4,
+        "correct": [
+          "db:migrate"
+        ],
+        "wrong": [],
+        "missing": [
+          "other:create-virtualenv",
+          "install:pip",
+          "env-manual",
+          "manual:create-databases",
+          "other:load-trac-schema",
+          "other:createsuperuser",
+          "other:loaddata-dev_sites",
+          "build-assets"
+        ],
+        "extraOptionalInGt": [
+          "script:compilemessages"
+        ],
+        "extra": [
+          "script:compile-scss",
+          "script:run"
+        ]
+      },
+      "pm": "n/a",
+      "readmePm": "n/a",
+      "runtimes": {
+        "python": "same"
+      },
+      "services": {
+        "gt": [
+          "postgres"
+        ],
+        "plan": [
+          "postgres"
+        ],
+        "found": [
+          "postgres"
+        ],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "correct",
+      "unknowns": 1,
+      "conflicts": 0,
+      "notes": "Steps follow README's 'virtual environment' path. README also documents a Docker path (README.rst:459-488): docker compose build, docker compose up (the dev entrypoint runs migrate, compile-scss and collectstatic, docker-entrypoint.dev.sh:3-5), then optionally docker compose run --rm web make reset-local-db; Postgres 17 runs in compose. readmeCommands: the secrets.json content and the ALTER USER statements typed inside psql are not shell commands and are omitted; the export line is meant to go into ~/.bashrc followed by 'source ~/.bashrc'; the 'make install' and 'loaddata dashboard_example_data' alternatives are omitted. secrets.json is technically optional (settings fall back to defaults when missing, common.py:17-24), but the DB passwords set in step 4 have to reach Django through it. createsuperuser is listed as a normal step but is only needed to use the admin. make run serves www, docs and dashboard on port 8000 via *.djangoproject.localhost hostnames (an /etc/hosts entry may be needed, README.rst:406-413). uv.lock exists and requirements/*.txt are exported from it, but the docs and CI use pip. Python is pinned ==3.12.* (pyproject.toml:5, CI PYTHON_VERSION 3.12). gettext is needed for compilemessages/update_docs (CI installs it)."
+    },
+    {
+      "id": "pocketbase",
+      "group": "generic",
+      "steps": {
+        "gt": 1,
+        "plan": 2,
+        "correct": [
+          "install:go"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [
+          "install:npm"
+        ],
+        "extra": []
+      },
+      "readme": {
+        "gt": 1,
+        "plan": 1,
+        "correct": [
+          "install:go"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "correct",
+      "readmePm": "not-stated",
+      "runtimes": {
+        "go": "same",
+        "node": "compatible"
+      },
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "different",
+      "devPort": "different",
+      "unknowns": 1,
+      "conflicts": 0,
+      "notes": "Contributor workflow (CONTRIBUTING.md:29-40): cd examples/base && go run main.go serve, which serves on http://localhost:8090 with the prebuilt Superuser UI embedded from the committed ui/dist. SQLite is embedded, so no services and no env file are needed. No separate dependency step is documented; module download happens inside go run / go build (recorded as install:go). The second dev entry (Vite UI dev server on :5173, which expects the backend at :8090 unless PB_BACKEND_URL is set in ui/.env.development.local, CONTRIBUTING.md:78-81) is only needed for Superuser UI work and requires 'npm install' in ui/ first. readmeCommands come from README 'Building and running the repo main.go example' and must run inside examples/base (README says 'Navigate to examples/base' in prose); the 'Use as a Go framework' section (go mod init myapp, go run main.go serve) is for a new project, not this repo, and is excluded. Versions: Go 1.27 (go.mod directive, README, CONTRIBUTING); Node 24+ per CONTRIBUTING.md:17, while CI asks for >=25.2.1 and Go >=1.27.3. CONTRIBUTING calls the UI 'Svelte and Vite', but ui/README.md and package.json show Shablon + Vite (no Svelte). README.md:1 says the repo has moved to ganigeorgiev.com/pocketbase/pocketbase, and PRs are restricted to collaborators."
+    },
+    {
+      "id": "zoxide",
+      "group": "generic",
+      "steps": {
+        "gt": 1,
+        "plan": 1,
+        "correct": [
+          "install:cargo"
+        ],
+        "wrong": [],
+        "missing": [],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "readme": {
+        "gt": 1,
+        "plan": 0,
+        "correct": [],
+        "wrong": [],
+        "missing": [
+          "install:cargo"
+        ],
+        "extraOptionalInGt": [],
+        "extra": []
+      },
+      "pm": "n/a",
+      "readmePm": "n/a",
+      "runtimes": {
+        "rust": "same"
+      },
+      "services": {
+        "gt": [],
+        "plan": [],
+        "found": [],
+        "missed": [],
+        "extra": []
+      },
+      "dev": "correct",
+      "devPort": "n/a",
+      "unknowns": 0,
+      "conflicts": 0,
+      "notes": "There is no CONTRIBUTING or development doc. README's Installation section only installs a released binary (install script, package managers, or 'cargo install zoxide --locked' from crates.io) and then hooks it into the shell; it never builds the local clone. readmeCommands record the Linux/WSL recommended path plus the Bash hook line (which README says to add to the end of ~/.bashrc); other OS/shell variants are omitted. Local development is therefore by Cargo convention: cargo build / cargo run. zoxide is a CLI without a default action, so a useful run passes a subcommand (e.g. 'cargo run -- init bash', 'cargo run -- query foo'); there is no port. The maintainers' own workflow (justfile, CI) is Nix-based: 'just test' = cargo nextest in nix-shell; on Windows plain 'cargo +stable test'. MSRV is rust-version 1.88.0 (Cargo.toml:12, checked by cargo msrv verify in 'just lint'); edition 2024. .cargo/config.toml defines an xtask alias, but there is no xtask package."
+    }
+  ]
+}

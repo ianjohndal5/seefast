@@ -1,0 +1,37 @@
+{
+  "id": "dub",
+  "sources": [
+    "README.md",
+    "package.json",
+    "pnpm-workspace.yaml",
+    "turbo.json",
+    "apps/web/package.json",
+    "apps/web/.env.example",
+    "apps/web/docker-compose.yml",
+    "packages/utils/package.json",
+    "packages/ui/package.json",
+    ".github/workflows/playwright.yaml",
+    ".github/workflows/e2e.yaml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["turborepo"], "packageManagers": ["pnpm"] },
+    { "root": "apps/web", "stack": ["nextjs", "prisma"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": { "node": "20" },
+  "services": ["mysql", "mailpit", "redis", "tinybird"],
+  "steps": [
+    { "kind": "install:pnpm", "source": "ci", "evidence": ".github/workflows/playwright.yaml:179-180 (pnpm install); README.md:75; packageManager pnpm@9.15.9 in package.json:30" },
+    { "kind": "workspace-build", "source": "ci", "evidence": ".github/workflows/e2e.yaml:30-32 builds packages/utils before running; package.json:7 build:packages = pnpm -r --filter ./packages/** build; @dub/utils and @dub/ui resolve to ./dist (packages/utils/package.json:6, packages/ui/package.json:6)" },
+    { "kind": "env-copy", "source": "convention", "evidence": "apps/web/.env.example -> apps/web/.env; prisma scripts load it via dotenv-flow -e .env (apps/web/package.json:15-16)" },
+    { "kind": "env-manual", "source": "docs", "evidence": "apps/web/.env.example:1-53 'REQUIRED ENV VARS' (NEXTAUTH_SECRET, CRON_SECRET, ENCRYPTION_KEY are empty; Upstash/QStash/Tinybird tokens must be filled)" },
+    { "kind": "compose-up", "source": "docs", "evidence": "apps/web/docker-compose.yml:1 ('meant for local development only'): mysql:8.0 on 3306, PlanetScale HTTP simulator on 3900, mailhog on 1025/8025; apps/web/.env.example:19-20 point at these ports" },
+    { "kind": "prisma:migrate", "source": "ci", "evidence": ".github/workflows/playwright.yaml:197-199 (cd apps/web && pnpm prisma:push = prisma db push); README.md:74" },
+    { "kind": "manual:tinybird-setup", "source": "ci", "evidence": ".github/workflows/playwright.yaml:103-109,140-168 (Tinybird Local + tb push datasources from packages/tinybird); apps/web/.env.example:34-38 marks TINYBIRD_API_KEY required" }
+  ],
+  "optionalSteps": [
+    { "kind": "script:script", "source": "docs", "evidence": "README.md:77-93 (cd apps/web && pnpm run script dev/seed [--truncate]) seeds dev data" }
+  ],
+  "dev": [{ "cwd": ".", "command": "pnpm dev", "port": 8888 }],
+  "readmeCommands": [],
+  "notes": "README has no in-repo setup steps: it defers to the external guide https://dub.co/docs/local-development (README.md:62), which could not be read, so steps are reconstructed from apps/web/.env.example, apps/web/docker-compose.yml, package scripts and CI. Package manager pnpm (pnpm-lock.yaml, packageManager pnpm@9.15.9). Node: README 'Recommended Versions' says node v23.11.0 / pnpm 9.15.9 (README.md:65-70) but CI runs Node 20, so 20 is recorded as the floor. Root 'pnpm dev' = turbo dev, which also runs tsup --watch for @dub/utils and @dub/ui and the react-email preview (packages/email, port 3333); the web dev script (apps/web) runs prisma generate itself, then next dev --turbopack --port 8888, so no separate prisma:generate step. workspace-build may be self-healing when using root turbo dev (tsup --watch builds dist), but is required when starting apps/web alone; CI builds utils explicitly. Env vars needing real values: NEXTAUTH_SECRET, CRON_SECRET, ENCRYPTION_KEY, UPSTASH_REDIS_REST_URL/TOKEN, QSTASH_TOKEN/QSTASH_CURRENT_SIGNING_KEY/QSTASH_NEXT_SIGNING_KEY, TINYBIRD_API_KEY (+TINYBIRD_API_URL), TEAM_ID_VERCEL/VERCEL_API_KEY and RESEND_API_KEY are listed as required; DATABASE_URL, PLANETSCALE_DATABASE_URL and SMTP_* have working local defaults. 'redis' is Upstash Redis over REST (hosted; CI substitutes redis:7 + serverless-redis-http on 8079); 'tinybird' is Tinybird cloud or tinybird-local (CI). QStash (Upstash) is also marked required; CI runs a local qstash-cli dev server. The PlanetScale HTTP simulator (ps-http-sim) is part of the compose stack alongside MySQL. mailhog is recorded as mailpit."
+}

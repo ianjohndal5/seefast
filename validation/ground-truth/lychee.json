@@ -1,0 +1,41 @@
+{
+  "id": "lychee",
+  "sources": [
+    "README.md",
+    "docs/Contribute.md",
+    "CONTRIBUTING.md",
+    "composer.json",
+    "package.json",
+    "package-lock.json",
+    ".env.example",
+    "config/database.php",
+    ".gitmodules",
+    "Makefile",
+    ".github/workflows/php_tests.yml",
+    ".github/workflows/js_check.yml",
+    "vite.config.ts"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "vue", "vite"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.4", "node": "24" },
+  "services": ["mysql"],
+  "steps": [
+    { "kind": "install:composer", "source": "docs", "evidence": "docs/Contribute.md:56" },
+    { "kind": "install:npm", "source": "docs", "evidence": "docs/Contribute.md:61" },
+    { "kind": "env-copy", "source": "docs", "evidence": "docs/Contribute.md:66" },
+    { "kind": "artisan:key:generate", "source": "docs", "evidence": "docs/Contribute.md:67" },
+    { "kind": "manual:create-database", "source": "docs", "evidence": "docs/Contribute.md:71-72 (create DB e.g. 'lychee' and put credentials in .env)" },
+    { "kind": "artisan:migrate", "source": "docs", "evidence": "docs/Contribute.md:75; CI php_tests.yml:115" }
+  ],
+  "optionalSteps": [],
+  "dev": [
+    { "cwd": ".", "command": "vp dev" },
+    { "cwd": ".", "command": "php artisan serve", "port": 8000 }
+  ],
+  "readmeCommands": [
+    "curl -O https://raw.githubusercontent.com/LycheeOrg/Lychee/master/docker-compose.minimal.yaml",
+    "docker compose -f docker-compose.minimal.yaml up -d"
+  ],
+  "notes": "Dev setup lives in docs/Contribute.md (README only links to it; README's Installation section is a Docker quick-try of the published image, which is what readmeCommands holds, not a from-source dev setup). composer.json post-install-cmd (lines 149-152) already copies .env.example to .env and runs key:generate --no-override, so env-copy/key:generate happen automatically during composer install. Database: docs say create a DB and set credentials (php-mysql 'usually used for your local database'), hence mysql; but .env.example:67 defaults to DB_CONNECTION=sqlite (database/database.sqlite, which migrate offers to create), so a SQLite setup works with no DB server. CI tests mariadb/postgresql/sqlite. .env.example ships APP_ENV=production / APP_DEBUG=false; a developer may want local/true. Frontend uses the Vite+ CLI `vp` (package.json dev script = `vp dev`, so `npm run dev` / `npx vp dev` also work); CI installs with `vp install --frozen-lockfile` against package-lock.json (npm). The docs never say how to serve the PHP side: `php artisan serve` (or Valet/Herd/nginx) is inferred; `vp dev` only serves assets (or proxies API with VITE_LOCAL_DEV=true + VITE_HTTP_PROXY_TARGET=http://localhost:8000). PHP ^8.4 (composer.json:40); Node floor 24 from CI matrix (24, 26), no engines field. .gitmodules lists public/Lychee-front but there is no gitlink, so no submodule step. Contribute.md also lists many PHP extensions (imagick, exif, gd, bcmath, intl, redis...)."
+}

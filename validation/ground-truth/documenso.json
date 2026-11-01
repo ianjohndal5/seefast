@@ -1,0 +1,38 @@
+{
+  "id": "documenso",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "AGENTS.md",
+    "apps/docs/content/docs/developers/local-development/quickstart.mdx",
+    "apps/docs/content/docs/developers/local-development/manual.mdx",
+    "package.json",
+    "turbo.json",
+    ".env.example",
+    "docker/development/compose.yml",
+    "packages/prisma/package.json",
+    "apps/remix/package.json",
+    ".github/actions/node-install/action.yml",
+    ".github/workflows/ci.yml",
+    ".github/workflows/e2e-tests.yml",
+    ".gitpod.yml",
+    ".devcontainer/on-create.sh"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["turborepo"], "packageManagers": ["npm"] },
+    { "root": "apps/remix", "stack": ["react-router", "hono", "prisma"], "packageManagers": ["npm"] }
+  ],
+  "runtimes": { "node": "24" },
+  "services": ["postgres", "mailpit"],
+  "steps": [
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:128 (cp .env.example .env); quickstart.mdx:39-46; .github/workflows/e2e-tests.yml:20-21" },
+    { "kind": "script:dx", "source": "docs", "evidence": "README.md:130-132 (npm run dx); package.json:25 dx = npm ci && npm run dx:up && npm run prisma:migrate-dev && npm run prisma:seed" }
+  ],
+  "optionalSteps": [
+    { "kind": "manual:signing-certificate", "source": "docs", "evidence": "manual.mdx:201-205 (optional); in development packages/signing/transports/local.ts falls back to ./example/cert.p12" },
+    { "kind": "other:background-jobs-provider", "source": "docs", "evidence": "manual.mdx:176-183 (default local job provider lacks scheduled jobs; inngest/bullmq optional)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "npm run dev", "port": 3000 }],
+  "readmeCommands": ["cp .env.example .env", "npm run dx", "npm run dev"],
+  "notes": "Package manager npm (package-lock.json, packageManager npm@11.19.1, engines npm >=11.17.0; CI: corepack enable npm + npm ci). Node: engines >=24.0.0, README 'v24 or above', CI v24.x. 'npm run dx' works on a fresh clone (pure shell script) and does: npm ci (install:npm), docker compose -f docker/development/compose.yml up -d (compose-up), prisma migrate dev via dotenv (prisma:migrate; also generates the client), prisma db seed. So the decomposed sequence is env-copy, install:npm, compose-up, prisma:migrate, seed. .env must exist before dx because prisma scripts load it via 'with:env' (dotenv -e .env -e .env.local); .env.example defaults (DB on 127.0.0.1:54320, NEXTAUTH_SECRET='secret', encryption keys, SMTP to inbucket) work without edits. 'npm run dev' compiles lingui translations then turbo dev for @documenso/remix on http://localhost:3000. 'npm run d' (README.md:136-140) = dx + translate:compile + dev in one go. README.md:132 says dx starts postgres and inbucket; the compose file also starts redis (only for the optional BullMQ jobs provider) and gotenberg (only for optional DOCX conversion, NEXT_PRIVATE_DOCUMENT_CONVERSION_URL is commented out), so they are not listed as required services. Inbucket (mail catcher, UI :9000, SMTP :2500) is recorded as mailpit. A docs 'Manual Setup' path (manual.mdx) uses npm i, your own Postgres, cp .env.example .env, npm run prisma:migrate-dev, npm run dev. readmeCommands omit the 'git clone' line (fresh clone assumed) and the alternative 'npm run d'."
+}

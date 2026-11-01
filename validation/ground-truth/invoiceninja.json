@@ -1,0 +1,39 @@
+{
+  "id": "invoiceninja",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    ".github/workflows/phpunit.yml",
+    "composer.json",
+    "package.json",
+    ".env.example",
+    ".gitignore",
+    "app/Http/Controllers/SetupController.php",
+    "routes/web.php"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "vite"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.2" },
+  "services": ["mysql"],
+  "steps": [
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:70 (cp .env.example .env)" },
+    { "kind": "install:composer", "source": "docs", "evidence": "README.md:71 / :146-158 (developers should run 'composer i -o' instead of 'composer i -o --no-dev')" },
+    { "kind": "manual:create-database", "source": "convention", "evidence": "Not in README; .env.example:12-19 expects MySQL database 'ninja' with user ninja/ninja, and the /setup wizard checks and connects to an existing database (SetupController.php:190-194 checkDB, :135-160 doSetup)" },
+    { "kind": "manual:web-setup-wizard", "source": "docs", "evidence": "README.md:91 (open http://localhost:8000/setup when no sample data was loaded); the wizard writes DB/mail settings to .env and runs key:generate, migrate, db:seed and creates the first account (SetupController.php:158-166). Done in the browser after 'php artisan serve'." }
+  ],
+  "optionalSteps": [
+    { "kind": "env-manual", "source": "docs", "evidence": "README.md:79 ('remember to configure .env' before loading sample data)" },
+    { "kind": "artisan:migrate:fresh", "source": "docs", "evidence": "README.md:81 (php artisan migrate:fresh --seed)" },
+    { "kind": "artisan:db:seed", "source": "docs", "evidence": "README.md:81" },
+    { "kind": "artisan:ninja:create-test-data", "source": "docs", "evidence": "README.md:81 (sample data; enables small@example.com / password login, README.md:94-95)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "php artisan serve", "port": 8000 }],
+  "readmeCommands": [
+    "cp .env.example .env",
+    "composer i -o",
+    "php artisan migrate:fresh --seed && php artisan db:seed && php artisan ninja:create-test-data",
+    "php artisan serve"
+  ],
+  "notes": "README's 'Quick Hosting Setup' block literally says 'composer i -o --no-dev'; its 'Developer environment' section (README.md:144-158) says developers should use 'composer i -o', which is what readmeCommands records. The git clone line (pinned to tag v5.11.53, older than VERSION.txt 5.13.49) is omitted. The sample-data command is optional (README.md:79) and the alternative to the /setup wizard; either path creates the schema. .env.example already contains a fixed APP_KEY, so key:generate is not required up front (the wizard regenerates it; CI runs it). Compiled assets are committed (public/build, Flutter main.dart.js), so no npm build is required; package.json (Vite/Tailwind) and playwright are only for rebuilding assets / e2e tests. CI (phpunit.yml) differs from local: cp .env.ci .env, composer install, key:generate, config:clear, ninja:post-update, optimize, migrate, db:seed, against MariaDB 10.6 + Redis with redis cache/queue/session; .env.example uses file/sync drivers so Redis is not needed locally. PHP floor 8.2 (composer.json require and config.platform, CI matrix 8.2-8.5). The official developer guide and self-host guide are external (invoiceninja.github.io, not read)."
+}

@@ -1,0 +1,22 @@
+{
+  "id": "precedent",
+  "sources": ["README.md", "package.json", "pnpm-lock.yaml", ".env.example", "app/layout.tsx"],
+  "projects": [
+    { "root": ".", "stack": ["nextjs"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": {},
+  "services": [],
+  "steps": [
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:43-49 (npm/yarn/pnpm offered); package.json:52 packageManager pnpm@9.3.0" },
+    { "kind": "env-copy", "source": "docs", "evidence": ".env.example:1-4 (create a Clerk app for these keys); app/layout.tsx:23 wraps everything in ClerkProvider" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "pnpm dev", "port": 3000 }],
+  "readmeCommands": [
+    "npx create-next-app precedent --example \"https://github.com/steven-tey/precedent\"",
+    "npm i",
+    "yarn",
+    "pnpm i"
+  ],
+  "notes": "The README lists `npm i`, `yarn` and `pnpm i` as interchangeable alternatives, but the repo uses pnpm (packageManager pnpm@9.3.0, pnpm-lock.yaml v9, no other lockfile). The README's only setup route is `npx create-next-app --example`, which a fresh clone skips. It has no env or run instructions; the Clerk keys appear only in the Vercel deploy button. NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY must hold real values from a Clerk application: @clerk/nextjs 5.6.2 (lockfile) has no keyless mode, so ClerkProvider fails at render without a publishable key. Either .env or .env.local works. The dev command comes from package.json (the README never names it). app/middleware.ts sits inside app/, so Next ignores it (harmless for startup). No Node version is stated and there is no CI."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "umami",
+  "sources": ["README.md", "CONTRIBUTING.md", "package.json", "pnpm-workspace.yaml", ".github/workflows/ci.yml", "docker-compose.yml", "Dockerfile", "prisma/schema.prisma", "prisma.config.ts", "scripts/check-env.js", "scripts/check-db.js", "podman/env.sample", "packages/mcp/package.json"],
+  "projects": [
+    { "root": ".", "stack": ["nextjs", "prisma"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": { "node": "20", "pnpm": "12.3.4" },
+  "services": ["postgres"],
+  "steps": [
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:38; .github/workflows/ci.yml:30" },
+    { "kind": "env-manual", "source": "docs", "evidence": "README.md:43-47 (create .env with DATABASE_URL; no root template)" },
+    { "kind": "prisma:generate", "source": "docs", "evidence": "README.md:69 (pnpm run build -> build:db -> prisma generate into gitignored src/generated/prisma)" },
+    { "kind": "prisma:migrate", "source": "docs", "evidence": "README.md:72 (build's check:db runs prisma migrate deploy, scripts/check-db.js:99-110; also pnpm db:migrate)" }
+  ],
+  "optionalSteps": [
+    { "kind": "workspace-build", "source": "ci", "evidence": ".github/workflows/ci.yml:34 (pnpm build:packages; only the /mcp route imports @umami/api-client and @umami/mcp dist, and MCP is off by default, README.md:57)" },
+    { "kind": "script:build:tracker", "source": "docs", "evidence": "README.md:69 via package.json build (public/script.js tracker, needed only to collect data)" },
+    { "kind": "script:build:geo", "source": "docs", "evidence": "README.md:69 via package.json build (downloads the GeoIP database into /geo)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "pnpm dev", "port": 3000 }],
+  "readmeCommands": [
+    "git clone https://github.com/umami-software/umami.git",
+    "cd umami",
+    "pnpm install",
+    "pnpm run build",
+    "pnpm run start"
+  ],
+  "notes": "pnpm everywhere: README, CI (pnpm/action-setup 12.3.4), pnpm-lock.yaml, pnpm-workspace.yaml (packages/api-client, packages/mcp). package.json engines.pnpm is pinned to exactly 12.3.4, and pnpm refuses to install with any other version. The README only documents a production-style install (pnpm run build, then pnpm run start). The build runs check:env, prisma generate, check:db (connects to the DB and applies migrations, which create the admin/umami login), tracker/recorder/geo/openapi builds, workspace packages and next build. For development, `pnpm dev` (dotenv next dev --turbo) is in package.json but not in any doc. It needs at least the generated Prisma client and a migrated DB, so in practice run `pnpm run build` once, or `pnpm build:db && pnpm db:migrate`. Node: the README says 18.18+, but packages/mcp engines require >=20, CI and the Dockerfile use 22, and Next 16 needs >=20.9, so the README is stale. Postgres version: the README says v12.14+, check-db.js enforces >=9.4, docker-compose uses postgres:15. The root docker-compose.yml runs the published image plus Postgres (a deployment setup, not dev). APP_SECRET is recommended (falls back to a hash of DATABASE_URL). REDIS_URL/CLICKHOUSE_URL are only needed for cloud mode."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "solidtime",
+  "sources": ["README.md", "CONTRIBUTING.md", "docker-compose.yml", ".env.example", ".env.ci", "composer.json", "package.json", "vite.config.js", "docker/local/8.3/Dockerfile", ".github/workflows/phpunit.yml", ".github/workflows/playwright.yml"],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "vue"], "packageManagers": ["composer", "npm"] }
+  ],
+  "runtimes": { "php": "8.3", "node": "20" },
+  "services": ["postgres", "mailpit", "minio", "gotenberg"],
+  "steps": [
+    { "kind": "install:composer", "source": "ci", "evidence": ".github/workflows/phpunit.yml:49; needed before ./vendor/bin/sail exists" },
+    { "kind": "env-copy", "source": "ci", "evidence": ".github/workflows/playwright.yml:57 copies .env.ci; for the local Docker stack the template is .env.example (DB_HOST=pgsql, NGINX_HOST_NAME, NETWORK_NAME)" },
+    { "kind": "manual:traefik-reverse-proxy", "source": "convention", "evidence": "docker-compose.yml:197-200 needs an external network named by NETWORK_NAME (.env.example:86), and the app container publishes no ports, so it is only reachable through a Traefik proxy at solidtime.test / vite.solidtime.test / storage.solidtime.test" },
+    { "kind": "compose-up", "source": "convention", "evidence": "docker-compose.yml (Laravel Sail: laravel.test, pgsql, mailpit, minio, gotenberg); laravel/sail in composer.json:49" },
+    { "kind": "artisan:passport:keys", "source": "ci", "evidence": ".github/workflows/playwright.yml:59; phpunit.yml:65" },
+    { "kind": "artisan:migrate", "source": "ci", "evidence": ".github/workflows/playwright.yml:60 (migrate --seed)" },
+    { "kind": "install:npm", "source": "ci", "evidence": ".github/workflows/playwright.yml:63 (npm ci)" },
+    { "kind": "build-assets", "source": "ci", "evidence": ".github/workflows/playwright.yml:66; phpunit.yml:59" }
+  ],
+  "optionalSteps": [
+    { "kind": "artisan:db:seed", "source": "ci", "evidence": ".github/workflows/playwright.yml:60 (migrate --seed): demo users and the Passport clients whose IDs match PASSPORT_PERSONAL_ACCESS_CLIENT_ID in .env.example" },
+    { "kind": "artisan:key:generate", "source": "ci", "evidence": ".github/workflows/playwright.yml:58; only needed with .env.ci (empty key). .env.example:4 already ships an APP_KEY" }
+  ],
+  "dev": [
+    { "cwd": ".", "command": "./vendor/bin/sail up -d" },
+    { "cwd": ".", "command": "./vendor/bin/sail npm run dev", "port": 5173 }
+  ],
+  "readmeCommands": [],
+  "notes": "There are no local-development docs in the repo. The README only links to self-hosting guides on docs.solidtime.io (not readable here), and CONTRIBUTING only covers lint commands. These steps are reconstructed from docker-compose.yml, .env.example and CI. Steps marked convention come from the compose/Sail configuration rather than prose docs. The compose stack relies on an external Traefik reverse proxy: an external Docker network named reverse-proxy-docker-traefik_routing, a proxy at REVERSE_PROXY_IP 10.100.100.10, and hosts entries for solidtime.test, vite.solidtime.test and storage.solidtime.test. Nothing in the repo explains how to set this up. Inside the container the app runs `artisan serve` on port 80 and is reached at APP_URL https://solidtime.test, so no host port is given. CI runs on the host instead: PHP 8.3, Node 20, Postgres on 127.0.0.1 via .env.ci, with Octane/FrankenPHP serving on port 8000. composer.json pins PHP to 8.3.*. minio (S3 disk) and gotenberg (PDF) are part of the dev stack but probably not needed for the first page to load. Running `npm run dev` makes the build step unnecessary. Whether passport:keys is strictly required for the first page load is unverified; both CI workflows run it."
+}

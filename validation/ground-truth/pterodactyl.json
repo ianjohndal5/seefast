@@ -1,0 +1,48 @@
+{
+  "id": "pterodactyl",
+  "sources": [
+    "README.md",
+    "BUILDING.md",
+    "CONTRIBUTING.md",
+    ".github/workflows/ci.yaml",
+    ".github/workflows/build.yaml",
+    ".github/docker/README.md",
+    ".github/docker/entrypoint.sh",
+    "Dockerfile",
+    "composer.json",
+    "package.json",
+    "yarn.lock",
+    ".env.example",
+    ".env.ci",
+    ".gitignore",
+    "config/queue.php",
+    "flake.nix",
+    "shell.nix"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "react"], "packageManagers": ["composer", "yarn"] }
+  ],
+  "runtimes": { "php": "8.2", "node": "22" },
+  "services": ["mysql", "redis"],
+  "steps": [
+    { "kind": "install:composer", "source": "ci", "evidence": ".github/workflows/ci.yaml:51 (composer install)" },
+    { "kind": "env-copy", "source": "ci", "evidence": ".github/workflows/ci.yaml:50 copies .env.ci (test config); for a dev instance the template is .env.example (also copied in Dockerfile:21)" },
+    { "kind": "env-manual", "source": "convention", "evidence": ".env.example:6,15-19 (APP_URL=http://panel.example.com, DB_PASSWORD blank for user 'pterodactyl'); must match the local DB. The external install docs do this via php artisan p:environment:setup / p:environment:database" },
+    { "kind": "artisan:key:generate", "source": "convention", "evidence": "APP_KEY empty in .env.example:3; the Docker entrypoint generates one (.github/docker/entrypoint.sh:18-23)" },
+    { "kind": "manual:create-database", "source": "convention", "evidence": ".env.example:17-18 (database 'panel', user 'pterodactyl'); MySQL/MariaDB only (ext-pdo_mysql in composer.json, CI matrix mariadb 10/11, mysql 8/9)" },
+    { "kind": "artisan:migrate", "source": "convention", "evidence": ".github/docker/entrypoint.sh:92 (php artisan migrate --seed --force)" },
+    { "kind": "install:yarn", "source": "docs", "evidence": "BUILDING.md:14 (yarn install); CI build.yaml:29 (yarn install --frozen-lockfile)" },
+    { "kind": "build-assets", "source": "docs", "evidence": "BUILDING.md:17-24 (yarn run build; without it the Panel returns a 500 about missing manifest.json; public/assets/manifest.json is gitignored)" },
+    { "kind": "artisan:p:user:make", "source": "docs", "evidence": ".github/docker/README.md:17-24 ('After the startup is complete you'll need to create a user'; no self-registration)" }
+  ],
+  "optionalSteps": [
+    { "kind": "artisan:db:seed", "source": "convention", "evidence": ".github/docker/entrypoint.sh:92 runs migrate with --seed (nests/eggs; needed to create game servers, not to start the panel)" },
+    { "kind": "artisan:p:environment:setup", "source": "convention", "evidence": "app/Console/Commands/Environment/AppSettingsCommand.php (sets HASHIDS_SALT, APP_URL, cache/session/queue drivers)" }
+  ],
+  "dev": [
+    { "cwd": ".", "command": "php artisan serve", "port": 8000 },
+    { "cwd": ".", "command": "yarn run watch" }
+  ],
+  "readmeCommands": [],
+  "notes": "The README has no setup commands; it links to external docs (pterodactyl.io panel getting_started, not read) and to the separate pterodactyl/development environment that BUILDING.md 'highly recommends'. In-repo docs cover only frontend assets (BUILDING.md); the PHP-side steps come from CI, the production Docker entrypoint/README and Laravel conventions, so most are tagged convention. No in-repo doc names a PHP dev server: 'php artisan serve' is the Laravel default, while production uses nginx/php-fpm. Redis: .env.example sets QUEUE_CONNECTION=redis (config/queue.php default is redis) and .github/docker/README.md calls a cache 'required'; switching QUEUE_CONNECTION to sync would avoid it. Node version disagreement: BUILDING.md says Node v14 + Yarn 1 (stale), flake.nix/shell.nix use nodejs_18, package.json engines '>=22' and CI/Dockerfile use Node 22. BUILDING.md also lists Go 1.17, but only for Wings (a separate repo), so it is omitted. The yarn serve (HMR) script is hard-wired to https://pterodactyl.test:5173 and local certs, so 'yarn run watch' is the practical dev command. This checkout is the 1.0-develop branch; README says v2 development happens on 2.0-develop."
+}

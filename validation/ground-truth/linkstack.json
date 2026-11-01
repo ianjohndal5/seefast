@@ -1,0 +1,35 @@
+{
+  "id": "linkstack",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "composer.json",
+    "composer.lock",
+    ".env",
+    ".env.example",
+    "INSTALLING",
+    "index.php",
+    "server.php",
+    "bootstrap/app.php",
+    "routes/web.php",
+    "config/database.php",
+    "database/database.sqlite",
+    ".github/workflows/release.yml"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["laravel", "livewire"], "packageManagers": ["composer"] }
+  ],
+  "runtimes": { "php": "8.0" },
+  "services": [],
+  "steps": [
+    { "kind": "install:composer", "source": "docs", "evidence": "CONTRIBUTING.md:29 (`composer update -vvv`, not composer install)" },
+    { "kind": "artisan:key:generate", "source": "convention", "evidence": "committed .env:33 has APP_KEY empty; routes/web.php:26-28 only auto-generates it when storage/app/ISINSTALLED exists, which a fresh clone lacks" },
+    { "kind": "artisan:migrate", "source": "docs", "evidence": "CONTRIBUTING.md:31; release.yml:64" },
+    { "kind": "artisan:db:seed", "source": "docs", "evidence": "CONTRIBUTING.md:32-35 (db:seed, then --class AdminSeeder, PageSeeder, ButtonSeeder); release.yml:65-67" },
+    { "kind": "manual:web-server", "source": "docs", "evidence": "CONTRIBUTING.md:37 (move the folder into a local web server; the repo root is the docroot)" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "php artisan serve", "port": 8000 }],
+  "readmeCommands": [],
+  "notes": "README only covers installing a release zip (no commands) and a separate Docker section (`docker pull linkstackorg/linkstack`); the from-source dev steps are in CONTRIBUTING.md. The repo commits a ready .env (DB_CONNECTION=sqlite, empty APP_KEY), an empty database/database.sqlite and an INSTALLING marker (which routes to the web setup wizard), so no env-copy step and no DB service; .env.example (MySQL) is a stale Laravel default and copying it would break the SQLite setup. APP_KEY generation is not documented for source checkouts; the release workflow touches storage/app/ISINSTALLED so routes/web.php generates the key there. CONTRIBUTING uses `composer update -vvv` (re-resolves); composer.lock as committed needs PHP >=8.2 (Symfony 7.4 packages) while composer.json says >=8.0 and release CI uses PHP 8.0 with composer update. Seeded admin: admin@admin.com / 12345678. Docs say to serve via a local web server (Apache etc.; index.php is at the repo root and bootstrap/app.php binds public path to the root); `php artisan serve` is inferred, not documented. package.json/laravel-mix exist but no view uses mix() and assets are committed under assets/, so no npm step."
+}

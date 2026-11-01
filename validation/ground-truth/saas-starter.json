@@ -1,0 +1,32 @@
+{
+  "id": "saas-starter",
+  "sources": ["README.md", "package.json", "pnpm-lock.yaml", ".env.example", "lib/db/setup.ts", "lib/db/drizzle.ts", "drizzle.config.ts"],
+  "projects": [
+    { "root": ".", "stack": ["nextjs", "drizzle"], "packageManagers": ["pnpm"] }
+  ],
+  "runtimes": {},
+  "services": ["postgres"],
+  "steps": [
+    { "kind": "install:pnpm", "source": "docs", "evidence": "README.md:32" },
+    { "kind": "manual:stripe-cli-login", "source": "docs", "evidence": "README.md:37-41; lib/db/setup.ts:25-77 exits if the Stripe CLI is missing or not logged in" },
+    { "kind": "script:db:setup", "source": "docs", "evidence": "README.md:46; lib/db/setup.ts writes .env and, for the local option, docker-compose.yml + docker compose up -d" },
+    { "kind": "db:migrate", "source": "docs", "evidence": "README.md:52 (pnpm db:migrate = drizzle-kit migrate)" },
+    { "kind": "script:db:seed", "source": "docs", "evidence": "README.md:53" }
+  ],
+  "optionalSteps": [
+    { "kind": "other:stripe-listen", "source": "docs", "evidence": "README.md:71-75 (forward Stripe webhooks to localhost:3000/api/stripe/webhook)" }
+  ],
+  "dev": [{ "cwd": ".", "command": "pnpm dev", "port": 3000 }],
+  "readmeCommands": [
+    "git clone https://github.com/nextjs/saas-starter",
+    "cd saas-starter",
+    "pnpm install",
+    "stripe login",
+    "pnpm db:setup",
+    "pnpm db:migrate",
+    "pnpm db:seed",
+    "pnpm dev",
+    "stripe listen --forward-to localhost:3000/api/stripe/webhook"
+  ],
+  "notes": "pnpm per README and pnpm-lock.yaml (lockfile v9); there is no packageManager field and no CI. The env file is created by the interactive `pnpm db:setup` script, not by copying: it asks Local (Docker) vs Remote Postgres, generates docker-compose.yml (postgres:16.4 on port 54322) and runs `docker compose up -d` for the local option (no compose file is committed), prompts for STRIPE_SECRET_KEY, gets STRIPE_WEBHOOK_SECRET via `stripe listen --print-secret`, and writes POSTGRES_URL, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, BASE_URL, AUTH_SECRET to .env. The alternative is to copy .env.example to .env (it must be .env, not .env.local) and fill in those values by hand. Seeding calls the Stripe API to create products/prices and creates test@test.com/admin123. The README lists it in the main sequence, but the app starts without it (users can sign up, pricing has fallbacks); only checkout needs the seeded prices. No Node version is stated (Next 15.6 canary)."
+}

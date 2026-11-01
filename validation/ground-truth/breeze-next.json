@@ -1,0 +1,28 @@
+{
+  "id": "breeze-next",
+  "sources": ["README.md", "package.json", "package-lock.json", ".env.example", ".github/workflows/pull-requests.yml"],
+  "projects": [
+    { "root": ".", "stack": ["nextjs"], "packageManagers": ["npm"] }
+  ],
+  "runtimes": {},
+  "services": [],
+  "steps": [
+    { "kind": "manual:laravel-backend", "source": "docs", "evidence": "README.md:11-35 (separate Laravel app with Breeze API scaffolding, migrated and served on :8000 with APP_URL/FRONTEND_URL set)" },
+    { "kind": "install:npm", "source": "docs", "evidence": "README.md:37; package-lock.json" },
+    { "kind": "env-copy", "source": "docs", "evidence": "README.md:37-41 (.env.example -> .env.local, NEXT_PUBLIC_BACKEND_URL)" }
+  ],
+  "optionalSteps": [],
+  "dev": [{ "cwd": ".", "command": "npm run dev", "port": 3000 }],
+  "readmeCommands": [
+    "laravel new next-backend",
+    "cd next-backend",
+    "composer require laravel/breeze --dev",
+    "php artisan breeze:install api",
+    "php artisan migrate",
+    "php artisan serve",
+    "yarn install",
+    "npm install",
+    "npm run dev"
+  ],
+  "notes": "The README says `yarn install` or `npm install`. Only package-lock.json (lockfile v2) is committed, so npm is the actual package manager. The frontend needs a separately created Laravel Breeze API backend (PHP, Composer and a database, per Laravel's defaults) running at http://localhost:8000. That backend lives outside this repo, so it is recorded as a manual step rather than a service. The Next dev server itself starts without it, but every auth/API call fails. The .env.example default (NEXT_PUBLIC_BACKEND_URL=http://localhost:8000) can be copied unchanged. `yarn install`/`npm install` and the .env copy are written inline or in prose in the README, not in code blocks. The workflows only automate Dependabot, issues and PRs; there is no build/test CI. No Node version is stated."
+}

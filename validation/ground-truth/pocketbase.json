@@ -1,0 +1,33 @@
+{
+  "id": "pocketbase",
+  "sources": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "Makefile",
+    "go.mod",
+    ".github/workflows/release.yaml",
+    "examples/base/main.go",
+    "ui/README.md",
+    "ui/package.json",
+    "ui/embed.go"
+  ],
+  "projects": [
+    { "root": ".", "stack": ["go"], "packageManagers": ["go"] },
+    { "root": "ui", "stack": ["vite"], "packageManagers": ["npm"] }
+  ],
+  "runtimes": { "go": "1.27", "node": "24" },
+  "services": [],
+  "steps": [
+    { "kind": "install:go", "source": "docs", "evidence": "CONTRIBUTING.md:37-38 (in examples/base, 'go run main.go serve' fetches modules and compiles); README.md:99-104 (cd examples/base, CGO_ENABLED=0 go build, ./base serve)" }
+  ],
+  "optionalSteps": [
+    { "kind": "install:npm", "source": "docs", "evidence": "CONTRIBUTING.md:69-70 (npm install in ui/, only for changing the Superuser UI)" },
+    { "kind": "build-assets", "source": "docs", "evidence": "CONTRIBUTING.md:85 (npm run build in ui/ after UI changes so ui/dist is re-embedded); CI release.yaml:37" }
+  ],
+  "dev": [
+    { "cwd": "examples/base", "command": "go run main.go serve", "port": 8090 },
+    { "cwd": "ui", "command": "npm run dev", "port": 5173 }
+  ],
+  "readmeCommands": ["CGO_ENABLED=0 go build", "./base serve"],
+  "notes": "Contributor workflow (CONTRIBUTING.md:29-40): cd examples/base && go run main.go serve, which serves on http://localhost:8090 with the prebuilt Superuser UI embedded from the committed ui/dist. SQLite is embedded, so no services and no env file are needed. No separate dependency step is documented; module download happens inside go run / go build (recorded as install:go). The second dev entry (Vite UI dev server on :5173, which expects the backend at :8090 unless PB_BACKEND_URL is set in ui/.env.development.local, CONTRIBUTING.md:78-81) is only needed for Superuser UI work and requires 'npm install' in ui/ first. readmeCommands come from README 'Building and running the repo main.go example' and must run inside examples/base (README says 'Navigate to examples/base' in prose); the 'Use as a Go framework' section (go mod init myapp, go run main.go serve) is for a new project, not this repo, and is excluded. Versions: Go 1.27 (go.mod directive, README, CONTRIBUTING); Node 24+ per CONTRIBUTING.md:17, while CI asks for >=25.2.1 and Go >=1.27.3. CONTRIBUTING calls the UI 'Svelte and Vite', but ui/README.md and package.json show Shablon + Vite (no Svelte). README.md:1 says the repo has moved to ganigeorgiev.com/pocketbase/pocketbase, and PRs are restricted to collaborators."
+}

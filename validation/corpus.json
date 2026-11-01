@@ -1,0 +1,173 @@
+{
+  "about": "Validation corpus: public repositories across the supported ecosystems, including popular Laravel and Next.js apps, monorepos, and repos only generic support covers. Cloned with --depth 1 into validation/repos/ (not committed); commits are recorded in validation/commits.json. Repos marked heldOut were added after the first scoring run, had their ground truth written before any tool change, and are scored once, after the changes, to check that improvements generalize.",
+  "repos": [
+    {
+      "id": "laravel",
+      "url": "https://github.com/laravel/laravel",
+      "group": "laravel"
+    },
+    {
+      "id": "koel",
+      "url": "https://github.com/koel/koel",
+      "group": "laravel"
+    },
+    {
+      "id": "solidtime",
+      "url": "https://github.com/solidtime-io/solidtime",
+      "group": "laravel"
+    },
+    {
+      "id": "bookstack",
+      "url": "https://github.com/BookStackApp/BookStack",
+      "group": "laravel"
+    },
+    {
+      "id": "firefly-iii",
+      "url": "https://github.com/firefly-iii/firefly-iii",
+      "group": "laravel"
+    },
+    {
+      "id": "monica",
+      "url": "https://github.com/monicahq/monica",
+      "group": "laravel"
+    },
+    {
+      "id": "pixelfed",
+      "url": "https://github.com/pixelfed/pixelfed",
+      "group": "laravel"
+    },
+    {
+      "id": "akaunting",
+      "url": "https://github.com/akaunting/akaunting",
+      "group": "laravel"
+    },
+    {
+      "id": "invoiceninja",
+      "url": "https://github.com/invoiceninja/invoiceninja",
+      "group": "laravel"
+    },
+    {
+      "id": "pterodactyl",
+      "url": "https://github.com/pterodactyl/panel",
+      "group": "laravel"
+    },
+    {
+      "id": "saas-starter",
+      "url": "https://github.com/nextjs/saas-starter",
+      "group": "nextjs"
+    },
+    {
+      "id": "dub",
+      "url": "https://github.com/dubinc/dub",
+      "group": "nextjs-monorepo"
+    },
+    {
+      "id": "umami",
+      "url": "https://github.com/umami-software/umami",
+      "group": "nextjs"
+    },
+    {
+      "id": "precedent",
+      "url": "https://github.com/steven-tey/precedent",
+      "group": "nextjs"
+    },
+    {
+      "id": "breeze-next",
+      "url": "https://github.com/laravel/breeze-next",
+      "group": "nextjs"
+    },
+    {
+      "id": "taxonomy",
+      "url": "https://github.com/shadcn-ui/taxonomy",
+      "group": "nextjs"
+    },
+    {
+      "id": "chatbot-ui",
+      "url": "https://github.com/mckaywrigley/chatbot-ui",
+      "group": "nextjs"
+    },
+    {
+      "id": "formbricks",
+      "url": "https://github.com/formbricks/formbricks",
+      "group": "nextjs-monorepo"
+    },
+    {
+      "id": "documenso",
+      "url": "https://github.com/documenso/documenso",
+      "group": "nextjs-monorepo"
+    },
+    {
+      "id": "calcom",
+      "url": "https://github.com/calcom/cal.com",
+      "group": "nextjs-monorepo"
+    },
+    {
+      "id": "commerce",
+      "url": "https://github.com/vercel/commerce",
+      "group": "nextjs"
+    },
+    {
+      "id": "djangoproject",
+      "url": "https://github.com/django/djangoproject.com",
+      "group": "generic"
+    },
+    {
+      "id": "pocketbase",
+      "url": "https://github.com/pocketbase/pocketbase",
+      "group": "generic"
+    },
+    {
+      "id": "zoxide",
+      "url": "https://github.com/ajeetdsouza/zoxide",
+      "group": "generic"
+    },
+    {
+      "id": "laravelio",
+      "url": "https://github.com/laravelio/laravel.io",
+      "group": "laravel",
+      "heldOut": true
+    },
+    {
+      "id": "lychee",
+      "url": "https://github.com/LycheeOrg/Lychee",
+      "group": "laravel",
+      "heldOut": true
+    },
+    {
+      "id": "filament-demo",
+      "url": "https://github.com/filamentphp/demo",
+      "group": "laravel",
+      "heldOut": true
+    },
+    {
+      "id": "linkstack",
+      "url": "https://github.com/linkstackorg/linkstack",
+      "group": "laravel",
+      "heldOut": true
+    },
+    {
+      "id": "ai-chatbot",
+      "url": "https://github.com/vercel/ai-chatbot",
+      "group": "nextjs",
+      "heldOut": true
+    },
+    {
+      "id": "next-auth-example",
+      "url": "https://github.com/nextauthjs/next-auth-example",
+      "group": "nextjs",
+      "heldOut": true
+    },
+    {
+      "id": "openstatus",
+      "url": "https://github.com/openstatusHQ/openstatus",
+      "group": "nextjs-monorepo",
+      "heldOut": true
+    },
+    {
+      "id": "fastapi-template",
+      "url": "https://github.com/fastapi/full-stack-fastapi-template",
+      "group": "generic",
+      "heldOut": true
+    }
+  ]
+}
