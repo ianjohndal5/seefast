@@ -618,7 +618,8 @@ async function viewAuto() {
   const run = runState();
   const seq = renderSeq;
   setTitle('Do it for me', `${p.meta.rootName} · nothing runs without your OK`);
-  const shown = p.steps.filter((s) => !s.optional || run.opts.includeOptional || (run.statuses[s.id] && run.statuses[s.id] !== 'skipped'));
+  // Optional steps are listed when included or once they have a result; the step being asked about always is.
+  const shown = p.steps.filter((s) => !s.optional || run.opts.includeOptional || run.consent?.step === s.id || (run.statuses[s.id] && run.statuses[s.id] !== 'skipped'));
   // Every command is on screen before anything runs (the consent prompt repeats the one about to run).
   const cmds = await Promise.all(shown.map((s) => (s.action.type === 'manual' ? s.action.text : commandFor(s.action))));
   if (seq !== renderSeq) return;
@@ -691,7 +692,8 @@ async function viewAuto() {
     const segs = h('div.segs', { 'aria-hidden': 'true' }, shown.map((s) => h('i' + (finished(s) ? '.done' : run.statuses[s.id] === 'failed' ? '.bad' : s.id === run.current ? '.now' : ''))));
     const where = run.stopping ? 'Stopping…' : run.consent ? 'Waiting for your OK' : at >= 0 ? `Step ${at + 1} of ${shown.length}` : 'Starting…';
     dock.append(h('div.runstat', { role: 'status', 'aria-label': `${where}, ${shown.filter(finished).length} of ${shown.length} steps finished` },
-      h('div.top', h('span', where), h('span.clock', { dataset: { since: String(run.startedAt) } }, clock(Date.now() - run.startedAt))), segs));
+      h('div.top', h('span', where, run.consent && !run.stopping ? h('button.linkish.show', { type: 'button', onclick: () => showAttention('smooth') }, 'Show') : null),
+        h('span.clock', { dataset: { since: String(run.startedAt) } }, clock(Date.now() - run.startedAt))), segs));
     dock.append(run.stopping
       ? h('button.btn.danger.stopping', { type: 'button', disabled: true, 'aria-live': 'polite' }, icon('spinner', 'ico spin'), 'Stopping…')
       : h('button.btn.danger', { type: 'button', onclick: stopRun }, icon('stop'), 'Stop'));
@@ -708,9 +710,18 @@ async function viewAuto() {
   // Bring the step that needs attention into view once, when it changes; otherwise leave the scroll alone.
   const focusId = run.consent?.step ?? run.current;
   if (focusId && focusId !== run.shownStep) {
-    run.shownStep = focusId;
-    requestAnimationFrame(() => (content.querySelector('.tl.current') ?? content.querySelector('.tl.running'))?.scrollIntoView({ block: 'nearest' }));
+    requestAnimationFrame(() => {
+      if (seq !== renderSeq) return; // a newer render takes over (and tries again)
+      if (showAttention()) run.shownStep = focusId;
+    });
   }
+}
+
+/** Scroll the step asking for approval (or running) into view; false when it is not on screen yet. */
+function showAttention(behavior = 'auto') {
+  const el = content.querySelector('.tl.current') ?? content.querySelector('.tl.running');
+  el?.scrollIntoView({ block: 'nearest', behavior });
+  return Boolean(el);
 }
 
 /** m:ss (or h:mm:ss) */

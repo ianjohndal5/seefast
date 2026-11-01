@@ -364,7 +364,9 @@ function registerIpc(): void {
         root: current.root, dryRun: opts.dryRun, includeOptional: opts.includeOptional, allowOutside: opts.allowOutside, approveAll: opts.approveAll,
         resume: opts.resume, only: opts.only, signal: runAbort.signal, shell: shellKind(),
         consent: (req: ConsentRequest) =>
-          new Promise<Decision>((resolve) => {
+          req.reason === 'optional' && !opts.includeOptional
+            ? Promise.resolve<Decision>('skip')
+            : new Promise<Decision>((resolve) => {
             const id = ++consentSeq;
             pendingConsent.set(id, resolve);
             send('runner', { type: 'consent', id, step: req.step.id, command: req.command, reason: req.reason });

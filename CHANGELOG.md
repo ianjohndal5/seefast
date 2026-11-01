@@ -33,7 +33,8 @@ First release.
   bottom; every command listed before automated setup starts.
 - Automated setup in the launcher shows that it is working: the running step is lit with a spinner, a moving bar, a
   clock and the latest output line; the dock shows "Step x of n", the elapsed time and one segment per step. Stop
-  turns into "Stopping…" at once, and a step ended by Stop is shown as stopped, not failed.
+  turns into "Stopping…" at once, and a step ended by Stop is shown as stopped, not failed. With "Include optional
+  extras" off, optional steps are skipped without asking, and a step waiting for approval is always on screen.
 - "What I can read" screen and `seefast support`: languages (in depth or basic), framework recipes, services and the
   files it reads, built from the analyzer's own tables and `recipes/` / `kb/` files.
 

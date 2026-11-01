@@ -226,6 +226,43 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
       await sleep(300);
       await shot('run-3-stopped');
     }
+    // Optional: SEEFAST_SMOKE_CONSENT=<folder> really runs that project's setup asking before each step (use a
+    // throwaway project you trust): answers Run to the first prompt and Skip to the rest, and checks that every wait
+    // has a visible prompt, that excluded optional steps are not asked about, and that the run finishes.
+    const consentDir = process.env.SEEFAST_SMOKE_CONSENT;
+    if (consentDir) {
+      await js(`window.__seefast.analyzeFolder(${JSON.stringify(consentDir)})`);
+      await sleep(800);
+      await js(`window.__seefast.open('auto')`);
+      await sleep(500);
+      await js(`(() => { const s = window.__seefast.state; s.run = null; window.__seefast.open('auto'); })()`);
+      await sleep(400);
+      await js(`(() => { const s = window.__seefast.state; s.run.opts.approveAll = false; s.run.opts.includeOptional = false; window.__seefast.startRun(false); })()`);
+      const asked: string[] = [];
+      let stuck = false;
+      const end = Date.now() + 30000;
+      while (Date.now() < end) {
+        const st = await js<{ running: boolean; consent: string | null; prompt: boolean }>(`(() => { const r = window.__seefast.state.run; return { running: r.running, consent: r.consent?.step ?? null, prompt: Boolean(document.querySelector('.tl.current .ask')) }; })()`);
+        if (!st.running) break;
+        if (st.consent) {
+          await sleep(300);
+          const visible = await js<boolean>(`Boolean(document.querySelector('.tl.current .ask'))`);
+          if (!visible) { stuck = true; break; }
+          if (!asked.includes(st.consent)) {
+            asked.push(st.consent);
+            if (asked.length === 1) await shot('consent-1-prompt');
+            await js(`[...document.querySelectorAll('.tl.current .ask button')].find((b) => b.textContent === '${asked.length === 1 ? 'Run' : 'Skip'}').click()`);
+          }
+        }
+        await sleep(150);
+      }
+      const final = await js<{ running: boolean; status: string | null }>(`(() => { const r = window.__seefast.state.run; return { running: r.running, status: r.result?.status ?? null }; })()`);
+      check('every "Waiting for your OK" has a visible prompt', !stuck, `asked: ${asked.join(', ')}`);
+      check('excluded optional steps are skipped without asking', !asked.some((id) => /build/.test(id)), asked.join(', '));
+      check('after Run and Skip the run finishes', !final.running && final.status !== null, JSON.stringify(final));
+      await sleep(300);
+      await shot('consent-2-finished');
+    }
     // Optional: SEEFAST_SMOKE_EXTRA=<folder> also screenshots that project's guide in both shells (layout checks).
     const extra = process.env.SEEFAST_SMOKE_EXTRA;
     if (extra) {

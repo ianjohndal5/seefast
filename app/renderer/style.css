@@ -447,3 +447,4 @@ pre.out { margin: 8px 0 0; max-height: 180px; overflow: auto; background: var(--
 .eco-tile .meta { font-size: 12px; color: var(--muted); }
 .sources strong { font: 700 12px var(--hud); text-transform: uppercase; letter-spacing: .07em; }
 .links { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; }
+.runstat .show { margin-left: 10px; color: var(--glow); font: 700 12.5px var(--hud); letter-spacing: .03em; text-decoration-color: var(--glow); }
