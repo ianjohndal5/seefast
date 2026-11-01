@@ -1,0 +1,7 @@
+# Same bytes on every OS: fixtures and expected plans are compared across Linux, macOS and Windows.
+* text=auto eol=lf
+# Fixtures that test Windows line endings and byte-order marks keep their bytes exactly.
+fixtures/crlf-bom/** -text
+*.png binary
+*.ico binary
+*.icns binary

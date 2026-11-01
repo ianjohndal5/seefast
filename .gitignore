@@ -1,0 +1,10 @@
+node_modules/
+dist/
+app/out/
+app/release/
+coverage/
+.seefast/
+validation/repos/
+validation/work/
+*.log
+app/node_modules/
