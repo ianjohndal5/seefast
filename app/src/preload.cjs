@@ -14,6 +14,7 @@ contextBridge.exposeInMainWorld('cr', {
   copy: (text) => ipcRenderer.invoke('copy', String(text)),
   doctor: () => ipcRenderer.invoke('doctor'),
   support: () => ipcRenderer.invoke('support'),
+  quickStart: (shell) => ipcRenderer.invoke('quick-start', shell),
   renderAction: (action, shell) => ipcRenderer.invoke('render-action', action, shell),
   writeSetupMd: () => ipcRenderer.invoke('write-setup-md'),
   runSetup: (opts) => ipcRenderer.invoke('run-setup', opts),

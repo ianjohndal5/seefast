@@ -278,7 +278,9 @@ async function analyzeFolder(folder) {
     say('Analysis failed: ' + r.error);
     return open('analysis');
   }
-  Object.assign(state, { plan: r.plan, root: r.root, changes: r.changes ?? null, doctor: null, error: null, run: null });
+  Object.assign(state, { plan: r.plan, root: r.root, changes: r.changes ?? null, doctor: null, error: null, run: null, qs: null });
+  const qs = await cr.quickStart(state.shell).catch(() => null);
+  if (qs) state.qs = { shell: state.shell, data: qs };
   say(`Analyzed ${r.plan.meta.rootName}: ${plural(r.plan.summary.projects, 'project')}, ${plural(r.plan.summary.steps, 'step')}.`);
   open('analysis');
 }
@@ -326,14 +328,14 @@ function render(view, opts) {
   else restore();
 }
 
-function copyButton(text, what = 'command') {
-  const b = h('button.copy', { type: 'button', 'aria-label': `Copy ${what}` }, icon('copy'), 'Copy');
+function copyButton(text, what = 'command', label = 'Copy') {
+  const b = h('button.copy', { type: 'button', 'aria-label': `Copy ${what}` }, icon('copy'), label);
   b.addEventListener('click', async () => {
     await cr.copy(text);
     b.replaceChildren(icon('check'), 'Copied');
     b.classList.add('done');
     say(`Copied ${what}`);
-    setTimeout(() => { b.replaceChildren(icon('copy'), 'Copy'); b.classList.remove('done'); }, 1400);
+    setTimeout(() => { b.replaceChildren(icon('copy'), label); b.classList.remove('done'); }, 1400);
   });
   return b;
 }
@@ -406,6 +408,11 @@ function viewAnalysis() {
     content.append(h('div.callout.info.pop', icon('refresh'), h('div', h('strong', 'Changed since last time'),
       h('details', h('summary', plural(state.changes.length, 'change')), h('ul.ev', state.changes.slice(0, 10).map((l) => h('li', h('code', l))))))));
   }
+
+  // Quick start, README style. Fetched again when the shell was switched in the guide.
+  const qs = state.qs?.shell === state.shell ? state.qs.data : null;
+  if (qs?.lines.length) content.append(section('Quick start', 'terminal', ...quickStartCard(qs)));
+  else if (!qs) loadQuickStart();
 
   // Projects
   const projs = p.projects;
@@ -539,6 +546,54 @@ async function stepCard(s, n, done, onChange) {
 function shellToggle(onChange) {
   const mk = (k, text) => h('button', { type: 'button', 'aria-pressed': String(state.shell === k), onclick: () => { state.shell = k; onChange(); } }, text);
   return h('div.seg', { role: 'group', 'aria-label': 'Command shell' }, mk('posix', 'Mac / Linux'), mk('powershell', 'PowerShell'));
+}
+
+// Quick start: `cd`, installs, start, built by the library from the plan. Required steps it leaves out are counted
+// in a "more steps first" line; "Copy all" only appears when nothing was left out and one terminal is enough.
+async function loadQuickStart() {
+  const { plan, shell } = state;
+  const data = await cr.quickStart(shell).catch(() => null);
+  if (!data || state.plan !== plan || state.shell !== shell) return;
+  state.qs = { shell, data };
+  if (state.view === 'analysis') render('analysis');
+}
+
+function quickStartCard(qs) {
+  const bar = h('div.qbar', h('span.dots', { 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
+    h('span.qname', state.shell === 'powershell' ? 'PowerShell' : 'Terminal'),
+    qs.text ? copyButton(qs.text, 'all quick start commands', 'Copy all') : null);
+  const lines = h('div.qlines');
+  for (const l of qs.lines) {
+    if (l.kind === 'more-steps') {
+      lines.append(h('div.qgap', h('span.qdots', { 'aria-hidden': 'true' }, '⋯'),
+        h('span', h('strong', `${plural(l.count, 'more step')} first`), l.what.length ? `: ${l.what.join(', ')}` : ''),
+        h('button.linkish', { type: 'button', onclick: () => open('manual') }, 'Guide me')));
+    } else if (l.kind === 'terminal') {
+      lines.append(h('div.qterm', l.n === 2 ? 'In a second terminal' : `In terminal ${l.n}`));
+    } else {
+      lines.append(h(`div.ql.is-${l.kind}`, l.title ? { title: l.title } : {},
+        h('code', l.text),
+        l.kind === 'start' && l.port ? h('span.port', { title: l.portConfidence === 'high' ? 'Where it serves' : 'Where it probably serves' }, `localhost:${l.port}`) : null,
+        l.confidence ? confTag(l.confidence) : null,
+        lineCopy(l.text)));
+    }
+  }
+  const out = [h('div.qs', { role: 'group', 'aria-label': 'Quick start commands' }, bar, lines)];
+  if (qs.noStart) out.push(h('div.note', 'No start command found in the scripts, task files or docs.'));
+  else if (qs.moreTargets) out.push(h('div.note', `${plural(qs.moreTargets, 'more start command')} in `, h('button.linkish', { type: 'button', onclick: () => open('manual') }, 'Guide me'), '.'));
+  return out;
+}
+
+function lineCopy(text) {
+  const b = h('button.lcopy', { type: 'button', title: 'Copy', 'aria-label': `Copy: ${text}` }, icon('copy'));
+  b.addEventListener('click', async () => {
+    await cr.copy(text);
+    b.replaceChildren(icon('check'));
+    b.classList.add('done');
+    say('Copied ' + text);
+    setTimeout(() => { b.replaceChildren(icon('copy')); b.classList.remove('done'); }, 1400);
+  });
+  return b;
 }
 
 async function viewGuide() {

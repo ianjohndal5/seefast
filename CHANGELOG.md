@@ -38,6 +38,10 @@ First release.
 - A project without an env template no longer gets only a "create .env by hand" step: the `env-names` action creates
   the file with the variable names the code reads, commented out, and no values (never overwriting an existing one).
   The launcher asks "Create it for me" or "I'll do it myself"; the guide and SETUP.md show the command.
+- Quick start on the launcher's overview, README style: `cd` into the folder, the installs, the start command and
+  where it serves. Every required step it leaves out is counted in a "N more steps first" line (env files, services,
+  database...), a second start command appears only when it belongs with the first (a frontend and its API), and
+  "Copy all" is offered only when the block is complete and fits one terminal. Built by `quickStart()` from the plan.
 - "What I can read" screen and `seefast support`: languages (in depth or basic), framework recipes, services and the
   files it reads, built from the analyzer's own tables and `recipes/` / `kb/` files.
 

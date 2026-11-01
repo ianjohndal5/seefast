@@ -140,7 +140,8 @@ from git. Nothing else is written unless you ask (`setup-md --write`). The analy
 ## The launcher
 
 A small desktop app built around a floating bubble: click it to choose a project folder (or drop a folder on it), and
-it turns into a panel with the analysis, the manual guide (a copy button per command, POSIX or PowerShell), the
+it turns into a panel with the analysis (led by a README-style quick start: `cd`, install, start, with any steps it
+leaves out counted, never hidden), the manual guide (a copy button per command, POSIX or PowerShell), the
 doctor, and the consent-driven runner (each command shown before it runs, per-step status, live output, stop and
 resume, then "Start the app" with readiness). It reads the same plan as the CLI. "What I can read" (from the home
 screen, the overview or Settings) lists the languages, framework recipes and services it knows, built from the same
@@ -224,7 +225,7 @@ Also exported: `checkPlan`, `planDigest`, `renderExplain`, `renderSetupMd`, `ren
 
 ```bash
 npm ci && npm run build
-npm test                         # 160 tests: fixtures, real-world traps, guarantees, consent, doctor, geometry, parsers
+npm test                         # 174 tests: fixtures, real-world traps, guarantees, consent, doctor, geometry, parsers
 UPDATE_EXPECTED=1 npm test       # regenerate test/expected/*.json after reviewing the change
 node scripts/make-crlf-fixture.mjs
 cd app && npm run smoke          # drive the real launcher window (unset ELECTRON_RUN_AS_NODE in VS Code terminals)

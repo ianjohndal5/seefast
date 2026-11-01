@@ -2,11 +2,12 @@
 // runs in a worker thread from the same package), makes no network requests, and runs nothing without consent.
 import { app, BrowserWindow, clipboard, dialog, globalShortcut, ipcMain, Menu, nativeImage, protocol, screen, session, shell, Tray } from 'electron';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { Worker } from 'node:worker_threads';
-import { runDoctor, runSetup, startTargets, renderSetupMd, renderAction, diffPlans, defaultShell, supportCatalog, displayName, type Plan, type DoctorReport, type Decision, type ConsentRequest } from 'seefast';
+import { runDoctor, runSetup, startTargets, renderSetupMd, renderAction, diffPlans, defaultShell, supportCatalog, quickStart, displayName, type Plan, type DoctorReport, type Decision, type ConsentRequest } from 'seefast';
 import { BUBBLE, bubbleFromPanel, keepOnScreen, panelBounds, restorePosition, savePosition, union, type Anchor, type DisplayInfo, type Rect, type SavedPosition } from './geometry.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -342,6 +343,9 @@ function registerIpc(): void {
     return { ...cat, services: cat.services.map((s) => ({ ...s, title: displayName(s.name) })) };
   });
   ipcMain.handle('render-action', (_e, action, sh?: 'posix' | 'powershell') => renderAction(action, sh ?? shellKind()));
+  // The overview's Quick start: install and start commands from the plan, starting with `cd` into the folder.
+  ipcMain.handle('quick-start', (_e, sh?: 'posix' | 'powershell') =>
+    current ? quickStart(current.plan, { shell: sh ?? shellKind(), root: current.root, home: os.homedir() }) : null);
   ipcMain.handle('write-setup-md', async () => {
     if (!current) return { error: 'No project analyzed.' };
     const file = path.join(current.root, 'SETUP.md');

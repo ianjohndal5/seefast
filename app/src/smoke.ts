@@ -6,6 +6,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { smokeState } from './main.js';
 
+// The laravel-next-monorepo fixture's quick start, in order (text-transform makes the heading upper case).
+const QUICK_START = /Quick start[\s\S]*cd \S*laravel-next-monorepo\/api[\s\S]*composer install[\s\S]*\d+ more steps first[\s\S]*composer run dev[\s\S]*localhost:8000[\s\S]*second terminal[\s\S]*pnpm run dev/i;
+
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export async function runSmoke(ctx: { win: BrowserWindow; getBubble: () => { x: number; y: number }; getShape: () => string; appRoot: string; mode: 'floating' | 'window' }): Promise<void> {
@@ -85,6 +88,7 @@ export async function runSmoke(ctx: { win: BrowserWindow; getBubble: () => { x: 
     const text = await js<string>('document.body.innerText');
     check('analysis shows projects and requirements', /api/.test(text) && /You.ll need/i.test(text) && /PHP/.test(text), text.slice(0, 120).replace(/\n/g, ' | '));
     check('focus moves into the panel', (await js<string>('document.activeElement && document.activeElement.id')) === 'panel-title');
+    check('the overview has a quick start: cd, installs, the left-out steps, start', QUICK_START.test(text), text.slice(0, 400).replace(/\n/g, ' | '));
     await shot('2-analysis');
 
     await js(`window.__seefast.open('manual')`);
@@ -164,8 +168,13 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
     await js(`window.__seefast.analyzeFolder(${JSON.stringify(fixture)})`);
     check('analysis shows projects and requirements', await waitFor(async () => /You.ll need/i.test(await text())));
     check('focus moves to the panel title', (await js<string>('document.activeElement && document.activeElement.id')) === 'panel-title');
+    check('the overview has a quick start: cd, installs, the left-out steps, start', QUICK_START.test(await text()), (await text()).slice(0, 400).replace(/\n/g, ' | '));
+    check('a quick start with left-out steps offers no "Copy all"', (await js<number>(`[...document.querySelectorAll('.qs button.copy')].length`)) === 0);
     await sleep(700);
     await shot('2-analysis');
+    await js(`document.querySelector('.qs')?.scrollIntoView({ block: 'end' })`);
+    await sleep(200);
+    await shot('2-quick-start');
     await js(`window.__seefast.open('manual')`);
     await sleep(800);
     check('manual guide lists commands with copy buttons', (await js<number>(`document.querySelectorAll('button.copy').length`)) >= 8);
@@ -271,7 +280,7 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
       await sleep(300);
       await shot('consent-2-finished');
     }
-    // Optional: SEEFAST_SMOKE_EXTRA=<folder> also screenshots that project's guide in both shells (layout checks).
+    // Optional: SEEFAST_SMOKE_EXTRA=<folder> also screenshots that project's guide and overview in both shells (layout checks).
     const extra = process.env.SEEFAST_SMOKE_EXTRA;
     if (extra) {
       await js(`window.__seefast.analyzeFolder(${JSON.stringify(extra)})`);
@@ -280,6 +289,10 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
         await js(`window.__seefast.state.shell = '${sh}'; window.__seefast.open('manual')`);
         await sleep(700);
         await shot(`extra-manual-${sh}`);
+        // Back on the overview, the quick start follows the shell picked in the guide.
+        await js(`window.__seefast.open('analysis')`);
+        await sleep(700);
+        await shot(`extra-overview-${sh}`);
       }
     }
   } catch (e) {

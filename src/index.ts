@@ -9,6 +9,7 @@ export { label as displayName } from './render/text.js';
 export { renderExplain } from './render/explain.js';
 export { renderSetupMd } from './render/setupmd.js';
 export { renderAction, renderFromRoot, defaultShell, type ShellKind } from './render/shell.js';
+export { quickStart, type QuickStart, type QuickStartLine, type QuickStartOptions } from './render/quickstart.js';
 export { diffPlans } from './render/diff.js';
 export { runDoctor, type DoctorReport, type Check } from './doctor/doctor.js';
 export { PROBES } from './doctor/probes.js';
