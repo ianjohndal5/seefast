@@ -131,6 +131,10 @@
       "debian": ["sudo apt install dotnet-sdk-{v}  (Ubuntu 22.04+; on Debian add Microsoft's package repository)"], "fedora": ["sudo dnf install dotnet-sdk-{v}"], "arch": ["sudo pacman -S dotnet-sdk"],
       "macos": ["brew install --cask dotnet-sdk"], "windows": ["winget install Microsoft.DotNet.SDK.{major}"]
     },
+    "aspnetcore-runtime": {
+      "debian": ["sudo apt install aspnetcore-runtime-{v}  (Ubuntu 22.04+; on Debian add Microsoft's package repository)"], "fedora": ["sudo dnf install aspnetcore-runtime-{v}"],
+      "windows": ["winget install Microsoft.DotNet.SDK.{major}"], "any": ["Install the .NET {major} SDK or ASP.NET Core runtime: https://dotnet.microsoft.com/download/dotnet/{v}"]
+    },
     "deno": { "any": ["See deno.com for the installer"], "macos": ["brew install deno"], "arch": ["sudo pacman -S deno"], "windows": ["winget install DenoLand.Deno"] },
     "elixir": { "debian": ["sudo apt install elixir"], "fedora": ["sudo dnf install elixir"], "arch": ["sudo pacman -S elixir"], "macos": ["brew install elixir"], "windows": ["See elixir-lang.org/install.html"] }
   },

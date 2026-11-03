@@ -191,7 +191,19 @@ function dotnet(ctx: Ctx, p: ProjectDraft): void {
   }
   step(ctx, p, 'install', 'install', 'Restore .NET packages', { type: 'exec', argv: ['dotnet', 'restore'] }, `${file.split('/').pop()} defines the project.`, file, { network: true, requires: ['runtime:dotnet'], confidence: 'medium' });
   const web = projFiles.find((f) => /proj$/.test(f) && /Microsoft\.NET\.Sdk\.Web/.test(ctx.files.readText(f) ?? ''));
-  if (web) run(ctx, p, 'run', `Start ${web.split('/').pop()}`, { type: 'exec', argv: ['dotnet', 'run', '--project', web.split('/').pop()!] }, null, `${web} uses the web SDK; its port is in Properties/launchSettings.json.`, web, [stepId(p.id, 'install')]);
+  if (!web) return;
+  run(ctx, p, 'run', `Start ${web.split('/').pop()}`, { type: 'exec', argv: ['dotnet', 'run', '--project', web.split('/').pop()!] }, null, `${web} uses the web SDK; its port is in Properties/launchSettings.json.`, web, [stepId(p.id, 'install')]);
+  // Running it needs the ASP.NET Core runtime of the major version it targets. A newer SDK builds it, but the app
+  // does not start on a newer runtime major unless the project opts in with RollForward.
+  const text = ctx.files.readText(web) ?? '';
+  const m = /<TargetFrameworks?>\s*net(\d+)\.(\d+)/.exec(text);
+  if (!m) return;
+  const anyMajor = /<RollForward>\s*(?:Major|LatestMajor)\s*<\/RollForward>/i.test(text);
+  const range = anyMajor ? `>=${m[1]}.${m[2]}.0` : `>=${m[1]}.${m[2]}.0 <${Number(m[1]) + 1}.0.0-0`;
+  const evidence = ev(web, text.slice(0, m.index).split('\n').length, 'manifest', `TargetFramework net${m[1]}.${m[2]}${anyMajor ? ', RollForward Major' : ''}`);
+  const why = `${web} targets net${m[1]}.${m[2]}, so it runs on the ASP.NET Core ${m[1]} runtime${anyMajor ? ' or newer (RollForward allows newer majors)' : '; a newer major version does not run it'}.`;
+  ctx.toolClaims.push({ tool: 'aspnetcore-runtime', project: p.id, optional: false, why, source: 'manifest', evidence });
+  ctx.versionClaims.push({ tool: 'aspnetcore-runtime', dir: p.root, role: 'constraint', range, display: anyMajor ? `>= ${m[1]}.${m[2]}` : `${m[1]}.x`, source: 'manifest', evidence });
 }
 
 function deno(ctx: Ctx, p: ProjectDraft): void {

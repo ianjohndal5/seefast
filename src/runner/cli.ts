@@ -75,6 +75,7 @@ export async function runSetupCli(plan: Plan, root: string, o: Flags, io: Io, ui
         else if (e.type === 'step-end') {
           const tag = e.status === 'done' || e.status === 'already-done' ? c.green('✓') : e.status === 'dry-run' ? c.dim('·') : e.status === 'skipped' ? c.yellow('–') : c.red('✗');
           io.out(`${tag} ${e.step.id}${e.message ? c.dim(` (${e.message})`) : ''}${e.ms > 1000 ? c.dim(` ${(e.ms / 1000).toFixed(1)} s`) : ''}${e.log ? c.dim(` · log: ${e.log}`) : ''}\n`);
+          for (const a of e.advice ?? []) io.out(`  ${c.yellow('→')} ${a}\n`);
         }
       },
     });
@@ -119,8 +120,12 @@ export async function runStartCli(plan: Plan, root: string, names: string[], o: 
         if (e.type === 'output') {
           const i = targets.findIndex((t) => t.id === e.target.id);
           for (const line of e.chunk.split(/\r?\n/)) if (line.trim()) io.out(`${palette[i % palette.length](e.target.id.padEnd(width))} │ ${line}\n`);
-        } else if (e.type === 'ready') io.out(`${e.level === 'failed' || e.level === 'timeout' ? c.red('✗') : c.green('✓')} ${e.target.id}: ${e.level} (${e.detail}, ${(e.ms / 1000).toFixed(1)} s)\n`);
-        else if (e.type === 'warning') io.out(c.yellow(`! ${e.message}\n`));
+        } else if (e.type === 'ready') {
+          io.out(`${e.level === 'failed' || e.level === 'timeout' ? c.red('✗') : c.green('✓')} ${e.target.id}: ${e.level} (${e.detail}, ${(e.ms / 1000).toFixed(1)} s)\n`);
+          // Its output is already on screen above; say why, and what usually fixes it.
+          if (e.diagnosis?.reason) io.out(`  ${c.bold(e.diagnosis.reason)}\n`);
+          for (const a of e.diagnosis?.advice ?? []) io.out(`  ${c.yellow('→')} ${a}\n`);
+        } else if (e.type === 'warning') io.out(c.yellow(`! ${e.message}\n`));
         else if (e.type === 'exit') io.out(c.dim(`${e.target.id} exited (${e.code})\n`));
       },
     });

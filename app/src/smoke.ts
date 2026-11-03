@@ -280,6 +280,25 @@ async function runWindowSmoke(ctx: { win: BrowserWindow; getShape: () => string;
       await sleep(300);
       await shot('consent-2-finished');
     }
+    // Optional: SEEFAST_SMOKE_START=<folder> runs that project's setup, then "Start the app" (use a throwaway project
+    // you trust, one whose start fails, such as a net9.0 web app on a machine with only .NET 10): checks that the
+    // failure says why, with the last lines it printed, instead of only an exit code.
+    const startDir = process.env.SEEFAST_SMOKE_START;
+    if (startDir) {
+      await js(`window.__seefast.analyzeFolder(${JSON.stringify(startDir)})`);
+      await sleep(800);
+      await js(`(async () => { window.__seefast.state.run = null; await window.__seefast.open('auto'); window.__seefast.state.run.opts.approveAll = true; void window.__seefast.startRun(false); })()`);
+      check('setup finishes before starting', await waitFor(async () => (await js<string | null>('window.__seefast.state.run.result?.status ?? null')) === 'success', 120000));
+      await js('window.__seefast.startApp()');
+      check('a target that does not start is reported as such', await waitFor(async () => /Did not start/i.test(await text()), 60000));
+      await sleep(400);
+      const card = await js<{ why: string | null; printed: boolean; speech: string }>(`(() => ({ why: document.querySelector('.proj.failed .why')?.textContent ?? null, printed: Boolean(document.querySelector('.proj.failed pre.out')?.textContent), speech: document.querySelector('.say .words')?.textContent ?? '' }))()`);
+      check('the failure says why, or shows what it printed', Boolean(card.why) || card.printed, JSON.stringify(card));
+      check('the mascot says it could not start', /couldn't start/.test(card.speech), card.speech);
+      await js(`document.querySelector('.proj.failed')?.scrollIntoView({ block: 'start' })`);
+      await sleep(300);
+      await shot('start-1-failed');
+    }
     // Optional: SEEFAST_SMOKE_EXTRA=<folder> also screenshots that project's guide and overview in both shells, and Do it for me (layout checks).
     const extra = process.env.SEEFAST_SMOKE_EXTRA;
     if (extra) {

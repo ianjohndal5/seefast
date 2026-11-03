@@ -50,6 +50,7 @@ The report lists every command it actually ran (`--json`: `probes[]`).
 | java | `java -version` | Java |
 | maven / gradle | `mvn --version`, `gradle --version` | Java builds |
 | dotnet | `dotnet --version` | .NET SDK |
+| dotnet-runtimes | `dotnet --list-runtimes` | installed .NET and ASP.NET Core runtimes (an ASP.NET Core app runs only on its target major version) |
 | deno | `deno --version` | Deno |
 | elixir | `elixir --version` | Elixir |
 | powershell-policy | `powershell -NoProfile -NonInteractive -Command Get-ExecutionPolicy` (Windows only, when Node.js is needed) | warns when `npm.ps1` would be blocked |

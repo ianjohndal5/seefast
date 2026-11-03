@@ -248,6 +248,12 @@ h2::after { content: ""; flex: 1; height: 2px; margin-left: 4px; background: rep
 .proj .badge { font-size: 13px; }
 .proj .name { font: 700 14.5px/1.3 var(--hud); letter-spacing: .01em; }
 .proj .meta { font-size: 12.5px; color: var(--muted); }
+/* A target that did not start: the reason in words, the fix, then what it printed. */
+.proj.failed { align-items: flex-start; }
+.proj.failed > .dot { margin-top: 5px; }
+.proj.failed > div { flex: 1; min-width: 0; }
+.proj .why { margin-top: 6px; font-size: 13px; font-weight: 700; line-height: 1.45; }
+.proj details { margin-top: 8px; }
 
 /* Callouts: a tinted plate with a light bar on the left */
 .callout { --tone: var(--sun); display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px 10px 14px; border: 2.5px solid var(--line); border-radius: 12px; background: color-mix(in oklab, var(--tone) 18%, var(--card)); box-shadow: inset 4px 0 0 var(--tone); font-size: 13px; }

@@ -2,6 +2,26 @@
 
 All notable changes. The plan format has its own version (`schemaVersion`, see [docs/PLAN-SCHEMA.md](docs/PLAN-SCHEMA.md)).
 
+## Unreleased
+
+### Failures say why
+- A start target or setup step that fails now says why in words, with what usually fixes it, instead of only an exit
+  code: a missing .NET runtime or SDK, a .NET build error, a busy port, a program or package that is not installed,
+  missing Composer dependencies, an empty `APP_KEY`, an old Node.js, a database it cannot reach, and known exit codes
+  (Windows status codes such as `0xC0000135`, .NET host errors such as `0x80008096`, POSIX 126/127/137). Windows exit
+  codes print in hex. The reasons come from the output the command already printed; nothing extra runs.
+- `start`: a target that exits during its "stays up" wait is reported at once rather than after the wait; a target
+  whose program is not installed fails with that reason instead of ending the run with an error; a target that stays
+  up reports the address it announces ("running at http://localhost:5242"); a port timeout says when it is running at
+  another address.
+- Launcher: the "Running" card shows the reason, the fix with copy buttons and the last lines the target printed;
+  failed setup steps show their fix; "Stop the app" stops started targets.
+
+### .NET
+- An ASP.NET Core project now also needs the ASP.NET Core runtime of the major version it targets (`net9.0` → 9.x,
+  any newer with `<RollForward>Major</RollForward>`): a newer SDK builds it but does not run it. The doctor checks it
+  with a new fixed probe, `dotnet --list-runtimes`.
+
 ## 0.1.0 (2026-11-01)
 
 First release.

@@ -651,7 +651,7 @@ async function writeSetupMd() {
 
 // Do it for me: everything is shown first; nothing runs until you say so.
 function runState() {
-  return (state.run ??= { statuses: {}, messages: {}, output: '', running: false, consent: null, result: null, current: null, opts: { dryRun: false, includeOptional: false, allowOutside: false, approveAll: false } });
+  return (state.run ??= { statuses: {}, messages: {}, advice: {}, output: '', running: false, consent: null, result: null, current: null, opts: { dryRun: false, includeOptional: false, allowOutside: false, approveAll: false } });
 }
 
 function speech(run, p) {
@@ -667,6 +667,8 @@ function speech(run, p) {
     const s = p.steps.find((x) => x.id === run.current);
     return ['busy', h('span', 'Working on ', h('strong', s ? s.title : 'it'), '…', run.approved ? ' I will keep going until every step is done.' : '')];
   }
+  const startFailed = run.start?.find(didNotStart);
+  if (startFailed) return ['worried', h('span', h('strong', `I couldn't start ${run.start.length === 1 ? 'the app' : startFailed.id}.`), startFailed.diagnosis?.reason ? ' Here is why, and how to fix it.' : ' The last lines it printed are below.')];
   if (res?.status === 'success') return ['happy', h('span', h('strong', 'All set!'), ' Your project is ready. Want me to start it?')];
   if (res?.status === 'dry-run') return ['happy', h('span', h('strong', 'Preview done: nothing was executed.'), ' That is everything I would run. Press Start when you are ready.')];
   if (res && (res.status === 'stopped' || res.status === 'declined')) return ['idle', h('span', h('strong', 'Stopped.'), ' Nothing else ran. Press Resume to continue where I left off.')];
@@ -708,7 +710,8 @@ async function viewAuto() {
       now ? h('div.live', { role: 'status' }, h('div.busybar', { 'aria-hidden': 'true' }),
         h('div.live-line', h('span.clock', run.stopping ? 'Stopping' : 'Running', ' · ', h('span', { dataset: { since: String(run.stepStarted?.[s.id] ?? Date.now()) } }, '0:00')),
           h('span.tail', lastLine(run.output) || 'Starting…'))) : null,
-      run.messages[s.id] ? h('div.msg', run.messages[s.id]) : null);
+      run.messages[s.id] ? h('div.msg', run.messages[s.id]) : null,
+      st === 'failed' && run.advice[s.id] ? fixes(run.advice[s.id]) : null);
     if (asking && offered(s)) {
       // "Create it for me" or "I'll do it myself": the file gets the names below, commented out, and no values.
       const a = s.action;
@@ -753,9 +756,17 @@ async function viewAuto() {
     content.append(d);
   }
   if (run.start) {
-    content.append(section('Running', 'play', h('div.card', run.start.map((t) => h('div.proj',
-      h(`span.dot.${['responding', 'listening', 'stays-up'].includes(t.level) ? 'ok' : t.level ? 'bad' : 'warn'}`),
-      h('div', h('div.name', t.id), h('div.meta', t.detail ?? 'starting…')))))));
+    // A target that did not start says why in words, then the fix, then (folded when there is a reason) what it printed.
+    const failed = run.start.some(didNotStart);
+    content.append(section(failed ? 'Did not start' : 'Running', failed ? 'alert' : 'play', h('div.card', run.start.map((t) => {
+      const d = didNotStart(t) ? t.diagnosis : null;
+      return h('div.proj' + (d ? '.failed' : ''),
+        h(`span.dot.${STARTED.includes(t.level) ? 'ok' : didNotStart(t) ? 'bad' : 'warn'}`),
+        h('div', h('div.name', t.id), h('div.meta', t.detail ?? 'starting…'),
+          d?.reason ? h('div.why', d.reason) : null,
+          d ? fixes(d.advice) : null,
+          d?.output.length ? h('details', { open: !d.reason }, h('summary', 'What it printed'), h('pre.out', { 'aria-label': `Last lines from ${t.id}` }, d.output.join('\n'))) : null));
+    }))));
   }
 
   // The buttons stay at the bottom of the panel, whatever the scroll position. While it runs, the dock shows where
@@ -771,6 +782,10 @@ async function viewAuto() {
     dock.append(run.stopping
       ? h('button.btn.danger.stopping', { type: 'button', disabled: true, 'aria-live': 'polite' }, icon('spinner', 'ico spin'), 'Stopping…')
       : h('button.btn.danger', { type: 'button', onclick: stopRun }, icon('stop'), 'Stop'));
+  } else if (run.startActive) {
+    dock.append(run.startStopping
+      ? h('button.btn.danger.stopping', { type: 'button', disabled: true, 'aria-live': 'polite' }, icon('spinner', 'ico spin'), 'Stopping…')
+      : h('button.btn.danger', { type: 'button', onclick: stopApp }, icon('stop'), 'Stop the app'));
   } else {
     if (res && (res.status === 'failed' || res.status === 'declined' || res.status === 'stopped')) dock.append(h('button.btn.go', { type: 'button', onclick: () => startRun(true) }, icon('play'), 'Resume'));
     else if (res?.status === 'success') dock.append(h('button.btn.go', { type: 'button', onclick: startApp }, icon('play'), 'Start the app'));
@@ -789,6 +804,14 @@ async function viewAuto() {
       if (showAttention()) run.shownStep = focusId;
     });
   }
+}
+
+const STARTED = ['responding', 'listening', 'stays-up', 'exited-ok'];
+const didNotStart = (t) => t.level === 'failed' || t.level === 'timeout';
+
+/** What usually fixes a failure, one copyable line each (as the doctor shows its advice). */
+function fixes(advice) {
+  return advice.map((a) => h('div.cmd', h('code', a), copyButton(a, 'fix')));
 }
 
 /** Scroll the step asking for approval (or running) into view; false when it is not on screen yet. */
@@ -843,7 +866,9 @@ function answer(d) {
 
 async function startRun(resume, dryRun = false) {
   const run = runState();
-  Object.assign(run, { running: true, stopping: false, result: null, statuses: resume ? run.statuses : {}, messages: resume ? run.messages : {}, output: resume ? run.output : '', current: null, shownStep: null, startedAt: Date.now(), stepStarted: {}, approved: run.opts.approveAll });
+  Object.assign(run, { running: true, stopping: false, result: null, statuses: resume ? run.statuses : {}, messages: resume ? run.messages : {}, advice: resume ? run.advice : {}, output: resume ? run.output : '', current: null, shownStep: null, startedAt: Date.now(), stepStarted: {}, approved: run.opts.approveAll });
+  // An earlier "Start the app" that has ended is out of date once setup runs again.
+  if (!run.startActive) run.start = null;
   clearInterval(clockTimer);
   clockTimer = setInterval(tickClocks, 1000);
   render('auto');
@@ -858,9 +883,28 @@ async function startRun(resume, dryRun = false) {
 }
 
 async function startApp() {
-  state.run.start = state.plan.run.filter((r) => r.primary && (r.kind === 'dev' || r.kind === 'worker')).map((r) => ({ id: r.id }));
+  const run = state.run;
+  run.start = state.plan.run.filter((r) => r.primary && (r.kind === 'dev' || r.kind === 'worker')).map((r) => ({ id: r.id }));
+  Object.assign(run, { startActive: true, startStopping: false });
   render('auto');
-  await cr.startApp();
+  const res = await cr.startApp();
+  // Every target ends up saying something: an error before it could run, stopped, or not started after another failed.
+  for (const t of run.start) {
+    if (res?.error && !t.level) Object.assign(t, { level: 'failed', detail: 'not started', diagnosis: { reason: res.error, advice: [], output: [] } });
+    else if (STARTED.includes(t.level)) Object.assign(t, { level: 'ended', detail: run.startStopping ? 'stopped' : 'not running any more' });
+    else if (!t.level) Object.assign(t, { level: 'not-started', detail: 'not started' });
+  }
+  Object.assign(run, { startActive: false, startStopping: false });
+  if (state.view === 'auto') render('auto');
+}
+
+function stopApp() {
+  const run = state.run;
+  if (!run?.startActive || run.startStopping) return;
+  run.startStopping = true;
+  say('Stopping the app');
+  cr.stop();
+  render('auto');
 }
 
 /** The runner speaks CLI (flags); say the same thing in terms of this window. */
@@ -888,17 +932,23 @@ cr.on('runner', (e) => {
     // A step ended by Stop is reported as failed with the message "stopped": show it as stopped.
     run.statuses[e.step] = e.status === 'dry-run' ? '' : e.status === 'failed' && e.message === 'stopped' ? 'stopped' : e.status;
     if (e.message) run.messages[e.step] = friendly(e.message);
+    if (e.advice?.length) run.advice[e.step] = e.advice;
     if (e.message) run.output += `# ${e.step}: ${e.status} (${e.message})\n`;
   } else if (e.type === 'warning') run.output += `! ${e.message}\n`;
   else if (e.type === 'manual') run.output += `→ ${e.text}\n`;
   rerenderAuto();
 });
 cr.on('start', (e) => {
-  const list = state.run?.start;
+  const run = state.run;
+  const list = run?.start;
   if (!list) return;
-  if (e.type === 'ready') { const t = list.find((x) => x.id === e.target); if (t) Object.assign(t, { level: e.level, detail: e.detail }); say(`${e.target}: ${e.level}`); }
-  else if (e.type === 'output') state.run.output += e.chunk;
-  else if (e.type === 'warning') state.run.output += `! ${e.message}\n`;
+  if (e.type === 'start') run.output += `\n$ ${e.command}\n`;
+  else if (e.type === 'ready') {
+    const t = list.find((x) => x.id === e.target);
+    if (t) Object.assign(t, { level: e.level, detail: e.detail, diagnosis: e.diagnosis });
+    say(e.diagnosis?.reason ? `${e.target} did not start: ${e.diagnosis.reason}` : `${e.target}: ${e.level}`);
+  } else if (e.type === 'output') { run.output += e.chunk.replace(ANSI, ''); if (run.output.length > 50000) run.output = run.output.slice(-40000); }
+  else if (e.type === 'warning') run.output += `! ${e.message}\n`;
   rerenderAuto();
 });
 
@@ -1037,5 +1087,5 @@ cr.on('command', (c) => {
     panel.hidden = false;
     render('home');
   }
-  window.__seefast = { state, open, collapse, analyzeFolder, activate, startRun };
+  window.__seefast = { state, open, collapse, analyzeFolder, activate, startRun, startApp };
 })();

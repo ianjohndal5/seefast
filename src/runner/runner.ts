@@ -11,6 +11,7 @@ import { STATE_DIR } from '../brand.js';
 import { renderAction, type ShellKind } from '../render/shell.js';
 import { realHost, type ProbeHost } from '../doctor/probes.js';
 import { argvForPlatform, fileExists, insideRoot, realSpawn, RefusedError, resolveCommand, stepEnv, killTree, type SpawnFn } from './exec.js';
+import { diagnose, exitText, OUTPUT_KEPT } from './diagnose.js';
 
 export type Decision = 'yes' | 'skip' | 'all' | 'quit';
 
@@ -27,7 +28,8 @@ export type RunnerEvent =
   | { type: 'warning'; message: string }
   | { type: 'step-start'; step: Step; command: string; index: number; total: number }
   | { type: 'output'; step: Step; stream: 'stdout' | 'stderr'; chunk: string }
-  | { type: 'step-end'; step: Step; status: StepStatus; code?: number | null; ms: number; message?: string; log?: string }
+  /** A failed step's `message` says why when its output or exit code does; `advice` is what usually fixes it. */
+  | { type: 'step-end'; step: Step; status: StepStatus; code?: number | null; ms: number; message?: string; advice?: string[]; log?: string }
   | { type: 'manual'; step: Step; text: string }
   | { type: 'done'; status: RunStatus; failed?: string };
 
@@ -56,7 +58,7 @@ export interface RunnerOptions {
 
 export interface RunResult {
   status: RunStatus;
-  steps: { id: string; status: StepStatus; code?: number | null; ms: number; message?: string; log?: string }[];
+  steps: { id: string; status: StepStatus; code?: number | null; ms: number; message?: string; advice?: string[]; log?: string }[];
   failed?: string;
 }
 
@@ -134,7 +136,7 @@ export async function runSetup(plan: Plan, opts: RunnerOptions): Promise<RunResu
     const record = (status: StepStatus, extra: Partial<RunResult['steps'][number]> = {}) => {
       const r = { id: step.id, status, ms: 0, ...extra };
       results.push(r);
-      emit({ type: 'step-end', step, status, code: r.code, ms: r.ms, message: r.message, log: r.log });
+      emit({ type: 'step-end', step, status, code: r.code, ms: r.ms, message: r.message, advice: r.advice, log: r.log });
       if (!opts.dryRun && status !== 'dry-run') {
         state.steps[step.id] = { status, hash: stepHash(step), at: new Date().toISOString(), log: r.log };
         writeState(root, state);
@@ -243,9 +245,11 @@ export async function runSetup(plan: Plan, opts: RunnerOptions): Promise<RunResu
       const log = fs.openSync(logFile, 'w');
       fs.writeSync(log, `$ ${resolved.display}\n# in ${cwd}\n\n`);
       const sp = spawnFn(resolved, { cwd, env: stepEnv(host.env), detached: true });
+      let printed = '';
       const onData = (stream: 'stdout' | 'stderr') => (b: Buffer) => {
         const chunk = b.toString();
         fs.writeSync(log, chunk);
+        printed = (printed + chunk).slice(-OUTPUT_KEPT);
         emit({ type: 'output', step, stream, chunk });
       };
       sp.child.stdout?.on('data', onData('stdout'));
@@ -264,7 +268,9 @@ export async function runSetup(plan: Plan, opts: RunnerOptions): Promise<RunResu
         return finish('stopped', step.id);
       }
       if (r.code !== 0) {
-        record('failed', { ms: ms(), code: r.code, message: r.error ? r.error.message : `exited with ${r.code ?? r.signal}`, log: rel });
+        const d = r.error ? null : diagnose({ code: r.code, signal: r.signal, output: printed, platform: host.platform });
+        const message = r.error ? r.error.message : `${exitText(r.code, r.signal, host.platform)}${d?.reason ? `: ${d.reason}` : ''}`;
+        record('failed', { ms: ms(), code: r.code, message, ...(d?.advice.length ? { advice: d.advice } : {}), log: rel });
         return finish('failed', step.id);
       }
       record('done', { ms: ms(), code: 0, log: rel });

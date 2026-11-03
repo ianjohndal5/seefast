@@ -369,7 +369,7 @@ export function resolveVersion(ctx: Ctx, tool: string, label: string, projectRoo
   };
 }
 
-const TOOL_LABEL: Record<string, string> = { node: 'Node.js', php: 'PHP', python: 'Python', go: 'Go', rust: 'Rust', ruby: 'Ruby', java: 'Java', dotnet: '.NET', bun: 'Bun', deno: 'Deno', pnpm: 'pnpm', yarn: 'Yarn', npm: 'npm', composer: 'Composer' };
+const TOOL_LABEL: Record<string, string> = { node: 'Node.js', php: 'PHP', python: 'Python', go: 'Go', rust: 'Rust', ruby: 'Ruby', java: 'Java', dotnet: '.NET', 'aspnetcore-runtime': 'ASP.NET Core runtime', bun: 'Bun', deno: 'Deno', pnpm: 'pnpm', yarn: 'Yarn', npm: 'npm', composer: 'Composer' };
 
 /** "`.nvmrc` pins Node.js 18 (lts/hydrogen)", "package.json engines.node requires \">=20.9.0\"", "CI (ci.yml) uses PHP 8.3". */
 export function describeVersion(c: VersionClaim): string {

@@ -6,14 +6,16 @@ import http from 'node:http';
 import path from 'node:path';
 import type { Plan, RunTarget } from '../core/schema.js';
 import { realHost, type ProbeHost } from '../doctor/probes.js';
-import { argvForPlatform, insideRoot, killTree, realSpawn, resolveCommand, stepEnv, type SpawnFn, type Spawned } from './exec.js';
+import { argvForPlatform, insideRoot, killTree, RefusedError, realSpawn, resolveCommand, stepEnv, type SpawnFn, type Spawned } from './exec.js';
+import { diagnose, exitText, outputLines, OUTPUT_KEPT, type Diagnosis } from './diagnose.js';
 
 export type Readiness = 'responding' | 'listening' | 'stays-up' | 'exited-ok' | 'failed' | 'timeout' | 'not-started';
 
 export type StartEvent =
   | { type: 'start'; target: RunTarget; command: string }
   | { type: 'output'; target: RunTarget; stream: 'stdout' | 'stderr'; chunk: string }
-  | { type: 'ready'; target: RunTarget; level: Readiness; ms: number; detail: string }
+  /** `diagnosis` when it failed or timed out: why, in words, and the last lines it printed. */
+  | { type: 'ready'; target: RunTarget; level: Readiness; ms: number; detail: string; diagnosis?: Diagnosis }
   | { type: 'exit'; target: RunTarget; code: number | null }
   | { type: 'service'; id: string; reachable: boolean; port?: number }
   | { type: 'warning'; message: string };
@@ -33,7 +35,7 @@ export interface StartOptions {
 }
 
 export interface StartResult {
-  targets: { id: string; level: Readiness; ms: number; detail: string }[];
+  targets: { id: string; level: Readiness; ms: number; detail: string; diagnosis?: Diagnosis }[];
   ok: boolean;
 }
 
@@ -103,6 +105,16 @@ export function httpResponds(port: number, timeoutMs = 3000): Promise<number | n
   });
 }
 
+/** The address a dev server says it serves ("Now listening on: http://localhost:5242", "Local: http://localhost:5173/"). */
+export function announcedUrl(output: string): string | undefined {
+  const lines = outputLines(output);
+  for (const l of lines) {
+    const m = /(?:listening on|Local|running (?:on|at)|server at|started server on|available (?:on|at))[:\s]+\[?(https?:\/\/[^\s,'"\]]+)/i.exec(l);
+    if (m) return m[1].replace(/\/$/, '');
+  }
+  return undefined;
+}
+
 const sleep = (ms: number, signal?: AbortSignal) =>
   new Promise<void>((r) => {
     const t = setTimeout(r, ms);
@@ -112,13 +124,29 @@ const sleep = (ms: number, signal?: AbortSignal) =>
     });
   });
 
+/** The promise's value, or null once `ms` pass or the signal aborts; no timer is left running either way. */
+function until<T>(p: Promise<T>, ms: number, signal?: AbortSignal): Promise<T | null> {
+  return new Promise((resolve) => {
+    const done = (v: T | null) => {
+      clearTimeout(timer);
+      signal?.removeEventListener('abort', onAbort);
+      resolve(v);
+    };
+    const onAbort = () => done(null);
+    const timer = setTimeout(onAbort, ms);
+    signal?.addEventListener('abort', onAbort);
+    void p.then(done);
+  });
+}
+
 export async function startTargets(plan: Plan, opts: StartOptions): Promise<StartResult> {
   const root = path.resolve(opts.root);
   const host = opts.host ?? realHost;
   const spawnFn = opts.spawn ?? realSpawn;
   const emit = opts.onEvent ?? (() => {});
   const targets = selectTargets(plan, opts.targets);
-  const running: { t: RunTarget; sp: Spawned; exited: { code: number | null } | null }[] = [];
+  type Exit = { code: number | null; signal: NodeJS.Signals | null; error?: Error };
+  const running: { t: RunTarget; sp: Spawned; exited: Exit | null }[] = [];
   const results: StartResult['targets'] = [];
   const stopAll = () => {
     for (const r of [...running].reverse()) killTree(r.sp.child);
@@ -140,19 +168,37 @@ export async function startTargets(plan: Plan, opts: StartOptions): Promise<Star
       if (t.action.type !== 'exec') continue;
       const cwd = path.resolve(root, ...t.cwd.split('/'));
       if (!insideRoot(root, cwd)) throw new Error(`${t.id}: working directory outside the project`);
-      const resolved = resolveCommand(argvForPlatform(t.action, host.platform), cwd, root, host);
+      let resolved;
+      try {
+        resolved = resolveCommand(argvForPlatform(t.action, host.platform), cwd, root, host);
+      } catch (e) {
+        // A missing program is this target failing to start, with the reason, not the whole run erroring out.
+        if (!(e instanceof RefusedError)) throw e;
+        const diagnosis: Diagnosis = { reason: e.message, advice: [], output: [] };
+        results.push({ id: t.id, level: 'failed', ms: 0, detail: 'not started', diagnosis });
+        emit({ type: 'ready', target: t, level: 'failed', ms: 0, detail: 'not started', diagnosis });
+        break;
+      }
       emit({ type: 'start', target: t, command: resolved.display });
       const sp = spawnFn(resolved, { cwd, env: stepEnv(host.env), detached: true });
-      const entry = { t, sp, exited: null as { code: number | null } | null };
+      const entry = { t, sp, exited: null as Exit | null };
       running.push(entry);
-      sp.child.stdout?.on('data', (b: Buffer) => emit({ type: 'output', target: t, stream: 'stdout', chunk: b.toString() }));
-      sp.child.stderr?.on('data', (b: Buffer) => emit({ type: 'output', target: t, stream: 'stderr', chunk: b.toString() }));
+      // The last part of what it printed, to say why when it fails.
+      let printed = '';
+      const onData = (stream: 'stdout' | 'stderr') => (b: Buffer) => {
+        const chunk = b.toString();
+        printed = (printed + chunk).slice(-OUTPUT_KEPT);
+        emit({ type: 'output', target: t, stream, chunk });
+      };
+      sp.child.stdout?.on('data', onData('stdout'));
+      sp.child.stderr?.on('data', onData('stderr'));
       void sp.done.then((r) => {
-        entry.exited = { code: r.code };
+        entry.exited = r;
         emit({ type: 'exit', target: t, code: r.code });
       });
       const t0 = performance.now();
       const ms = () => Math.round(performance.now() - t0);
+      const exitOf = (x: Exit) => exitText(x.code, x.signal, host.platform, x.error);
       const rd = t.readiness;
       let level: Readiness = 'timeout';
       let detail = '';
@@ -161,7 +207,7 @@ export async function startTargets(plan: Plan, opts: StartOptions): Promise<Star
         while (Date.now() < deadline && !opts.signal?.aborted) {
           if (entry.exited) {
             level = 'failed';
-            detail = `exited with ${entry.exited.code} before listening on ${rd.port}`;
+            detail = `${exitOf(entry.exited)} before listening on ${rd.port}`;
             break;
           }
           if (await tcpReachable(rd.port, 500)) {
@@ -174,16 +220,26 @@ export async function startTargets(plan: Plan, opts: StartOptions): Promise<Star
         }
         if (level === 'timeout') detail = `nothing listened on port ${rd.port} within ${opts.timeoutSec ?? rd.timeoutSec} s`;
       } else if (rd.type === 'stays-up') {
-        await sleep(rd.seconds * 1000, opts.signal);
+        // An exit ends the wait: a target that fails at once is reported at once.
+        await until(sp.done, rd.seconds * 1000, opts.signal);
         level = entry.exited ? 'failed' : 'stays-up';
-        detail = entry.exited ? `exited with ${entry.exited.code} within ${rd.seconds} s` : `still running after ${rd.seconds} s (no port to check)`;
+        const url = announcedUrl(printed);
+        detail = entry.exited ? `${exitOf(entry.exited)} within ${rd.seconds} s` : url ? `running at ${url}` : `still running after ${rd.seconds} s (no port to check)`;
       } else {
-        const r = await Promise.race([sp.done, sleep((opts.timeoutSec ?? rd.timeoutSec) * 1000, opts.signal).then(() => null)]);
+        const r = await until(sp.done, (opts.timeoutSec ?? rd.timeoutSec) * 1000, opts.signal);
         level = r === null ? 'timeout' : r.code === 0 ? 'exited-ok' : 'failed';
-        detail = r === null ? 'did not finish in time' : `exited with ${r.code}`;
+        detail = r === null ? 'did not finish in time' : exitOf(r);
       }
-      results.push({ id: t.id, level, ms: ms(), detail });
-      emit({ type: 'ready', target: t, level, ms: ms(), detail });
+      let diagnosis: Diagnosis | undefined;
+      if (level === 'failed' && entry.exited) diagnosis = diagnose({ ...entry.exited, output: printed, platform: host.platform });
+      else if (level === 'timeout' && !opts.signal?.aborted) {
+        // Still running, but not where it was expected: often it picked or was configured for another port.
+        const url = announcedUrl(printed);
+        const elsewhere = url && rd.type === 'port' && !new RegExp(`:${rd.port}(?:/|$)`).test(url);
+        diagnosis = { reason: elsewhere ? `It is running, but at ${url} instead of port ${rd.port}.` : undefined, advice: [], output: outputLines(printed).slice(-15) };
+      }
+      results.push({ id: t.id, level, ms: ms(), detail, ...(diagnosis ? { diagnosis } : {}) });
+      emit({ type: 'ready', target: t, level, ms: ms(), detail, ...(diagnosis ? { diagnosis } : {}) });
       if (level === 'failed' || level === 'timeout') break;
     }
     const ok = results.length === targets.filter((t) => t.action.type === 'exec').length && results.every((r) => ['responding', 'listening', 'stays-up', 'exited-ok'].includes(r.level));

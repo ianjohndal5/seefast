@@ -15,5 +15,6 @@ export { runDoctor, type DoctorReport, type Check } from './doctor/doctor.js';
 export { PROBES } from './doctor/probes.js';
 export { runSetup, selectSteps, readState, type RunnerOptions, type RunnerEvent, type RunResult, type ConsentRequest, type Decision } from './runner/runner.js';
 export { startTargets, selectTargets, type StartOptions, type StartEvent, type StartResult } from './runner/start.js';
+export { diagnose, type Diagnosis } from './runner/diagnose.js';
 export { TOOL_NAME, TOOL_TITLE, STATE_DIR, PLAN_FILE } from './brand.js';
 export { TOOL_VERSION } from './version.js';

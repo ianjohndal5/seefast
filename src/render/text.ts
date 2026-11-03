@@ -2,7 +2,7 @@
 import type { Evidence, Plan, Requirement, Service } from '../core/schema.js';
 
 const LABELS: Record<string, string> = {
-  node: 'Node.js', php: 'PHP', python: 'Python', go: 'Go', rust: 'Rust', ruby: 'Ruby', java: 'Java', dotnet: '.NET SDK', deno: 'Deno', elixir: 'Elixir',
+  node: 'Node.js', php: 'PHP', python: 'Python', go: 'Go', rust: 'Rust', ruby: 'Ruby', java: 'Java', dotnet: '.NET SDK', 'aspnetcore-runtime': 'ASP.NET Core runtime', deno: 'Deno', elixir: 'Elixir',
   npm: 'npm', pnpm: 'pnpm', yarn: 'Yarn', bun: 'Bun', composer: 'Composer', bundler: 'Bundler', uv: 'uv', poetry: 'Poetry', pipenv: 'Pipenv', pdm: 'PDM',
   maven: 'Maven', gradle: 'Gradle', docker: 'Docker', git: 'Git', 'git-lfs': 'Git LFS', make: 'make', just: 'just',
   mysql: 'MySQL', mariadb: 'MariaDB', postgres: 'PostgreSQL', redis: 'Redis', memcached: 'Memcached', mongodb: 'MongoDB', sqlserver: 'SQL Server',

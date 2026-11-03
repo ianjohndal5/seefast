@@ -8,7 +8,7 @@ import { loadData } from '../core/kb.js';
 import { satisfies } from '../core/versions.js';
 import { label, requirementLine, colors } from '../render/text.js';
 import type { ShellKind } from '../render/shell.js';
-import { LOOKUPS, PROBES_FOR, osFamily, parsePhpModules, readOsRelease, realHost, runProbes, which, type ProbeHost, type ProbeResult } from './probes.js';
+import { LOOKUPS, PROBES_FOR, osFamily, parseDotnetRuntimes, parsePhpModules, readOsRelease, realHost, runProbes, which, type ProbeHost, type ProbeResult } from './probes.js';
 
 export type CheckStatus = 'ok' | 'missing' | 'wrong-version' | 'unknown' | 'warning' | 'info';
 
@@ -173,7 +173,11 @@ export async function runDoctor(plan: Plan, deps: DoctorDeps = {}): Promise<Doct
   const phpIni = loaded && loaded !== '(none)' ? loaded : iniDir ? `${iniDir}/php.ini` : undefined;
 
   for (const r of plan.requirements) {
-    checks.push(r.kind === 'extension' ? checkExtension(r, probe('php'), probe('php-modules'), fam.family, phpVersion, phpIni) : checkTool(r, probes, fam.family, present, host));
+    checks.push(
+      r.kind === 'extension' ? checkExtension(r, probe('php'), probe('php-modules'), fam.family, phpVersion, phpIni)
+        : r.name === 'aspnetcore-runtime' ? checkAspNetRuntime(r, probe('dotnet'), probe('dotnet-runtimes'), fam.family, present, host)
+        : checkTool(r, probes, fam.family, present, host),
+    );
   }
   // Windows: npm.ps1 blocked by the default execution policy.
   const policy = probe('powershell-policy');
@@ -285,6 +289,37 @@ function checkTool(r: Requirement, probes: Map<string, ProbeResult>, family: str
     ...base, status: 'ok', found: res.version,
     message: `${label(r.name)} ${res.version}${r.rangeText && r.rangeText !== 'any' ? ` satisfies ${r.rangeText}` : ''}.${off ? ` The maintainers use ${r.recommended}; differences are possible.` : ''}`,
     advice: [],
+  };
+}
+
+/**
+ * An ASP.NET Core app starts only when both shared frameworks it runs on are installed in its range:
+ * Microsoft.AspNetCore.App and the Microsoft.NETCore.App under it. `dotnet --version` names the SDK, which builds
+ * apps for older versions but does not run them.
+ */
+function checkAspNetRuntime(r: Requirement, sdk: ProbeResult | undefined, list: ProbeResult | undefined, family: string, present: Set<string>, host: ProbeHost): Check {
+  const base = { id: r.id, kind: 'requirement' as const, title: requirementLine(r), required: !r.optional, expected: r.rangeText };
+  const major = r.range ? /^>=(\d+)/.exec(r.range)?.[1] : undefined;
+  const install = () => toolAdvice('aspnetcore-runtime', family, major ? `${major}.0` : undefined, present, host.env);
+  if (!sdk?.found) return { ...base, status: 'missing', message: `.NET is not on PATH.${r.optional ? ' (optional)' : ''}`, advice: install() };
+  if (!list?.ok) return { ...base, status: 'unknown', message: `\`${list?.command ?? 'dotnet --list-runtimes'}\` failed: ${(list?.error ?? list?.output ?? '').split('\n')[0].slice(0, 160)}`, advice: [] };
+  const installed = parseDotnetRuntimes(list.output);
+  const fits = (fw: string) => (installed.get(fw) ?? []).filter((v) => !r.range || satisfies(v, r.range));
+  const missing = ['Microsoft.AspNetCore.App', 'Microsoft.NETCore.App'].filter((fw) => !fits(fw).length);
+  if (!missing.length) {
+    const v = fits('Microsoft.AspNetCore.App').at(-1);
+    return { ...base, status: 'ok', found: v, message: `ASP.NET Core runtime ${v} satisfies ${r.rangeText}.`, advice: [] };
+  }
+  const have = installed.get(missing[0]) ?? [];
+  const newest = Math.max(...have.map((v) => Number(v.split('.')[0])));
+  const capped = Boolean(r.range?.includes('<'));
+  return {
+    ...base, status: have.length ? 'wrong-version' : 'missing', found: have.at(-1),
+    message: `Found ${missing[0]} ${have.length ? have.join(', ') : 'none'}, but the app runs on ${r.rangeText}.${capped && have.length ? ' .NET does not run an app on a newer major version unless the project allows it.' : ''}`,
+    advice: [
+      ...install(),
+      ...(capped && major && newest > Number(major) ? [`or run it on .NET ${newest}: add <RollForward>Major</RollForward> to ${r.evidence[0]?.file ?? 'the project file'} (usually works; newer versions can change behaviour)`] : []),
+    ],
   };
 }
 

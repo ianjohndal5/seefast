@@ -54,6 +54,7 @@ export const PROBES: ProbeDef[] = [
   { id: 'maven', bin: 'mvn', args: ['--version'] },
   { id: 'gradle', bin: 'gradle', args: ['--version'] },
   { id: 'dotnet', bin: 'dotnet', args: ['--version'] },
+  { id: 'dotnet-runtimes', bin: 'dotnet', args: ['--list-runtimes'] },
   { id: 'deno', bin: 'deno', args: ['--version'] },
   { id: 'elixir', bin: 'elixir', args: ['--version'], version: /Elixir (\d+\.\d+\.\d+)/ },
   { id: 'powershell-policy', bin: 'powershell', args: ['-NoProfile', '-NonInteractive', '-Command', 'Get-ExecutionPolicy'], platform: 'win32' },
@@ -68,8 +69,15 @@ export const PROBES_FOR: Record<string, string[]> = {
   php: ['php', 'php-ini'], composer: ['composer'], docker: ['docker', 'docker-compose', 'docker-daemon'], git: ['git'], 'git-lfs': ['git-lfs'],
   make: ['make'], just: ['just'], python: ['python', 'python-win'], uv: ['uv'], poetry: ['poetry'], pipenv: ['pipenv'], pdm: ['pdm'],
   go: ['go'], rust: ['rust', 'cargo'], ruby: ['ruby'], bundler: ['bundler'], java: ['java'], maven: ['maven'], gradle: ['gradle'],
-  dotnet: ['dotnet'], deno: ['deno'], elixir: ['elixir'],
+  dotnet: ['dotnet'], 'aspnetcore-runtime': ['dotnet', 'dotnet-runtimes'], deno: ['deno'], elixir: ['elixir'],
 };
+
+/** `dotnet --list-runtimes` output → installed versions per shared framework (`Microsoft.NETCore.App` → ['10.0.9']). */
+export function parseDotnetRuntimes(output: string): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const m of output.matchAll(/^(\S+) (\d+\.\d+\.\d+\S*) \[/gm)) out.set(m[1], [...(out.get(m[1]) ?? []), m[2]]);
+  return out;
+}
 
 export interface ProbeResult {
   id: string;
