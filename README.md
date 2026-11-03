@@ -22,15 +22,36 @@ which file it comes from and how sure it is; "unknown" is an allowed answer.
 
 ## Quick start
 
+SeeFast is not on npm yet, so run it from a clone of this repository. You need [Node.js](https://nodejs.org) 20 or
+newer (22.12 or newer for the desktop launcher) and Git. The commands are the same in PowerShell, Command Prompt and
+macOS / Linux shells.
+
+### Command line
+
+The compiled code (`dist/`) is not in git, so a fresh clone has nothing to run until it is built. Do this once, and
+again after you pull changes:
+
 ```bash
-npx seefast                 # the setup guide for the current folder
-npx seefast doctor          # check this machine against what the project needs
-npx seefast setup --dry-run # every command automated setup would run, nothing executed
-npx seefast setup           # run them, asking before each one
-npx seefast start           # start the dev servers (services → backends → frontends), wait until they answer
+git clone https://github.com/ianjohndal5/seefast.git
+cd seefast
+npm ci          # its dependencies, including the TypeScript compiler
+npm run build   # compiles src/ into dist/
 ```
 
-On the Laravel + Next.js fixture in this repo, the guide begins:
+Then point it at a project:
+
+```bash
+node dist/cli.js path/to/project                  # the setup guide
+node dist/cli.js doctor path/to/project           # check this machine against what the project needs
+node dist/cli.js setup path/to/project --dry-run  # every command automated setup would run, nothing executed
+node dist/cli.js setup path/to/project            # run them, asking before each one
+node dist/cli.js start path/to/project            # start the dev servers (services → backends → frontends), wait until they answer
+```
+
+To type `seefast` instead of `node dist/cli.js`, from any folder, run `npm link` once in the clone (`npm rm -g seefast`
+undoes it). Once SeeFast is published, `npx seefast` will work without a clone.
+
+On the Laravel + Next.js fixture in this repo (`node dist/cli.js fixtures/laravel-next-monorepo`), the guide begins:
 
 ```
 Projects
@@ -62,16 +83,44 @@ Setup steps (POSIX shell; paths are relative to this folder)
       $ docker compose up -d mysql redis
 ```
 
-`seefast explain api.key` shows why a step exists and every file that supports or contradicts it.
+`node dist/cli.js explain fixtures/laravel-next-monorepo api.key` shows why a step exists and every file that supports
+or contradicts it.
+
+### Desktop launcher
+
+The launcher uses the command line's build, so do the steps above first. Then, from the clone:
+
+```bash
+cd app
+npm ci
+npm start       # builds the launcher and opens the bubble
+```
+
+The first `npm start` downloads Electron (about 100 MB, once). After you change `src/`, run `npm run build` in the root
+again: the launcher picks up the new build on its next `npm start`.
+
+### If it does not start
+
+| What you see | Why | Fix |
+| --- | --- | --- |
+| `Cannot find module '…/dist/cli.js'` | It is not built yet | `npm run build` in the repository root |
+| `'tsc' is not recognized…` or `tsc: not found` | The root's dependencies are not installed | `npm ci`, then `npm run build`, in the repository root |
+| `Cannot find module 'seefast'` while the launcher builds | The launcher was built before the command line it uses | `npm ci` and `npm run build` in the repository root, then `npm start` in `app` again |
+| `Electron failed to install correctly` | Electron's first-start download failed (offline, proxy) | With network access, in `app`: `node node_modules/electron/install.js` |
+| `The requested module 'electron' does not provide an export named 'BrowserWindow'` | `ELECTRON_RUN_AS_NODE` is set (some editor terminals, such as VS Code's, set it), so Electron runs as plain Node.js | Clear it, then `npm start` again. PowerShell: `Remove-Item Env:ELECTRON_RUN_AS_NODE` · Command Prompt: `set ELECTRON_RUN_AS_NODE=` · bash / zsh: `unset ELECTRON_RUN_AS_NODE` |
+| `running scripts is disabled on this system` when typing `npm` in PowerShell | PowerShell's execution policy blocks npm's `.ps1` shim | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, or type `npm.cmd`, or use Command Prompt |
 
 ## Install
 
-* **CLI and library:** Node.js 20 or newer. `npx seefast`, or `npm install -g seefast`. Four pure-JavaScript
-  dependencies, no install scripts, no native build step.
-* **Desktop launcher:** `app/` (Electron); see [The launcher](#the-launcher). It bundles its own runtime.
-* **From source:** `npm ci && npm run build && node dist/cli.js <folder>`.
+* **From source (today):** see [Quick start](#quick-start).
+* **CLI and library, once published:** `npx seefast`, or `npm install -g seefast`. Node.js 20 or newer. Four
+  pure-JavaScript dependencies, no install scripts, no native build step.
+* **Desktop launcher:** `app/` (Electron; Node.js 22.12 or newer to install and start it); see
+  [Desktop launcher](#desktop-launcher) and [The launcher](#the-launcher).
 
 ## Commands
+
+From a clone without `npm link`, type `node dist/cli.js` where these say `seefast`.
 
 ```
 seefast [path]                     the setup guide (same as `guide`)
@@ -148,9 +197,11 @@ screen, the overview or Settings) lists the languages, framework recipes and ser
 tables and `recipes/` / `kb/` files as `seefast support`, so a new recipe shows up there without UI changes.
 
 ```bash
-npm ci && npm run build
-cd app && npm ci && node node_modules/electron/install.js && npm start   # npm 11+ skips Electron's download script
+npm ci && npm run build          # in the repository root: the launcher uses this build
+cd app && npm ci && npm start    # the first start downloads Electron
 ```
+
+If it does not open, see [If it does not start](#if-it-does-not-start).
 
 * Drag it anywhere; it remembers its place per display and stays on screen when monitors change. A drag is never
   taken for a click.
@@ -225,7 +276,7 @@ Also exported: `checkPlan`, `planDigest`, `renderExplain`, `renderSetupMd`, `ren
 
 ```bash
 npm ci && npm run build
-npm test                         # 174 tests: fixtures, real-world traps, guarantees, consent, doctor, geometry, parsers
+npm test                         # 194 tests: fixtures, real-world traps, guarantees, consent, doctor, diagnosis, geometry, parsers
 UPDATE_EXPECTED=1 npm test       # regenerate test/expected/*.json after reviewing the change
 node scripts/make-crlf-fixture.mjs
 cd app && npm run smoke          # drive the real launcher window (unset ELECTRON_RUN_AS_NODE in VS Code terminals)
